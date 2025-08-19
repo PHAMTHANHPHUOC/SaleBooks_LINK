@@ -1,2 +1,2 @@
-from . import view_KhachHang
+from . import view_count
 

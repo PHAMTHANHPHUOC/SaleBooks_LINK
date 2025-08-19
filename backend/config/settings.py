@@ -172,7 +172,6 @@ REST_FRAMEWORK = {
 CORS_ALLOW_ALL_ORIGINS = True  # Chỉ dùng cho development
 CORS_ALLOW_CREDENTIALS = True
 
-AUTH_USER_MODEL = 'core.KhachHang'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'

@@ -176,29 +176,10 @@ export default {
       align-items: center;
       gap: calc(var(--space) * 0.8);
     }
-    .shop-now-wrapper {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    margin: 32px 0;
-  }
+   
 
     /* Shop button */
     .shop-now-btn {
-      display: inline-block;
-      padding: 16px 38px;
-      border: 3px solid #2563eb;
-      border-radius: 40px;
-      background: #fff;
-      color: #1a1a1a;
-      font-weight: 800;
-      font-size: 1.18rem;
-      letter-spacing: .04em;
-      text-decoration: none;
-      transition: background .18s, color .18s, box-shadow .18s;
-      box-shadow: 0 2px 12px rgba(37,99,235,0.07);
-      text-align: center;
-    }.shop-now-btn {
       display: inline-block;
       padding: 16px 38px;
       border: 3px solid #2563eb;
@@ -391,61 +372,51 @@ export default {
       font-size: 1rem;
       text-align: center;
     }
+    /* Animations */
+       /* Responsive: all mobile under 820px */
+@media (max-width: 820px) {
+  body { font-size: 16.5px; }
+  .bogiki-linktree { padding: 10px 8px 20px; max-width: 100vw; gap: 12px; }
+  .main-btn { gap: 10px; border-radius: 18px; margin: 0 auto 8px; }
+  .btn-icon { width: 22px; height: 22px; }
+  .shop-now-btn {
+    padding: 10px 22px;
+    border: 2px solid #2563eb;
+    border-radius: 28px;
+    font-size: 1rem;
+    box-shadow: 0 1px 6px rgba(37,99,235,0.07);
+  }
+  .shop-now-btn:hover {
+    background: #2563eb;
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(37,99,235,0.13);
+  }
+  .avatar-circle { width: 120px; height: 120px; }
+  .avatar-img { width: 90px; height: 90px; }
+  .brand { font-size: 1.5rem; }
+  .section-title, .product-title { font-size: 1.1rem; margin: 12px 0 6px; }
+  .social-list { gap: 8px; }
+  .social-btn { width: 38px; height: 38px; }
+  .social-btn img { width: 22px; height: 22px; }
+  .product-list { grid-template-columns: 1fr 1fr; }
+  .card { width: 100%;
+  aspect-ratio: 3 / 4; /* giữ tỉ lệ card */
+  overflow: hidden;
+  display: flex; }
+  .card-img-top  { width: 100%; height: 100%; display: block; flex: 1 0 0;}
+  .product-name  { font-size: 1rem; margin: 4px 0 2px; }
+  .product-price { font-size: 1.05rem; }
+}
 
-    /* Responsive: all mobile under 820px */
-    @media (max-width: 820px) {
-      body { font-size: 16.5px; }
-      .bogiki-linktree { padding: 10px 8px 20px; max-width: 100vw; gap: 12px; }
-      .main-btn { gap: 10px; border-radius: 18px; margin: 0 auto 8px; }
-      .btn-icon { width: 22px; height: 22px; }
-      .shop-now-btn {
-        padding: 10px 22px;
-        border: 2px solid #2563eb;
-        border-radius: 28px;
-        font-size: 1rem;
-        box-shadow: 0 1px 6px rgba(37,99,235,0.07);
-      }
-      .shop-now-btn:hover {
-        background: #2563eb;
-        color: #fff;
-        box-shadow: 0 4px 16px rgba(37,99,235,0.13);
-      }
-      .avatar-circle { width: 120px; height: 120px; }
-      .avatar-img { width: 90px; height: 90px; }
-      .brand { font-size: 1.5rem; }
-      .section-title, .product-title { font-size: 1.1rem; margin: 12px 0 6px; }
-      .social-list { gap: 8px; }
-      .social-btn { width: 38px; height: 38px; }
-      .social-btn img { width: 22px; height: 22px; }
-      .product-list { grid-template-columns: 1fr 1fr; }
-      .card { width: 100%;
-      aspect-ratio: 3 / 4; /* giữ tỉ lệ card */
-      overflow: hidden;
-      display: flex; }
-      .card-img-top {
-      width: 100%;
-      height: 100%;
-      object-fit: cover; /* lấp đầy card, có thể cắt hình nếu cần */
-      object-position: center; 
-      border-radius: 0;
-      background: #f3f4f6;
-      display: block;
-      flex: 1 0 0;
-    }
-
-      .product-name { font-size: 1rem; margin: 4px 0 2px; }
-      .product-price { font-size: 1.05rem; }
-    }
-
-    /* Subtle animation */
-    @keyframes floatIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .bogiki-linktree > * { animation: floatIn .5s ease both; }
-    .bogiki-linktree > *:nth-child(1) { animation-delay: .02s; }
-    .bogiki-linktree > *:nth-child(2) { animation-delay: .06s; }
-    .bogiki-linktree > *:nth-child(3) { animation-delay: .1s; }
-    .bogiki-linktree > *:nth-child(4) { animation-delay: .14s; }
-    .bogiki-linktree > *:nth-child(5) { animation-delay: .18s; }
+/* Subtle animation */
+@keyframes floatIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.bogiki-linktree > * { animation: floatIn .5s ease both; }
+.bogiki-linktree > *:nth-child(1) { animation-delay: .02s; }
+.bogiki-linktree > *:nth-child(2) { animation-delay: .06s; }
+.bogiki-linktree > *:nth-child(3) { animation-delay: .1s; }
+.bogiki-linktree > *:nth-child(4) { animation-delay: .14s; }
+.bogiki-linktree > *:nth-child(5) { animation-delay: .18s; }
 </style>
