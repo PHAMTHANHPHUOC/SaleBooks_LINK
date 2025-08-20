@@ -27,6 +27,7 @@ load_dotenv()
 # OpenAI Configuration
 # API key mới từ tài khoản OpenAI
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY',"keyyy" )
+AUTH_USER_MODEL = 'core.KhachHang'
 
 
 # Quick-start development settings - unsuitable for production

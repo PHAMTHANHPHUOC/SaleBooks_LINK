@@ -38,92 +38,21 @@
     <a class="main-btn" href="#" target="_blank" rel="noopener">Bogiki Coloring Community</a>
     <a class="main-btn" href="#" target="_blank" rel="noopener">Free Digital Coloring Pages</a>
 
-    <!-- Product Section -->
-    <div class="product-section">
-      <div class="product-title">Fantasy</div>
-      <div class="product-list">
-        <a href="https://www.amazon.com/Life-Jar-Featuring-Whimsical-Relaxation/dp/B0FBLXTT2Q" target="_blank" class="product-link">
-          <div class="card" style="width: 21rem;">
-            <img src="https://m.media-amazon.com/images/I/71dlHGN2PfL._SL1000_.jpg" class="card-img-top" alt="...">
+    <!-- Product Section: For từng loại sản phẩm -->
+    <div v-for="type in productTypes" :key="type.id" class="product-section">
+      <div class="product-title">{{ type.ten_loai }}</div>
+      <div style="margin-bottom: 550px;" class="product-list ">
+        <a v-for="product in type.products" :key="product.id" :href="product.duong_dan_ngoai" target="_blank" class="product-link">
+          <div class="card">
+            <img :src="product.anh_dai_dien" class="card-img-top" alt="...">
             <div class="card-body">
-            <div class="product-name">Tiny Fairy</div>
-            <div class="product-price">$9.99</div>
-            </div>
-          </div>
-        </a>
-        <a href="https://www.amazon.com/Tiny-Fairy-Coloring-Featuring-Relaxation/dp/B0FC24T4X1" target="_blank" class="product-link">
-          <div class="card" style="width: 21rem;">
-            <img src="https://m.media-amazon.com/images/I/716nbdXgLtL._SL1000_.jpg" class="card-img-top" alt="...">
-            <div class="card-body">
-            <div class="product-name">Life in Jar</div>
-            <div class="product-price">$9.99</div>
-            </div>
-          </div>
-        </a>
-        <a href="https://www.amazon.com/Meowmaid-Coloring-Featuring-Mermaid-Relaxation/dp/B0FCLNZCS2" target="_blank" class="product-link">
-          <div class="card" style="width: 21rem;">
-            <img src="https://m.media-amazon.com/images/I/714m73Jcp7L._SL1000_.jpg" class="card-img-top" alt="...">
-            <div class="card-body">
-            <div class="product-name">Meowmaid</div>
-            <div class="product-price">$9.99</div>
-            </div>
-          </div>
-        </a>
-        <a href="https://www.amazon.com/Little-Meowmaid-Coloring-Featuring-Relaxation/dp/B0FL2NMHKP" target="_blank" class="product-link">
-          <div class="card" style="width: 21rem;">
-            <img src="https://m.media-amazon.com/images/I/71VG5U0P7tL._SL1000_.jpg" class="card-img-top" alt="...">
-            <div class="card-body">
-           <div class="product-name">Little Meowmaid</div>
-          <div class="product-price">$9.99</div>
+              <div class="product-name">{{ product.ten_san_pham }}</div>
+              <div class="product-price">${{ product.gia_mac_dinh }}</div>
             </div>
           </div>
         </a>
       </div>
-     <div class="shop-now-wrapper" style="width:100%; display:flex; justify-content:center; margin: 550px  10px 0 0;">
-        <a href="#" class="shop-now-btn">SHOP NOW</a>
-      </div>
-    </div>
-    <div class="product-section">
-      <div class="product-title">Fantasy</div>
-      <div class="product-list">
-        <a href="https://www.amazon.com/Life-Jar-Featuring-Whimsical-Relaxation/dp/B0FBLXTT2Q" target="_blank" class="product-link">
-          <div class="card" style="width: 21rem;">
-            <img src="https://m.media-amazon.com/images/I/71dlHGN2PfL._SL1000_.jpg" class="card-img-top" alt="...">
-            <div class="card-body">
-            <div class="product-name">Tiny Fairy</div>
-            <div class="product-price">$9.99</div>
-            </div>
-          </div>
-        </a>
-        <a href="https://www.amazon.com/Tiny-Fairy-Coloring-Featuring-Relaxation/dp/B0FC24T4X1" target="_blank" class="product-link">
-          <div class="card" style="width: 21rem;">
-            <img src="https://m.media-amazon.com/images/I/716nbdXgLtL._SL1000_.jpg" class="card-img-top" alt="...">
-            <div class="card-body">
-            <div class="product-name">Life in Jar</div>
-            <div class="product-price">$9.99</div>
-            </div>
-          </div>
-        </a>
-        <a href="https://www.amazon.com/Meowmaid-Coloring-Featuring-Mermaid-Relaxation/dp/B0FCLNZCS2" target="_blank" class="product-link">
-          <div class="card" style="width: 21rem;">
-            <img src="https://m.media-amazon.com/images/I/714m73Jcp7L._SL1000_.jpg" class="card-img-top" alt="...">
-            <div class="card-body">
-            <div class="product-name">Meowmaid</div>
-            <div class="product-price">$9.99</div>
-            </div>
-          </div>
-        </a>
-        <a href="https://www.amazon.com/Little-Meowmaid-Coloring-Featuring-Relaxation/dp/B0FL2NMHKP" target="_blank" class="product-link">
-          <div class="card" style="width: 21rem;">
-            <img src="https://m.media-amazon.com/images/I/71VG5U0P7tL._SL1000_.jpg" class="card-img-top" alt="...">
-            <div class="card-body">
-           <div class="product-name">Little Meowmaid</div>
-          <div class="product-price">$9.99</div>
-            </div>
-          </div>
-        </a>
-      </div>
-     <div class="shop-now-wrapper" style="width:100%; display:flex; justify-content:center; margin: 550px 0;">
+      <div class="shop-now-wrapper" style="width:100%; display:flex; justify-content:center; ">
         <a href="#" class="shop-now-btn">SHOP NOW</a>
       </div>
     </div>
@@ -135,11 +64,100 @@
 </footer>
 </template>
 <script>
+import axios from 'axios';
 export default {
-  
+  data() {
+    return {
+      productTypes: [] // [{id, ten_loai, products: []}]
+    };
+  },
+  async mounted() {
+    this.loadAllProductTypes();
+    // Gọi API đếm lượt truy cập trang home
+    try {
+      await axios.get('http://127.0.0.1:8000/api/frontend-page-visit/?page=home');
+    } catch (err) {
+      // Có thể log lỗi hoặc bỏ qua
+    }
+  },
+  methods: {
+    async loadAllProductTypes() {
+      try {
+        // Lấy danh sách loại sản phẩm
+        const resType = await axios.get('http://127.0.0.1:8000/products/type/list/');
+        const types = resType.data;
+        // For từng loại, lấy sản phẩm theo id loại
+        const promises = types.map(async (type) => {
+          const resProduct = await axios.get(`http://127.0.0.1:8000/products/type/${type.id}/`);
+          return {
+            ...type,
+            products: resProduct.data.status ? resProduct.data.data : []
+          };
+        });
+        this.productTypes = await Promise.all(promises);
+      } catch (err) {
+        this.productTypes = [];
+      }
+    }
+  }
 }
 </script>
  <style>
+    @media (max-width: 600px) {
+      body { font-size: 14px; }
+      .bogiki-linktree { padding: 4px 1px 8px 1px; gap: 4px; }
+      .main-btn { gap: 4px; border-radius: 10px; margin-bottom: 4px; font-size: 0.9rem; padding: 8px 10px; }
+      .btn-icon { width: 14px; height: 14px; }
+      .shop-now-btn {
+        padding: 6px 10px;
+        border-radius: 12px;
+        font-size: 0.9rem;
+      }
+      .avatar-circle { width: 50px; height: 50px; }
+      .avatar-img { width: 30px; height: 30px; }
+      .brand { font-size: 0.9rem; }
+      .section-title, .product-title { font-size: 0.9rem; margin: 6px 0 2px 0; }
+      .social-list { gap: 2px; }
+      .social-btn { width: 18px; height: 18px; }
+      .social-btn img { width: 10px; height: 10px; }
+      .product-list {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4px;
+        padding: 0;
+      }
+      .shop-now-wrapper {  margin-top: 500px;}
+
+      .card {
+        min-height: 60px;
+        border-radius: 4px;
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        box-sizing: border-box;
+        padding: 2px;
+      }
+      .card-img-top {
+        height: 48px;
+        border-radius: 4px 4px 0 0;
+        width: 100%;
+        object-fit: cover;
+      }
+      .product-name {
+        font-size: 0.75rem;
+        margin: 1px 0 1px 0;
+      }
+      .product-section{
+        margin: 0 0 10px 0;
+      }
+      .product-price {
+        font-size: 0.75rem;
+      }
+  
+      .footer-logo { width: 30px; }
+      .footer-inner { gap: 4px; }
+      .footer-text { font-size: 0.85rem; }
+    }
     :root {
       --bg: #faf9f6;
       --card: #ffffff;
@@ -325,7 +343,6 @@ export default {
       flex-direction: column;
       align-items: center;
       transition: transform .18s ease, box-shadow .18s ease;
-      min-height: 370px;
     }
     .card:hover { transform: translateY(-6px); box-shadow: var(--shadow-hover); }
     .card-img-top {
@@ -400,7 +417,6 @@ export default {
   .social-btn img { width: 22px; height: 22px; }
   .product-list { grid-template-columns: 1fr 1fr; }
   .card { width: 100%;
-  aspect-ratio: 3 / 4; /* giữ tỉ lệ card */
   overflow: hidden;
   display: flex; }
   .card-img-top  { width: 100%; height: 100%; display: block; flex: 1 0 0;}

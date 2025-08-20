@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import SanPham
+from core.models.SanPham import SanPham
 class SanPhamSerializer(serializers.ModelSerializer):
     class Meta:
         model = SanPham
