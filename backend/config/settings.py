@@ -149,6 +149,7 @@ CSRF_TRUSTED_ORIGINS = [
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
+    "192.168.1.28"
 ]
 
 # Static files (CSS, JavaScript, Images)

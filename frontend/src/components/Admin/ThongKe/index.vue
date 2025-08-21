@@ -82,8 +82,9 @@
 </template>
 
 <script>
-import axios from 'axios'
+
 import Chart from 'chart.js/auto'
+import baseRequest from '../../../../src/core/baseRequest';
 
 export default {
   name: 'ColoringBookDashboard',
@@ -124,7 +125,7 @@ export default {
   methods: {
     async fetchVisitStats() {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/api/visits/?page=home")
+        const response = await baseRequest.get("api/visits/?page=home")
         const data = response.data
         
         this.stats = data

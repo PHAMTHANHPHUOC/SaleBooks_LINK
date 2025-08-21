@@ -227,9 +227,12 @@
 </template>
 
 <script>
-import axios from "axios";
+
 import { createToaster } from "@meforma/vue-toaster";
 const toaster = createToaster({ position: "top-right" });
+import baseRequest from '../../../../src/core/baseRequest';
+
+
 export default {
   data() {
     return {
@@ -248,8 +251,8 @@ export default {
   methods: {
     loadLoaiSanPham() {
       this.loading = true;
-      axios
-        .get("http://127.0.0.1:8000/products/type/list/")
+      baseRequest
+        .get("products/type/list/")
         .then((res) => {
           console.log("API Response:", res.data); 
           this.api_response = JSON.stringify(res.data);
@@ -287,9 +290,9 @@ export default {
         return;
       }
       
-      axios
+      baseRequest
         .post(
-          "http://127.0.0.1:8000/products/type/create/",
+          "products/type/create/",
           this.create_loai_san_pham
         )
         .then((res) => {
@@ -314,8 +317,8 @@ export default {
     },
     
     capNhatLoaiSanPham() {
-      axios
-        .post(`http://127.0.0.1:8000/products/type/update/${this.edit_loai_san_pham.id}/`, this.edit_loai_san_pham)
+      baseRequest
+        .post(`products/type/update/${this.edit_loai_san_pham.id}/`, this.edit_loai_san_pham)
         .then((res) => {
           if (res.data.status) {
             toaster.success(res.data.message);
@@ -338,9 +341,9 @@ export default {
     },
     
     xoaLoaiSanPham() {
-      axios
+      baseRequest
         .post(
-          `http://127.0.0.1:8000/products/type/delete/${this.delete_loai_san_pham.id}/`,
+          `products/type/delete/${this.delete_loai_san_pham.id}/`,
           this.delete_loai_san_pham
         )
         .then((res) => {
@@ -365,9 +368,9 @@ export default {
     },
     
     changeStatus(value) {
-      axios
+      baseRequest
         .post(
-          "http://127.0.0.1:8000/products/type/change-status/",
+          "products/type/change-status/",
           value
         )
         .then((res) => {

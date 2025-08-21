@@ -199,9 +199,11 @@
    </div>
 </template>
 <script>
-import axios from "axios";
+
 import { createToaster } from "@meforma/vue-toaster";
 const toaster = createToaster({ position: "top-right" });
+import baseRequest from '../../../../src/core/baseRequest';
+
 export default {
   data() {
     return {
@@ -221,8 +223,8 @@ export default {
   },
   methods: {
     loadLoaiSanPham() {
-      axios
-        .get("http://127.0.0.1:8000/products/type/list/")
+      baseRequest
+        .get("products/type/list/")
         .then((res) => {
           if (res.data && res.data.data) {
             this.loaisanpham = res.data.data;
@@ -237,9 +239,9 @@ export default {
         });
     },
     changeStatus(value) {
-      axios
+      baseRequest
         .post(
-          "http://127.0.0.1:8000/products/change-status/",
+          "products/change-status/",
           value
         )
         .then((res) => {
@@ -264,8 +266,8 @@ export default {
     },
     loadSanPham() {
       this.loading = true;
-      axios
-        .get("http://127.0.0.1:8000/products/data/")
+      baseRequest
+        .get("products/data/")
         .then((res) => {
           console.log("API Response:", res.data); 
           this.api_response = JSON.stringify(res.data);
@@ -307,9 +309,9 @@ export default {
         return;
       }
       
-      axios
+      baseRequest
         .post(
-          "http://127.0.0.1:8000/products/create/",
+          "products/create/",
           this.create_san_pham
         )
         .then((res) => {
@@ -334,8 +336,8 @@ export default {
     },
     
     capNhatSanPham() {
-      axios
-        .post(`http://127.0.0.1:8000/products/update/${this.edit_san_pham.id}/`, this.edit_san_pham)
+      baseRequest
+        .post(`products/update/${this.edit_san_pham.id}/`, this.edit_san_pham)
         .then((res) => {
           if (res.data.status) {
             toaster.success(res.data.message);
@@ -358,9 +360,9 @@ export default {
     },
     
     xoaLoaiSanPham() {
-      axios
+      baseRequest
         .post(
-          `http://127.0.0.1:8000/products/delete/${this.delete_san_pham.id}/`,
+          `products/delete/${this.delete_san_pham.id}/`,
           this.delete_san_pham
         )
         .then((res) => {

@@ -61,7 +61,9 @@
 </footer>
 </template>
 <script>
-import axios from 'axios';
+
+import baseRequest from '../../../../src/core/baseRequest';
+
 export default {
   data() {
     return {
@@ -72,7 +74,7 @@ export default {
     this.loadAllProductTypes();
     // Gọi API đếm lượt truy cập trang home
     try {
-      await axios.get('http://127.0.0.1:8000/api/frontend-page-visit/?page=home');
+      await baseRequest.get('api/frontend-page-visit/?page=home');
     } catch (err) {
       // Có thể log lỗi hoặc bỏ qua
     }
@@ -81,11 +83,11 @@ export default {
     async loadAllProductTypes() {
       try {
         // Lấy danh sách loại sản phẩm
-        const resType = await axios.get('http://127.0.0.1:8000/products/type/list/');
+        const resType = await baseRequest.get('products/type/list/');
         const types = resType.data.filter(type => type.tinh_trang == 1);
         // For từng loại, lấy sản phẩm theo id loại
         const promises = types.map(async (type) => {
-          const resProduct = await axios.get(`http://127.0.0.1:8000/products/type/${type.id}/`);
+          const resProduct = await baseRequest.get(`products/type/${type.id}/`);
           return {
             ...type,
             products: resProduct.data.status ? resProduct.data.data : []
