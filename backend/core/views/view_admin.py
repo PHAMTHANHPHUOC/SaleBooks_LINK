@@ -9,6 +9,11 @@ from rest_framework.authentication import SessionAuthentication,TokenAuthenticat
 from rest_framework.permissions import IsAuthenticated
 from django.http import HttpResponse, JsonResponse
 from rest_framework.authtoken.models import Token
+# python manage.py shell
+# from core.models.KhachHang import KhachHang
+# u = KhachHang.objects.get(email='Admin@gmail.com')
+# u.set_password('123456')
+# u.save()
 @csrf_exempt
 @api_view(['POST'])
 def admin_login(request):
@@ -45,6 +50,8 @@ def admin_login(request):
             'message': 'Tài khoản hoặc mật khẩu không đúng!',
             'status': 0
         }, status=status.HTTP_401_UNAUTHORIZED)
+        
+
 @api_view(['GET'])
 @authentication_classes([TokenAuthentication])
 def check_login(request):

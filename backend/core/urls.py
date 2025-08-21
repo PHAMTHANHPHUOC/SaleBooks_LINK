@@ -16,6 +16,8 @@ path('products/data/', view_sanpham.product_data, name='product_data'),
 path('products/create/', view_sanpham.create_san_pham, name='create_san_pham'),
 path('products/update/<int:id>/', view_sanpham.update_san_pham, name='update_san_pham'),
 path('products/delete/<int:id>/', view_sanpham.delete_san_pham, name='delete_san_pham'),
+path('products/change-status/', view_sanpham.change_san_pham, name='change_san_pham'),
+
 
 
 

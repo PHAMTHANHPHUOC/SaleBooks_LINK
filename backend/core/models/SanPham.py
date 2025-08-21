@@ -4,6 +4,8 @@ from django.db import models
 class LoaiSanPham(models.Model):
     ten_loai = models.CharField(max_length=100, unique=True)  # Tên loại sản phẩm
     tinh_trang = models.IntegerField(default=0)
+    link_danh_muc = models.URLField(blank=True, null=True)  
+    
     # Mô tả loại sản phẩm (tuỳ chọn)
     
     def __str__(self):
@@ -14,8 +16,11 @@ class LoaiSanPham(models.Model):
 class SanPham(models.Model):
     ten_san_pham = models.CharField(max_length=255)   
     duong_dan_ngoai = models.URLField(blank=True, null=True)  
-    gia_mac_dinh = models.BigIntegerField() 
+    gia_mac_dinh = models.BigIntegerField()
+    tinh_trang = models.IntegerField(default=0)
+     
     anh_dai_dien = models.URLField(max_length=500, blank=True, null=True) 
+    
     # Thêm ForeignKey tới LoaiSanPham
     loai_san_pham = models.ForeignKey(
         LoaiSanPham,

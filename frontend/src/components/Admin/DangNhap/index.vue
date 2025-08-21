@@ -3,7 +3,7 @@
     <div class="auth-card">
       <div class="logo-box">
       </div>
-      <h2 class="auth-title">Đăng Nhập AI</h2>
+      <h2 class="auth-title">Đăng Nhập</h2>
       <form class="auth-form">
         <div class="form-group">
           <label>Email</label>

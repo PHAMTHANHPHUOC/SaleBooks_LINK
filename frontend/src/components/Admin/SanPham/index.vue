@@ -24,6 +24,7 @@
                             <label class="form-label">Đường dẫn ngoài</label>
                             <input v-model="create_san_pham.duong_dan_ngoai" type="email" class="form-control" />
                         </div>
+                 
                         <div class="mb-2">
                             <label class="form-label">Giá Tiền</label>
                             <input v-model="create_san_pham.gia_mac_dinh" type="text" class="form-control" />
@@ -32,6 +33,14 @@
                             <label class="form-label">Ảnh bìa</label>
                             <input v-model="create_san_pham.anh_dai_dien" type="text" class="form-control" />
                         </div>
+                        <label class="form-lable mt-2"> Tình Trạng</label>
+                          <select
+                            v-model="create_san_pham.tinh_trang"
+                            class="form-control"
+                          >
+                            <option value="1">Hiển Thị</option>
+                            <option value="0">Tạm Dừng</option>
+                          </select>
 
                         <div class="mb-2">
                             <label>Loại Sản Phẩm</label>
@@ -70,6 +79,7 @@
                             <label class="form-label">Đường dẫn ngoài</label>
                             <input v-model="edit_san_pham.duong_dan_ngoai" type="email" class="form-control" />
                         </div>
+                      
                         <div class="mb-2">
                             <label class="form-label">Giá Tiền</label>
                             <input v-model="edit_san_pham.gia_mac_dinh" type="text" class="form-control" />
@@ -78,7 +88,14 @@
                             <label class="form-label">Ảnh bìa</label>
                             <input v-model="edit_san_pham.anh_dai_dien" type="text" class="form-control" />
                         </div>
-
+                        <label class="form-lable mt-2"> Tình Trạng</label>
+                          <select
+                            v-model="edit_san_pham.tinh_trang"
+                            class="form-control"
+                          >
+                            <option value="1">Hiển Thị</option>
+                            <option value="0">Tạm Dừng</option>
+                          </select>
                         <div class="mb-2">
                             <label>Loại Sản Phẩm</label>
                             <select v-model="edit_san_pham.loai_san_pham" class="form-control mt-2">
@@ -150,6 +167,7 @@
                         <th>Giá</th>
                         <th>Ảnh</th>
                         <th>Loại Sản Phẩm</th>
+                        <th>Tình Trạng</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -161,6 +179,14 @@
                         <td>${{ v.gia_mac_dinh }}</td>
                         <td>{{ v.anh_dai_dien }}</td>
                         <td>{{ getLoaiSanPhamName(v.loai_san_pham) }}</td>
+                        <td class="align-middle text-nowrap text-center">
+                          <template v-if="v.tinh_trang == 1">
+                            <button v-on:click="changeStatus(v)" class="btn btn-success w-100">Hiển Thị</button>
+                          </template>
+                          <template v-else-if="v.tinh_trang == 0">
+                            <button v-on:click="changeStatus(v)" class="btn btn-danger w-100">Tạm Tắt</button>
+                          </template>
+                        </td>
                          <td class="text-center align-middle text-nowrap">
                             <button class="btn btn-info me-2" data-bs-toggle="modal" v-on:click="Object.assign(edit_san_pham, v)" data-bs-target="#editModal">Cập Nhật</button>
                             <button class="btn btn-danger" data-bs-toggle="modal" v-on:click="Object.assign(delete_san_pham, v)" data-bs-target="#deleteModal">Xóa Bỏ</button>
@@ -208,6 +234,32 @@ export default {
         })
         .catch(() => {
           this.loaisanpham = [];
+        });
+    },
+    changeStatus(value) {
+      axios
+        .post(
+          "http://127.0.0.1:8000/products/change-status/",
+          value
+        )
+        .then((res) => {
+          if (res.data.status) {
+            toaster.success(res.data.message);
+            this.loadSanPham();
+            
+          } else {
+            toaster.error(res.data.message);
+          }
+        })
+        .catch((res) => {
+          if (res.response && res.response.data && res.response.data.errors) {
+            const errors = Object.values(res.response.data.errors);
+            errors.forEach((v) => {
+              toaster.error(v[0]);
+            });
+          } else {
+            toaster.error("Có lỗi xảy ra khi thay đổi trạng thái");
+          }
         });
     },
     loadSanPham() {
@@ -337,5 +389,51 @@ export default {
 };
 </script>
 <style >
-    
+    .section-title {
+  width: 100%;
+  color: #2563eb;
+  font-weight: 700;
+  text-align: center;
+  font-size: clamp(1.15rem, 2.5vw, 1.5rem);
+  letter-spacing: 0.04em;
+  margin: 24px 0 10px 0;
+  text-transform: uppercase;
+  background: linear-gradient(90deg, #e0e7ff 0%, #fff 100%);
+  border-radius: 12px;
+  padding: 10px 0 8px 0;
+  box-shadow: 0 2px 12px rgba(37,99,235,0.07);
+  transition: background 0.2s, color 0.2s;
+  position: relative;
+  z-index: 1;
+}
+
+.section-title::after {
+  content: "";
+  display: block;
+  margin: 8px auto 0 auto;
+  width: 48px;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #2563eb 0%, #e75480 100%);
+  opacity: 0.7;
+}
+
+@media (max-width: 600px) {
+  .section-title {
+    font-size: 1rem;
+    padding: 7px 0 6px 0;
+    margin: 14px 0 6px 0;
+  }
+  .section-title::after {
+    width: 32px;
+    height: 2px;
+    margin-top: 5px;
+  }
+}
+.table td:nth-child(3) {
+  max-width: 320px;      /* Giới hạn chiều rộng tối đa */
+  white-space: nowrap;   /* Không xuống dòng */
+  overflow: hidden;      /* Ẩn phần vượt quá */
+  text-overflow: ellipsis; /* Hiển thị ... */
+}
 </style>

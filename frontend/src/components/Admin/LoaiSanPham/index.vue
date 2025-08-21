@@ -12,6 +12,12 @@
             class="form-control mt-1"
             type="text"
           />
+          <label class="form-lable">Link Danh Mục</label>
+          <input
+            v-model="create_loai_san_pham.link_danh_muc"
+            class="form-control mt-1"
+            type="text"
+          />
   
           <label class="form-lable mt-2"> Tình Trạng</label>
           <select
@@ -45,6 +51,9 @@
                   <th class="text-center align-middle text-nowrap">
                     Tên Loại Sản Phẩm
                   </th>
+                  <th class="text-center align-middle text-nowrap">
+                    Link Danh Mục
+                  </th>
                   
                   <th class="text-center align-middle text-nowrap">
                     Tình Trạng
@@ -63,7 +72,8 @@
                 <tr v-else v-for="(v, k) in list_loai_san_pham" :key="k">
                   <th class="text-center align-middle text-nowrap">{{ k + 1 }}</th>
                   <td class="align-middle text-nowrap">{{ v.ten_loai }}</td>
-                  <!-- Sửa lỗi: mo_ta thay vì mota -->
+                  <td class="align-middle text-nowrap">  {{ v.link_danh_muc }}</td>
+                 
           
                   <td class="align-middle text-nowrap text-center">
                     <template v-if="v.tinh_trang == 1">
@@ -172,6 +182,12 @@
                 <label class="form-lable">Tên Sản Phẩm</label>
                 <input
                   v-model="edit_loai_san_pham.ten_loai"
+                  class="form-control mt-1"
+                  type="text"
+                />
+                <label class="form-lable">Link Danh Mục</label>
+                <input
+                  v-model="edit_loai_san_pham.link_danh_muc"
                   class="form-control mt-1"
                   type="text"
                 />

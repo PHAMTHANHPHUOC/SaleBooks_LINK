@@ -2,8 +2,8 @@
   <div class="container">
     <!-- Header -->
     <div class="header">
-      <h1>🎨 Coloring Book Store</h1>
-      <p>Khám phá thế giới màu sắc với những cuốn sách tô màu tuyệt vời</p>
+      <h1>Thống kê lược truy cập</h1>
+
     </div>
 
     <!-- Loading State -->

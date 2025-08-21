@@ -3,7 +3,7 @@
     <!-- Avatar & Name -->
     <div class="profile">
       <div class="avatar-circle">
-        <img class="avatar-img" src="https://www.hngallery.com.my/image/hngallery/image/data/yqBiBGII1595518895.jpg" alt="Avatar" />
+        <img class="avatar-img" src="../../../assets/images/TINY.jpg" alt="Avatar" />
         </div>
       <h1 class="brand">Bogiki Coloring</h1>
     </div>
@@ -11,37 +11,34 @@
     <!-- Social Icons -->
     <div class="section-title">Connect with us</div>
     <div class="social-list">
-      <a href="#" class="social-btn" aria-label="Facebook"><img src="https://img.icons8.com/color/96/000000/facebook.png" alt="Facebook" /></a>
-      <a href="#" class="social-btn" aria-label="Instagram"><img src="https://img.icons8.com/color/96/000000/instagram-new.png" alt="Instagram" /></a>
-      <a href="#" class="social-btn" aria-label="Pinterest"><img src="https://img.icons8.com/color/96/000000/pinterest--v1.png" alt="Pinterest" /></a>
-      <a href="#" class="social-btn" aria-label="YouTube"><img src="https://img.icons8.com/color/96/000000/youtube-play.png" alt="YouTube" /></a>
-      <a href="#" class="social-btn" aria-label="TikTok"><img src="https://img.icons8.com/color/96/000000/tiktok--v1.png" alt="TikTok" /></a>
-     <a href="#" class="social-btn" aria-label="Threads">
-  <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/threads.svg" alt="Threads" style="background:#fff; border-radius:50%;" />
-</a>
-      <a href="#" class="social-btn" aria-label="Reddit"><img src="https://img.icons8.com/color/96/000000/reddit--v1.png" alt="Reddit" /></a>
+      <a target="_blank" rel="noopener"  href="https://www.facebook.com/groups/tinydaisycoloring/" class="social-btn" aria-label="Facebook"><img src="https://img.icons8.com/color/96/000000/facebook.png" alt="Facebook" /></a>
+      <a target="_blank" rel="noopener"  href="https://www.instagram.com/tinydaisy.coloring/?igsh=MWw1bDM0a2NxaDNkYw%3D%3D#" class="social-btn" aria-label="Instagram"><img src="https://img.icons8.com/color/96/000000/instagram-new.png" alt="Instagram" /></a>
+      <a target="_blank" rel="noopener"  href="https://www.youtube.com/channel/UCiyNAJD7uKF4nPa9ahbWhmw" class="social-btn" aria-label="YouTube"><img src="https://img.icons8.com/color/96/000000/youtube-play.png" alt="YouTube" /></a>
+      <a target="_blank" rel="noopener"  href="https://www.tiktok.com/@tinydaisycoloring" class="social-btn" aria-label="TikTok"><img src="https://img.icons8.com/color/96/000000/tiktok--v1.png" alt="TikTok" /></a>
+      
+    
     </div>
 
     <!-- Shop Now -->
     <div class="section-title">Shop now on</div>
-    <a class="main-btn" href="https://amazon.com" target="_blank" rel="noopener">
+    <a class="main-btn" href="https://www.amazon.com/stores/Tiny-Daisy-Publishing/author/B0FBM1HFN7?ref=ap_rdr&isDramIntegrated=true&shoppingPortalEnabled=true&ccs_id=a410f5d1-df8a-4744-8a59-d3158a00958e" target="_blank" rel="noopener">
       <img class="btn-icon" src="https://img.icons8.com/color/96/000000/amazon.png" alt="Amazon" />
       Amazon
     </a>
-    <a class="main-btn" href="https://bogiki.com" target="_blank" rel="noopener">
+    <a class="main-btn" href="https://tinydaisycoloring.com/" target="_blank" rel="noopener">
       <img class="btn-icon" src="https://img.icons8.com/color/96/000000/internet--v1.png" alt="Website" />
-      Bogiki.com
+      tinydaisycoloring.com
     </a>
 
     <!-- Community -->
     <div class="section-title">Connect with me</div>
-    <a class="main-btn" href="#" target="_blank" rel="noopener">Bogiki Coloring Community</a>
-    <a class="main-btn" href="#" target="_blank" rel="noopener">Free Digital Coloring Pages</a>
+    <a class="main-btn" href="https://www.facebook.com/groups/500373872321133/?ref=share&mibextid=K35XfP&rdid=6qcKUvfA2CmMLoop&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2Fg%2FzWCnoaWky8jvFEZ6%2F%3Fmibextid%3DK35XfP#" target="_blank" rel="noopener">Bogiki Coloring Community</a>
+    <a class="main-btn" href="https://drive.google.com/drive/folders/1iABbcQbxquxzQvz6F1pxylGcD6OUxC5O?usp=sharing" target="_blank" rel="noopener">Free Digital Coloring Pages</a>
 
     <!-- Product Section: For từng loại sản phẩm -->
     <div v-for="type in productTypes" :key="type.id" class="product-section">
       <div class="product-title">{{ type.ten_loai }}</div>
-      <div style="margin-bottom: 550px;" class="product-list ">
+      <div class="product-list">
         <a v-for="product in type.products" :key="product.id" :href="product.duong_dan_ngoai" target="_blank" class="product-link">
           <div class="card">
             <img :src="product.anh_dai_dien" class="card-img-top" alt="...">
@@ -52,14 +49,14 @@
           </div>
         </a>
       </div>
-      <div class="shop-now-wrapper" style="width:100%; display:flex; justify-content:center; ">
-        <a href="#" class="shop-now-btn">SHOP NOW</a>
+      <div class="shop-now-wrapper">
+        <a  target="_blank" rel="noopener" :href="type.link_danh_muc" class="shop-now-btn">SHOP NOW</a>
       </div>
     </div>
   </div>
   <footer class="footer">
   <div class="footer-inner">
-    <img src="https://www.hngallery.com.my/image/hngallery/image/data/yqBiBGII1595518895.jpg" alt="Bogiki Logo" class="footer-logo" />
+    <img src="../../../assets/images/TINY.jpg" alt="Bogiki Logo" class="footer-logo" />
   </div>
 </footer>
 </template>
@@ -105,8 +102,8 @@ export default {
  <style>
     @media (max-width: 600px) {
       body { font-size: 14px; }
-      .bogiki-linktree { padding: 4px 1px 8px 1px; gap: 4px; }
-      .main-btn { gap: 4px; border-radius: 10px; margin-bottom: 4px; font-size: 0.9rem; padding: 8px 10px; }
+      .bogiki-linktree { padding: 4px 1px 4px 1px; gap: 2px; }
+      .main-btn { gap: 2px; border-radius: 10px; margin-bottom: 2px; font-size: 0.9rem; padding: 6px 8px; }
       .btn-icon { width: 14px; height: 14px; }
       .shop-now-btn {
         padding: 6px 10px;
@@ -116,17 +113,14 @@ export default {
       .avatar-circle { width: 50px; height: 50px; }
       .avatar-img { width: 30px; height: 30px; }
       .brand { font-size: 0.9rem; }
-      .section-title, .product-title { font-size: 0.9rem; margin: 6px 0 2px 0; }
+      .section-title, .product-title { font-size: 0.9rem; margin: 4px 0 2px 0; }
       .social-list { gap: 2px; }
       .social-btn { width: 18px; height: 18px; }
       .social-btn img { width: 10px; height: 10px; }
-      .product-list {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 4px;
-        padding: 0;
-      }
-      .shop-now-wrapper {  margin-top: 500px;}
+      .product-section { margin: 0 0 10px 0; }
+      
+    .footer { padding: 12px 0 8px 0; }
+    .footer-inner { gap: 2px; }
 
       .card {
         min-height: 60px;
@@ -257,7 +251,7 @@ export default {
     .section-title {
       width: 100%;
       color: var(--brand);
-      font-weight: 800;
+      font-weight: auto;
       text-align: center;
       font-size: clamp(1.05rem, 2.4vw, 1.35rem);
       letter-spacing: .06em;
@@ -334,6 +328,7 @@ export default {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: clamp(16px, 3.2vw, 28px);
+      margin-bottom:10px;
     }
     .card {
       background: var(--card);
@@ -365,6 +360,15 @@ export default {
       font-weight: 800;
       text-align: center;
       font-size: clamp(1.05rem, 2.4vw, 1.3rem);
+    }
+
+    /* Shop now wrapper: căn giữa và chiếm toàn bộ chiều ngang */
+    .shop-now-wrapper {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      margin: 550px 0 20px 0;
+      grid-column: 1 / -1;
     }
 
     /* Footer */
@@ -407,6 +411,13 @@ export default {
     background: #2563eb;
     color: #fff;
     box-shadow: 0 4px 16px rgba(37,99,235,0.13);
+  }
+  .shop-now-wrapper {
+    grid-column: 1 / -1;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: 200px 0 20px 0;
   }
   .avatar-circle { width: 120px; height: 120px; }
   .avatar-img { width: 90px; height: 90px; }

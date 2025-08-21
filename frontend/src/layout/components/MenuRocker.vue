@@ -18,7 +18,7 @@
         <li class="nav-item">
           <router-link to="/admin/quan-ly-loai-san-pham">
             <a class="nav-link" href="/admin/quan-ly-loai-san-pham">
-              <div class="parent-icon"><i class="fa-solid fa-home"></i></div>
+              <div class="parent-icon"><i class="fa-brands fa-product-hunt"></i></div>
               <div class="menu-title">Quản Lý Loại Sản Phẩm</div>
             </a>
           </router-link>
@@ -26,7 +26,7 @@
         <li class="nav-item">
           <router-link to="/admin/quan-ly-san-pham">
             <a class="nav-link" href="/admin/quan-ly-san-pham">
-              <div class="parent-icon"><i class="fa-solid fa-home"></i></div>
+              <div class="parent-icon"><i class="fa-brands fa-skype"></i></div>
               <div class="menu-title">Quản Lý Sản Phẩm</div>
             </a>
           </router-link>
@@ -34,7 +34,7 @@
         <li class="nav-item">
           <router-link to="/admin/quan-ly-thong-ke">
             <a class="nav-link" href="/admin/quan-ly-thong-ke">
-              <div class="parent-icon"><i class="fa-solid fa-home"></i></div>
+              <div class="parent-icon"><i class="fa-solid fa-eye"></i></div>
               <div class="menu-title">Quản Lý Thống Kê</div>
             </a>
           </router-link>
