@@ -122,7 +122,9 @@ def product_data(request):
     """
     try:
         # Giả sử bạn có một mô hình Sản Phẩm
-        san_phams = SanPham.objects.all()  # Thay thế bằng mô hình thực tế của bạn
+        # san_phams = SanPham.objects.all()  # Thay thế bằng mô hình thực tế của bạn
+
+        san_phams = SanPham.objects.filter(loai_san_pham_id=id, loai_san_pham__tinh_trang=1)
         serializer = SanPhamSerializer(san_phams, many=True)
         return Response({
             'status': True,

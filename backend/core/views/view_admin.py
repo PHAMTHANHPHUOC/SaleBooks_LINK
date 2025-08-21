@@ -2,7 +2,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
-from core.models import KhachHang
+from core.models.KhachHang import KhachHang
 from django.contrib.auth import authenticate
 from rest_framework.decorators import authentication_classes,permission_classes
 from rest_framework.authentication import SessionAuthentication,TokenAuthentication
@@ -12,7 +12,7 @@ from rest_framework.authtoken.models import Token
 @csrf_exempt
 @api_view(['POST'])
 def admin_login(request):
-    email = request.data.get('email')
+    email = request.data.get('email','').lower()  # chuyển về chữ thường
     password = request.data.get('password')
     try:
         user = KhachHang.objects.get(email=email)

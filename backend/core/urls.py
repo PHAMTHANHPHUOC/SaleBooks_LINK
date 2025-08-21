@@ -33,7 +33,7 @@ path('products/type/change-status/', view_sanpham.change_loai_san_pham, name='ch
     
 
 
-path('admin/login/',view_admin.admin_login,name='admin_login'),
+path('api/admin/login/',view_admin.admin_login,name='admin_login'),
 path('check_login/',view_admin.check_login),
 path('logout/',view_admin.logout),
 path('logout-all/',view_admin.logout_all),

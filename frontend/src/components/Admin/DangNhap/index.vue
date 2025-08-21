@@ -60,7 +60,7 @@ export default {
   methods: {
     actionDangNhap() {
       baseRequest
-        .post('admin/login/', this.khach_hang)
+        .post('api/admin/login/', this.khach_hang)
         .then((res) => {
           if (res.data.status == 1) {
             console.log(res.data.chia_khoa);

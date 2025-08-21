@@ -85,7 +85,7 @@ export default {
       try {
         // Lấy danh sách loại sản phẩm
         const resType = await axios.get('http://127.0.0.1:8000/products/type/list/');
-        const types = resType.data;
+        const types = resType.data.filter(type => type.tinh_trang == 1);
         // For từng loại, lấy sản phẩm theo id loại
         const promises = types.map(async (type) => {
           const resProduct = await axios.get(`http://127.0.0.1:8000/products/type/${type.id}/`);
