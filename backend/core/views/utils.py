@@ -44,11 +44,66 @@ def update_visit_counter(request: HttpRequest, page_name='homepage'):
     )
     return 
 
-
+def calculate_growth_rate(page_name, period):
+    """Tính tỷ lệ tăng trưởng"""
+    from datetime import datetime, timedelta
+    now = datetime.now()
+    
+    if period == 'day':
+        current_start = now.date()
+        previous_start = current_start - timedelta(days=1)
+        current_count = VisitLog.objects.filter(
+            page_visited=page_name,
+            visit_time__date=current_start
+        ).count()
+        previous_count = VisitLog.objects.filter(
+            page_visited=page_name,
+            visit_time__date=previous_start
+        ).count()
+        
+    elif period == 'week':
+        current_start = now.date() - timedelta(days=now.weekday())
+        previous_start = current_start - timedelta(days=7)
+        current_count = VisitLog.objects.filter(
+            page_visited=page_name,
+            visit_time__date__gte=current_start
+        ).count()
+        previous_count = VisitLog.objects.filter(
+            page_visited=page_name,
+            visit_time__date__gte=previous_start,
+            visit_time__date__lt=current_start
+        ).count()
+        
+    elif period == 'month':
+        current_start = now.replace(day=1).date()
+        if current_start.month == 1:
+            previous_start = current_start.replace(year=current_start.year-1, month=12)
+        else:
+            previous_start = current_start.replace(month=current_start.month-1)
+        
+        current_count = VisitLog.objects.filter(
+            page_visited=page_name,
+            visit_time__date__gte=current_start
+        ).count()
+        previous_count = VisitLog.objects.filter(
+            page_visited=page_name,
+            visit_time__date__gte=previous_start,
+            visit_time__date__lt=current_start
+        ).count()
+    
+    if previous_count == 0:
+        return 100 if current_count > 0 else 0
+    
+    growth = ((current_count - previous_count) / previous_count) * 100
+    return round(growth, 1)
 def get_visit_stats(page_name='homepage'):
     """Lấy thống kê visit"""
     try:
         counter = VisitCounter.objects.get(page_name=page_name)
+        print(f"[DEBUG] Found counter: {counter.page_name} - Total: {counter.total_visits}")
+        
+        # Force refresh từ DB
+        counter.refresh_from_db()
         
         # Thống kê tuần này
         from datetime import datetime, timedelta
@@ -57,6 +112,7 @@ def get_visit_stats(page_name='homepage'):
             page_visited=page_name,
             visit_time__date__gte=week_start
         ).count()
+        print(f"[DEBUG] Week visits query: {week_visits}")
         
         # Thống kê tháng này
         month_start = timezone.now().replace(day=1).date()
@@ -64,6 +120,7 @@ def get_visit_stats(page_name='homepage'):
             page_visited=page_name,
             visit_time__date__gte=month_start
         ).count()
+        print(f"[DEBUG] Month visits query: {month_visits}")
         
         return {
             'total_visits': counter.total_visits,

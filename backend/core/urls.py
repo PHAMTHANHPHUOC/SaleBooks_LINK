@@ -13,7 +13,7 @@ path('api/frontend-page-visit/', view_count.frontend_page_visit, name='frontend_
 
 
 path('products/data/', view_sanpham.product_data, name='product_data'),
-path('products/create/', view_sanpham.create_san_pham, name='create_loai_san_pham'),
+path('products/create/', view_sanpham.create_san_pham, name='create_san_pham'),
 path('products/update/<int:id>/', view_sanpham.update_san_pham, name='update_san_pham'),
 path('products/delete/<int:id>/', view_sanpham.delete_san_pham, name='delete_san_pham'),
 
@@ -34,6 +34,9 @@ path('products/type/change-status/', view_sanpham.change_loai_san_pham, name='ch
 
 
 path('admin/login/',view_admin.admin_login,name='admin_login'),
+path('check_login/',view_admin.check_login),
+path('logout/',view_admin.logout),
+path('logout-all/',view_admin.logout_all),
 
 
 

@@ -16,10 +16,26 @@
     <nav class="navbar navbar-expand-xl w-100">
       <ul class="navbar-nav justify-content-start flex-grow-1 gap-1">
         <li class="nav-item">
-          <router-link to="/">
-            <a class="nav-link" href="/">
+          <router-link to="/admin/quan-ly-loai-san-pham">
+            <a class="nav-link" href="/admin/quan-ly-loai-san-pham">
               <div class="parent-icon"><i class="fa-solid fa-home"></i></div>
-              <div class="menu-title">Home</div>
+              <div class="menu-title">Quản Lý Loại Sản Phẩm</div>
+            </a>
+          </router-link>
+        </li>
+        <li class="nav-item">
+          <router-link to="/admin/quan-ly-san-pham">
+            <a class="nav-link" href="/admin/quan-ly-san-pham">
+              <div class="parent-icon"><i class="fa-solid fa-home"></i></div>
+              <div class="menu-title">Quản Lý Sản Phẩm</div>
+            </a>
+          </router-link>
+        </li>
+        <li class="nav-item">
+          <router-link to="/admin/quan-ly-thong-ke">
+            <a class="nav-link" href="/admin/quan-ly-thong-ke">
+              <div class="parent-icon"><i class="fa-solid fa-home"></i></div>
+              <div class="menu-title">Quản Lý Thống Kê</div>
             </a>
           </router-link>
         </li>
