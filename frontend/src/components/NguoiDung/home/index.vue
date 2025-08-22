@@ -100,7 +100,7 @@ export default {
     },
     async handleClick(productId) {
       try {
-        const res = await baseRequest.post(`san-pham/${productId}/click/`);
+        const res = await baseRequest.post(`api/san-pham/${productId}/click/`);
         console.log(res.data); // => {success: true, message: "..."}
       } catch (error) {
         console.error("Lỗi khi gửi click:", error);
@@ -339,6 +339,7 @@ export default {
       grid-template-columns: repeat(2, 1fr);
       gap: clamp(16px, 3.2vw, 28px);
       margin-bottom:10px;
+      width: 100%;
     }
     .card {
       background: var(--card);
@@ -377,8 +378,8 @@ export default {
       width: 100%;
       display: flex;
       justify-content: center;
-      margin: 550px 0 20px 0;
-      grid-column: 1 / -1;
+      margin: 20px 0;  /* ← Fix: bỏ margin cố định */
+   
     }
 
     /* Footer */
@@ -423,12 +424,12 @@ export default {
     box-shadow: 0 4px 16px rgba(37,99,235,0.13);
   }
   .shop-now-wrapper {
-    grid-column: 1 / -1;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    margin: 200px 0 20px 0;
-  }
+
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin: 15px 0;  /* ← Fix: bỏ margin cố định */
+}
   .avatar-circle { width: 120px; height: 120px; }
   .avatar-img { width: 90px; height: 90px; }
   .brand { font-size: 1.5rem; }

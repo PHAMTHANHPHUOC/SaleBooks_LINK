@@ -75,13 +75,11 @@
           class="product-card"
           :class="getRankClass(index)"
         >
-          <div class="rank">{{ index + 1 }}</div>
-          <div class="image-container">
-            <img :src="sp.anh" :alt="sp.ten" @error="handleImageError" />
-          </div>
-          <div class="content">
-            <h3>{{ sp.ten }}</h3>
-            <div class="views">
+          <div class="card">
+            <img :src="sp.anh" class="card-img-top" alt="...">
+            <div class="card-body">
+              <h4 class="product-name">{{ sp.ten }}</h4>
+              <div class="views">
               👁️ {{ sp.so_luot.toLocaleString() }} lượt xem
             </div>
             <div class="progress">
@@ -89,6 +87,7 @@
                 class="progress-bar"
                 :style="{ width: getProgressWidth(sp.so_luot) + '%' }"
               ></div>
+            </div>
             </div>
           </div>
         </div>
