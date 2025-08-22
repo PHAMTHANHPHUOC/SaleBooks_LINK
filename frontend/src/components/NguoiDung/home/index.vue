@@ -49,9 +49,10 @@
           </div>
         </a>
       </div>
-      <div class="shop-now-wrapper">
+      <div  :style="{ marginTop: calcMargin(type.products.length) + 'px' }" class="shop-now-wrapper">
         <a  target="_blank" rel="noopener" :href="type.link_danh_muc" class="shop-now-btn">SHOP NOW</a>
       </div>
+     
     </div>
   </div>
   <footer class="footer">
@@ -67,8 +68,14 @@ import baseRequest from '../../../../src/core/baseRequest';
 export default {
   data() {
     return {
-      productTypes: [] // [{id, ten_loai, products: []}]
+      productTypes: [], // [{id, ten_loai, products: []}]
+      windowWidth: window.innerWidth 
     };
+  },
+   computed: {
+    isMobile() {
+      return this.windowWidth <= 820; // Dùng computed
+    }
   },
   async mounted() {
     this.loadAllProductTypes();
@@ -78,8 +85,83 @@ export default {
     } catch (err) {
       // Có thể log lỗi hoặc bỏ qua
     }
+    window.addEventListener('resize', () => {
+      this.windowWidth = window.innerWidth;
+    });
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.handleResize);
   },
   methods: {
+     handleResize() {
+      this.windowWidth = window.innerWidth;
+    },
+   
+    calcMargin(cardCount) {
+    if (this.windowWidth <= 820) {
+    if (cardCount <= 2) return -115;      // 1–2 card
+    if (cardCount <= 4) return 160;     // 3–4 card
+    if (cardCount <= 6) return 430;     // 5–6 card
+    if (cardCount <= 8) return 700;     // 7–8 card
+    if (cardCount <= 10) return 970;    // 9–10 card
+    if (cardCount <= 12) return 1240;    // 11–12 card
+    if (cardCount <= 14) return 560;    // 13–14 card
+    if (cardCount <= 16) return 640;    // 15–16 card
+    if (cardCount <= 18) return 720;    // 17–18 card
+    if (cardCount <= 20) return 800;    // 19–20 card
+    return Math.ceil(cardCount / 2) * 80;
+
+  }
+    if (cardCount <= 2) return 90;    // 1–2 card
+    if (cardCount <= 4) return 555;    // 3–4 card
+    if (cardCount <= 6) return 1100;    // 5–6 card
+    if (cardCount <= 8) return 1550;   // 7–8 card
+    if (cardCount <= 10) return 2010;  // 9–10 card
+    if (cardCount <= 12) return 2490;  // 11–12 card
+    if (cardCount <= 14) return 2980;  // 13–14 card
+    if (cardCount <= 16) return 3470;  // 15–16 card
+    if (cardCount <= 18) return 3950;  // 17–18 card
+    if (cardCount <= 20) return 4440;  // 19–20 card
+    
+    
+    // và cứ thế tăng tiếp
+    return Math.ceil(cardCount / 2) * 275;
+  },
+  calcResponsiveMargin(cardCount) {
+  // Check if we're on mobile (you can also use window.innerWidth)
+  const isMobile = window.innerWidth <= 820;
+  
+  if (isMobile) {
+    // Mobile: Much smaller margins
+    if (cardCount <= 2) return 20;    // 1–2 cards
+    if (cardCount <= 4) return 30;    // 3–4 cards
+    if (cardCount <= 6) return 40;    // 5–6 cards
+    if (cardCount <= 8) return 50;    // 7–8 cards
+    if (cardCount <= 10) return 60;   // 9–10 cards
+    
+    // For more cards, increase by 10px per 2 cards
+    return Math.ceil(cardCount / 2) * 10 + 10;
+  } else {
+    // Desktop: Original logic
+    if (cardCount <= 2) return 275;
+    if (cardCount <= 4) return 550;
+    if (cardCount <= 6) return 825;
+    if (cardCount <= 8) return 1100;
+    if (cardCount <= 10) return 1375;
+    if (cardCount <= 12) return 1650;
+    if (cardCount <= 14) return 1925;
+    if (cardCount <= 16) return 2200;
+    if (cardCount <= 18) return 2475;
+    if (cardCount <= 20) return 2750;
+    if (cardCount <= 22) return 3025;
+    if (cardCount <= 24) return 3300;
+    if (cardCount <= 26) return 3575;
+    if (cardCount <= 28) return 3850;
+    if (cardCount <= 30) return 4125;
+    
+    return Math.ceil(cardCount / 2) * 275;
+  }
+},
     async loadAllProductTypes() {
       try {
         // Lấy danh sách loại sản phẩm
@@ -100,7 +182,7 @@ export default {
     },
     async handleClick(productId) {
       try {
-        const res = await baseRequest.post(`api/san-pham/${productId}/click/`);
+        const res = await baseRequest.post(`san-pham/${productId}/click/`);
         console.log(res.data); // => {success: true, message: "..."}
       } catch (error) {
         console.error("Lỗi khi gửi click:", error);
@@ -131,7 +213,13 @@ export default {
       
     .footer { padding: 12px 0 8px 0; }
     .footer-inner { gap: 2px; }
-
+.shop-now-wrapper-mobile {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  grid-column: 1 / -1;
+  margin-top: 20px; /* Cố định 20px cho mobile */
+}
       .card {
         min-height: 60px;
         border-radius: 4px;
@@ -338,9 +426,14 @@ export default {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: clamp(16px, 3.2vw, 28px);
-      margin-bottom:10px;
-      width: 100%;
+    
     }
+    .shop-now-wrapper {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: center;
+  margin-top: 16px; /* chỉ cần ít thôi */
+}
     .card {
       background: var(--card);
       border-radius: 16px;
@@ -378,8 +471,8 @@ export default {
       width: 100%;
       display: flex;
       justify-content: center;
-      margin: 20px 0;  /* ← Fix: bỏ margin cố định */
-   
+      grid-column: 1 / -1;
+      margin-top: 50px;
     }
 
     /* Footer */
@@ -423,13 +516,7 @@ export default {
     color: #fff;
     box-shadow: 0 4px 16px rgba(37,99,235,0.13);
   }
-  .shop-now-wrapper {
 
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  margin: 15px 0;  /* ← Fix: bỏ margin cố định */
-}
   .avatar-circle { width: 120px; height: 120px; }
   .avatar-img { width: 90px; height: 90px; }
   .brand { font-size: 1.5rem; }

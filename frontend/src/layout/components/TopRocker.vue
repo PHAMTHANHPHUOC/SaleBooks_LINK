@@ -135,10 +135,10 @@ export default {
     align-items: center;
 }
 .logo-text {
-    font-size: 22px;
+    font-size: 30px;
     margin-left: 10px;
     margin-bottom: 0;
-    letter-spacing: 1px;
-    color: #0e0f0f;
+    letter-spacing: 2px;
+    color: #494049;
 }
 </style>
