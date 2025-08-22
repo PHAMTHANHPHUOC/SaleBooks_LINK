@@ -35,7 +35,15 @@
           <router-link to="/admin/quan-ly-thong-ke">
             <a class="nav-link" href="/admin/quan-ly-thong-ke">
               <div class="parent-icon"><i class="fa-solid fa-eye"></i></div>
-              <div class="menu-title">Quản Lý Thống Kê</div>
+              <div class="menu-title">Quản Lý Thống Kê Truy Cập</div>
+            </a>
+          </router-link>
+        </li>
+        <li class="nav-item">
+          <router-link to="/admin/quan-ly-thong-ke-san-pham">
+            <a class="nav-link" href="/admin/quan-ly-thong-ke-san-pham">
+              <div class="parent-icon"><i class="fa-solid fa-fire"></i></div>
+              <div class="menu-title">Quản Lý Thống Kê Sản Phẩm</div>
             </a>
           </router-link>
         </li>

@@ -9,22 +9,21 @@ const routes = [
         path: '/admin/quan-ly-loai-san-pham', component: () => import('../components/Admin/LoaiSanPham/index.vue'), 
         meta : {layout : 'client'},
         beforeEnter: KiemTraAdmin,
-
-
     },
     {
         path: '/admin/quan-ly-san-pham', component: () => import('../components/Admin/SanPham/index.vue'), 
         meta : {layout : 'client'},
         beforeEnter: KiemTraAdmin,
-
-
     },
     {
         path: '/admin/quan-ly-thong-ke', component: () => import('../components/Admin/ThongKe/index.vue'), 
         meta : {layout : 'client'},
         beforeEnter: KiemTraAdmin,
-
-
+    },
+    {
+        path: '/admin/quan-ly-thong-ke-san-pham', component: () => import('../components/Admin/ThongKeSanPham/index.vue'), 
+        meta : {layout : 'client'},
+        beforeEnter: KiemTraAdmin,
     },
     {
         path: '/admin/dang-nhap', component: () => import('../components/Admin/DangNhap/index.vue'), 

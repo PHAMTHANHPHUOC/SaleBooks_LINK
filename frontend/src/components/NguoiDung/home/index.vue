@@ -39,7 +39,7 @@
     <div v-for="type in productTypes" :key="type.id" class="product-section">
       <div class="product-title">{{ type.ten_loai }}</div>
       <div class="product-list">
-        <a v-for="product in type.products" :key="product.id" :href="product.duong_dan_ngoai" target="_blank" class="product-link">
+        <a v-for="product in type.products" :key="product.id" :href="product.duong_dan_ngoai"  @click="handleClick(product.id)" target="_blank" class="product-link">
           <div class="card">
             <img :src="product.anh_dai_dien" class="card-img-top" alt="...">
             <div class="card-body">
@@ -97,8 +97,16 @@ export default {
       } catch (err) {
         this.productTypes = [];
       }
-    }
+    },
+    async handleClick(productId) {
+      try {
+        const res = await baseRequest.post(`san-pham/${productId}/click/`);
+        console.log(res.data); // => {success: true, message: "..."}
+      } catch (error) {
+        console.error("Lỗi khi gửi click:", error);
+      }
   }
+}
 }
 </script>
  <style>

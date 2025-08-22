@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 # Bảng loại sản phẩm
 class LoaiSanPham(models.Model):
@@ -32,3 +33,14 @@ class SanPham(models.Model):
 
     def __str__(self):
         return self.ten_san_pham
+
+class SanPhamView(models.Model):
+    san_pham = models.ForeignKey(
+        SanPham,
+        on_delete=models.CASCADE,
+        related_name="views"
+    )
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"{self.san_pham.ten_san_pham} - {self.created_at.strftime('%Y-%m-%d %H:%M:%S')}"

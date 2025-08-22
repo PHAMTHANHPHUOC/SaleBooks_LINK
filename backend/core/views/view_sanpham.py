@@ -1,13 +1,69 @@
 
-from core.models.SanPham import SanPham,LoaiSanPham
+from core.models.SanPham import SanPham,LoaiSanPham,SanPhamView
+from django.shortcuts import get_object_or_404
 from core.serializers import SanPhamSerializer
 from rest_framework.response import Response
 from django.http import JsonResponse
-
+from django.views.decorators.http import require_GET
 from rest_framework import status
 from rest_framework.decorators import api_view
 import logging
+from datetime import timedelta
+from django.db.models import Count
+from django.utils.timezone import now
+
 logger = logging.getLogger(__name__)
+
+
+
+@require_GET
+def top_san_pham(request):
+    loai = request.GET.get("loai", "ngay")  # giá trị: "ngay", "thang", "nam"
+    today = now().date()
+
+    if loai == "ngay":
+        start = today
+    elif loai == "tuan":
+        # Lấy ngày đầu tuần (theo ISO: thứ 2)
+        start = today - timedelta(days=today.weekday())
+    elif loai == "thang":
+        start = today.replace(day=1)
+    elif loai == "nam":
+        start = today.replace(month=1, day=1)
+    else:
+        return JsonResponse({"error": "Tham số 'loai' không hợp lệ"}, status=400)
+
+    views = (
+        SanPhamView.objects.filter(created_at__date__gte=start)
+        .values("san_pham__id", "san_pham__ten_san_pham", "san_pham__anh_dai_dien")
+        .annotate(so_luot=Count("id"))
+        .order_by("-so_luot")[:10]
+    )
+    data = [
+        {
+            "id": v["san_pham__id"],
+            "ten": v["san_pham__ten_san_pham"],
+            "anh": v["san_pham__anh_dai_dien"],
+            "so_luot": v["so_luot"]
+        }
+        for v in views
+    ]
+    return JsonResponse(data, safe=False)
+
+
+@api_view(['POST'])
+def tang_luot_xem(request, pk):
+    if request.method == "POST":
+        sp = get_object_or_404(SanPham, pk=pk)
+        SanPhamView.objects.create(san_pham=sp)
+        return JsonResponse({
+            "success": True,
+            "message": f"Đã ghi nhận click cho sản phẩm {sp.ten_san_pham}"
+        })
+    return JsonResponse({"success": False}, status=400)
+
+
+
 @api_view(['POST'])
 def change_san_pham(request):
     """
