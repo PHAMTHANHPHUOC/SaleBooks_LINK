@@ -9,10 +9,11 @@
     <!-- Filter Tabs -->
     <div class="tabs">
       <button 
-        v-for="tab in tabs" 
-        :key="tab.key"
+        v-for="(tab, index) in tabs" 
+        :key="`tab-${index}`"
         :class="{ 'active': activeTab === tab.key }"
-        @click="loadTop(tab.key)"
+        @click="handleTabClick(tab.key)"
+        :data-key="tab.key"
       >
         {{ tab.icon }} {{ tab.label }}
       </button>
@@ -71,12 +72,14 @@
       <div v-if="viewMode === 'grid'" class="grid">
         <div 
           v-for="(sp, index) in topSanPham" 
-          :key="sp.id"
+          :key="`${activeTab}-${sp.id}`"
           class="product-card"
           :class="getRankClass(index)"
         >
-          <div class="card">
-            <img :src="sp.anh" class="card-img-top" alt="...">
+          
+            <div class="rank">{{ index + 1 }}</div>
+             <div class="card">
+            <img :src="sp.anh" class="card-img-top" @error="handleImageError" alt="...">
             <div class="card-body">
               <h4 class="product-name">{{ sp.ten }}</h4>
               <div class="views">
@@ -90,6 +93,7 @@
             </div>
             </div>
           </div>
+
         </div>
       </div>
 
@@ -97,7 +101,7 @@
       <div v-else class="list">
         <div 
           v-for="(sp, index) in topSanPham" 
-          :key="sp.id"
+          :key="`${activeTab}-${sp.id}`"
           class="product-row"
           :class="getRankClass(index)"
         >
@@ -154,19 +158,64 @@ export default {
   },
   
   methods: {
+    handleTabClick(tabKey) {
+      console.log('Tab clicked:', tabKey);
+      
+      // Nếu tabKey undefined, lấy từ event
+      if (!tabKey) {
+        const event = arguments[0];
+        if (event && event.target) {
+          tabKey = event.target.getAttribute('data-key');
+          console.log('Got key from data-key:', tabKey);
+        }
+      }
+      
+      if (!tabKey) {
+        console.error('Cannot determine tab key');
+        return;
+      }
+      
+      this.loadTop(tabKey);
+    },
+    
     async loadTop(loai) {
+      console.log('loadTop called with:', loai);
+      
+      if (!loai) {
+        console.error('loai is undefined!');
+        return;
+      }
+      
+      // Reset dữ liệu trước khi load
+      this.topSanPham = [];
       this.loading = true;
       this.error = null;
       this.activeTab = loai;
       
       try {
-        const res = await baseRequest.get(`san-pham/top/`, {
-          params: { loai }
-        });
+        console.log('Loading data for:', loai);
+        
+        // Thử 2 cách gọi API
+        let res;
+        try {
+          // Cách 1: với params object
+          res = await baseRequest.get(`san-pham/top/`, {
+            params: { loai: loai }
+          });
+        } catch (e) {
+          console.log('Cách 1 thất bại, thử cách 2');
+          // Cách 2: trực tiếp trong URL
+          res = await baseRequest.get(`san-pham/top/?loai=${loai}`);
+        }
+        
+        console.log('Full response:', res);
+        console.log('Response data:', res.data);
+        
         this.topSanPham = res.data || [];
       } catch (error) {
         this.error = "Không thể tải dữ liệu. Vui lòng thử lại.";
         console.error("Lỗi khi load top sản phẩm:", error);
+        console.error("Error details:", error.response);
       } finally {
         this.loading = false;
       }
@@ -178,6 +227,7 @@ export default {
     },
     
     getProgressWidth(views) {
+      if (this.topSanPham.length === 0) return 0;
       const maxViews = Math.max(...this.topSanPham.map(sp => sp.so_luot));
       return maxViews > 0 ? (views / maxViews) * 100 : 0;
     },
@@ -199,6 +249,8 @@ export default {
   },
   
   mounted() {
+    console.log('Component mounted');
+    console.log('Tabs data:', this.tabs);
     this.loadTop("ngay");
   }
 };

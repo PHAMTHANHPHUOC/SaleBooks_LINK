@@ -32,6 +32,14 @@
           </router-link>
         </li>
         <li class="nav-item">
+          <router-link to="/admin/quan-ly-link">
+            <a class="nav-link" href="/admin/quan-ly-link">
+              <div class="parent-icon"><i class="fa-solid fa-link-slash"></i></div>
+              <div class="menu-title">Quản Lý Link Mạng Xã Hội</div>
+            </a>
+          </router-link>
+        </li>
+        <li class="nav-item">
           <router-link to="/admin/quan-ly-thong-ke">
             <a class="nav-link" href="/admin/quan-ly-thong-ke">
               <div class="parent-icon"><i class="fa-solid fa-eye"></i></div>

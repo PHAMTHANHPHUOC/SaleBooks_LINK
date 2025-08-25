@@ -29,10 +29,11 @@
                             <label class="form-label">Giá Tiền</label>
                             <input v-model="create_san_pham.gia_mac_dinh" type="text" class="form-control" />
                         </div>
-                        <div class="mb-2">
-                            <label class="form-label">Ảnh bìa</label>
-                            <input v-model="create_san_pham.anh_dai_dien" type="text" class="form-control" />
-                        </div>
+                       <div class="mb-2">
+                        <label class="form-label">Ảnh bìa</label>
+                        <input type="file" class="form-control" @change="onFileChange" />
+                      </div>
+
                         <label class="form-lable mt-2"> Tình Trạng</label>
                           <select
                             v-model="create_san_pham.tinh_trang"
@@ -56,7 +57,7 @@
                             Close
                         </button>
                         <button v-on:click="createSanPham()" class="btn btn-primary" data-bs-dismiss="modal">
-                            Thêm Mới
+                            Thêm Mới
                         </button>
                     </div>
                 </div>
@@ -85,8 +86,14 @@
                             <input v-model="edit_san_pham.gia_mac_dinh" type="text" class="form-control" />
                         </div>
                         <div class="mb-2">
-                            <label class="form-label">Ảnh bìa</label>
-                            <input v-model="edit_san_pham.anh_dai_dien" type="text" class="form-control" />
+                            <label class="form-label">Ảnh bìa hiện tại</label>
+                            <div v-if="edit_san_pham.anh_dai_dien" class="mb-2">
+                                <img :src="getFullImageUrl(edit_san_pham.anh_dai_dien)" 
+                                     class="img-thumbnail" 
+                                     style="max-width: 100px; max-height: 100px;" 
+                                     @error="handleImageError" />
+                            </div>
+                            <input type="file" class="form-control" @change="onEditFileChange" />
                         </div>
                         <label class="form-lable mt-2"> Tình Trạng</label>
                           <select
@@ -120,7 +127,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h1 class="modal-title fs-5" id="exampleModalLabel">
-                            Xóa Sản Phẩm
+                            Xóa Sản Phẩm
                         </h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
@@ -148,7 +155,7 @@
                             Close
                         </button>
                         <button type="button" class="btn btn-danger" data-bs-dismiss="modal" v-on:click="xoaLoaiSanPham()">
-                            Xác nhận
+                            Xác nhận
                         </button>
                     </div>
                 </div>
@@ -177,7 +184,18 @@
                         <td>{{ v.ten_san_pham }}</td>
                         <td>{{ v.duong_dan_ngoai }}</td>
                         <td>${{ v.gia_mac_dinh }}</td>
-                        <td>{{ v.anh_dai_dien }}</td>
+                        <td>
+                            <div v-if="v.anh_dai_dien" class="image-container">
+                                <img :src="getFullImageUrl(v.anh_dai_dien)" 
+                                     class="product-image img-thumbnail" 
+                                     @error="handleImageError"
+                                     @click="showImagePreview(getFullImageUrl(v.anh_dai_dien))" />
+                            </div>
+                            <div v-else class="no-image">
+                                <i class="bx bx-image text-muted"></i>
+                                <small class="text-muted">Chưa có ảnh</small>
+                            </div>
+                        </td>
                         <td>{{ getLoaiSanPhamName(v.loai_san_pham) }}</td>
                         <td class="align-middle text-nowrap text-center">
                           <template v-if="v.tinh_trang == 1">
@@ -197,6 +215,21 @@
         </div>
     </div>
    </div>
+
+   <!-- Image Preview Modal -->
+   <div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-labelledby="imagePreviewLabel" aria-hidden="true">
+       <div class="modal-dialog modal-lg">
+           <div class="modal-content">
+               <div class="modal-header">
+                   <h5 class="modal-title" id="imagePreviewLabel">Xem trước ảnh</h5>
+                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+               </div>
+               <div class="modal-body text-center">
+                   <img :src="previewImageUrl" class="img-fluid" style="max-height: 70vh;" />
+               </div>
+           </div>
+       </div>
+   </div>
 </template>
 <script>
 
@@ -214,14 +247,75 @@ export default {
       loaisanpham: [], // Thêm mảng loại sản phẩm
       loading: false,
       debug_mode: true, // Bật debug mode để kiểm tra
-      api_response: null
+      api_response: null,
+      previewImageUrl: '', // Thêm để preview ảnh
+      baseUrl: '' // Thêm base URL
     };
   },
   mounted() {
+    this.initializeBaseUrl();
     this.loadSanPham();
     this.loadLoaiSanPham();
   },
   methods: {
+    
+    // Khởi tạo base URL từ baseRequest
+    initializeBaseUrl() {
+      // Giả sử baseRequest có thuộc tính baseURL hoặc defaults.baseURL
+      this.baseUrl = baseRequest.defaults?.baseURL || 'http://192.168.1.28:8000';
+      // Đảm bảo không có dấu / cuối
+      this.baseUrl = this.baseUrl.replace(/\/$/, '');
+    },
+
+    // Tạo URL đầy đủ cho ảnh
+    getFullImageUrl(imagePath) {
+      if (!imagePath) return '';
+      
+      // Nếu đã là URL đầy đủ thì return luôn
+      if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+        return imagePath;
+      }
+      
+      // Nếu không bắt đầu bằng / thì thêm vào
+      if (!imagePath.startsWith('/')) {
+        imagePath = '/' + imagePath;
+      }
+      
+      return this.baseUrl + imagePath;
+    },
+
+    // Xử lý lỗi khi không tải được ảnh
+    handleImageError(event) {
+      event.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0zMCAyMEMyNi42ODYzIDIwIDI0IDIyLjY4NjMgMjQgMjZDMjQgMjkuMzEzNyAyNi42ODYzIDMyIDMwIDMyQzMzLjMxMzcgMzIgMzYgMjkuMzEzNyAzNiAyNkMzNiAyMi42ODYzIDMzLjMxMzcgMjAgMzAgMjBaIiBmaWxsPSIjOUNBM0FGIi8+CjxwYXRoIGQ9Ik0xNiA0MEw0NCA0MEw0MCAzNkwzNiAzMkwyOCAzNkwyMCAzMkwxNiAzNloiIGZpbGw9IiM5Q0EzQUYiLz4KPC9zdmc+';
+      event.target.alt = 'Không thể tải ảnh';
+    },
+
+    // Hiển thị preview ảnh
+    showImagePreview(imageUrl) {
+      this.previewImageUrl = imageUrl;
+      // Sử dụng Bootstrap modal
+      const modal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
+      modal.show();
+    },
+
+    // Xử lý file upload cho thêm mới
+    onFileChange(event) {
+      const file = event.target.files[0];
+      if (file) {
+        // Có thể thêm logic upload file ở đây
+        this.create_san_pham.anh_dai_dien = file;
+      }
+    },
+
+    // Xử lý file upload cho chỉnh sửa
+    onEditFileChange(event) {
+      const file = event.target.files[0];
+      if (file) {
+        // Có thể thêm logic upload file ở đây
+        this.edit_san_pham.new_image = file;
+      }
+    },
+    
     loadLoaiSanPham() {
       baseRequest
         .get("products/type/list/")
@@ -437,5 +531,43 @@ export default {
   white-space: nowrap;   /* Không xuống dòng */
   overflow: hidden;      /* Ẩn phần vượt quá */
   text-overflow: ellipsis; /* Hiển thị ... */
+}
+
+/* CSS cho hiển thị ảnh */
+.image-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.product-image {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.product-image:hover {
+  transform: scale(1.1);
+}
+
+.no-image {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60px;
+  color: #6c757d;
+}
+
+.no-image i {
+  font-size: 24px;
+  margin-bottom: 4px;
+}
+
+.no-image small {
+  font-size: 10px;
 }
 </style>

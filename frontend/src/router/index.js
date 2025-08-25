@@ -16,6 +16,11 @@ const routes = [
         beforeEnter: KiemTraAdmin,
     },
     {
+        path: '/admin/quan-ly-link', component: () => import('../components/Admin/LinkMangXaHoi/index.vue'), 
+        meta : {layout : 'client'},
+        beforeEnter: KiemTraAdmin,
+    },
+    {
         path: '/admin/quan-ly-thong-ke', component: () => import('../components/Admin/ThongKe/index.vue'), 
         meta : {layout : 'client'},
         beforeEnter: KiemTraAdmin,

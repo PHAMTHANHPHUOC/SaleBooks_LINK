@@ -1,7 +1,7 @@
 from django.urls import path,re_path
-from .views import view_count,view_sanpham,view_admin
-
-
+from .views import view_count,view_sanpham,view_admin,view_link
+from django.conf import settings
+from django.conf.urls.static import static
 
 app_name = 'core'
 
@@ -45,7 +45,11 @@ path('logout-all/',view_admin.logout_all),
 
 
 
-
+path('api/links/', view_link.get_links_api, name='get_links'),
+path('api/links/list/', view_link.get_list_links, name='get_list_links'),
+path('api/link/create/',view_link.create_link,name='create_link'),
+path('api/link/delete/<int:id>/',view_link.delete_link,name='delete_link'),
+path('api/link/update/<int:id>/',view_link.update_link,name='update_link'),
 
 
     
@@ -53,7 +57,8 @@ path('logout-all/',view_admin.logout_all),
 
 
 ]
-
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
 

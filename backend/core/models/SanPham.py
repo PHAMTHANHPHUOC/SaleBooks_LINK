@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from rest_framework import serializers
 
 # Bảng loại sản phẩm
 class LoaiSanPham(models.Model):
@@ -17,10 +18,9 @@ class LoaiSanPham(models.Model):
 class SanPham(models.Model):
     ten_san_pham = models.CharField(max_length=255)   
     duong_dan_ngoai = models.URLField(blank=True, null=True)  
-    gia_mac_dinh = models.BigIntegerField()
+    gia_mac_dinh = models.CharField(max_length=50)
     tinh_trang = models.IntegerField(default=0)
-     
-    anh_dai_dien = models.URLField(max_length=500, blank=True, null=True) 
+    anh_dai_dien = models.ImageField(upload_to='avatars/', blank=True, null=True)
     
     # Thêm ForeignKey tới LoaiSanPham
     loai_san_pham = models.ForeignKey(

@@ -5,35 +5,33 @@
       <div class="avatar-circle">
         <img class="avatar-img" src="../../../assets/images/TINY.jpg" alt="Avatar" />
         </div>
-      <h1 class="brand">Bogiki Coloring</h1>
+      <h1 class="brand">Tiny Daisy</h1>
     </div>
 
     <!-- Social Icons -->
     <div class="section-title">Connect with us</div>
     <div class="social-list">
-      <a target="_blank" rel="noopener"  href="https://www.facebook.com/groups/tinydaisycoloring/" class="social-btn" aria-label="Facebook"><img src="https://img.icons8.com/color/96/000000/facebook.png" alt="Facebook" /></a>
-      <a target="_blank" rel="noopener"  href="https://www.instagram.com/tinydaisy.coloring/?igsh=MWw1bDM0a2NxaDNkYw%3D%3D#" class="social-btn" aria-label="Instagram"><img src="https://img.icons8.com/color/96/000000/instagram-new.png" alt="Instagram" /></a>
-      <a target="_blank" rel="noopener"  href="https://www.youtube.com/channel/UCiyNAJD7uKF4nPa9ahbWhmw" class="social-btn" aria-label="YouTube"><img src="https://img.icons8.com/color/96/000000/youtube-play.png" alt="YouTube" /></a>
-      <a target="_blank" rel="noopener"  href="https://www.tiktok.com/@tinydaisycoloring" class="social-btn" aria-label="TikTok"><img src="https://img.icons8.com/color/96/000000/tiktok--v1.png" alt="TikTok" /></a>
-      
-    
+      <a target="_blank" rel="noopener"  :href="list_link.Facebook" class="social-btn" aria-label="Facebook"><img src="https://img.icons8.com/color/96/000000/facebook.png" alt="Facebook" /></a>
+      <a target="_blank" rel="noopener"  :href="list_link.Instagram" class="social-btn" aria-label="Instagram"><img src="https://img.icons8.com/color/96/000000/instagram-new.png" alt="Instagram" /></a>
+      <a target="_blank" rel="noopener"  :href="list_link.YouTube" class="social-btn" aria-label="YouTube"><img src="https://img.icons8.com/color/96/000000/youtube-play.png" alt="YouTube" /></a>
+      <a target="_blank" rel="noopener"  :href="list_link.TikTok" class="social-btn" aria-label="TikTok"><img src="https://img.icons8.com/color/96/000000/tiktok--v1.png" alt="TikTok" /></a>
     </div>
 
     <!-- Shop Now -->
     <div class="section-title">Shop now on</div>
-    <a class="main-btn" href="https://www.amazon.com/stores/Tiny-Daisy-Publishing/author/B0FBM1HFN7?ref=ap_rdr&isDramIntegrated=true&shoppingPortalEnabled=true&ccs_id=a410f5d1-df8a-4744-8a59-d3158a00958e" target="_blank" rel="noopener">
+    <a class="main-btn" :href="list_link.Amazon" target="_blank" rel="noopener">
       <img class="btn-icon" src="https://img.icons8.com/color/96/000000/amazon.png" alt="Amazon" />
       Amazon
     </a>
-    <a class="main-btn" href="https://tinydaisycoloring.com/" target="_blank" rel="noopener">
+    <a class="main-btn" :href="list_link.Website" target="_blank" rel="noopener">
       <img class="btn-icon" src="https://img.icons8.com/color/96/000000/internet--v1.png" alt="Website" />
       tinydaisycoloring.com
     </a>
 
     <!-- Community -->
     <div class="section-title">Connect with me</div>
-    <a class="main-btn" href="https://www.facebook.com/groups/500373872321133/?ref=share&mibextid=K35XfP&rdid=6qcKUvfA2CmMLoop&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2Fg%2FzWCnoaWky8jvFEZ6%2F%3Fmibextid%3DK35XfP#" target="_blank" rel="noopener">Bogiki Coloring Community</a>
-    <a class="main-btn" href="https://drive.google.com/drive/folders/1iABbcQbxquxzQvz6F1pxylGcD6OUxC5O?usp=sharing" target="_blank" rel="noopener">Free Digital Coloring Pages</a>
+    <a class="main-btn" :href="list_link.Bogiki" target="_blank" rel="noopener">Bogiki Coloring Community</a>
+    <a class="main-btn" :href="list_link.FreeDigital" target="_blank" rel="noopener">Free Digital Coloring Pages</a>
 
     <!-- Product Section: For từng loại sản phẩm -->
     <div v-for="type in productTypes" :key="type.id" class="product-section">
@@ -49,125 +47,228 @@
           </div>
         </a>
       </div>
-      <div  :style="{ marginTop: calcMargin(type.products.length) + 'px' }" class="shop-now-wrapper">
-        <a  target="_blank" rel="noopener" :href="type.link_danh_muc" class="shop-now-btn">SHOP NOW</a>
+      <!-- Enhanced calcMargin for multiple devices -->
+      <div :style="{ marginTop: calcMargin(type.products.length) + 'px' }" class="shop-now-wrapper">
+        <a target="_blank" rel="noopener" :href="type.link_danh_muc" class="shop-now-btn">SHOP NOW</a>
       </div>
-     
     </div>
   </div>
+  
   <footer class="footer">
-  <div class="footer-inner">
-    <img src="../../../assets/images/TINY.jpg" alt="Bogiki Logo" class="footer-logo" />
-  </div>
-</footer>
+    <div class="footer-inner">
+      <img src="../../../assets/images/TINY.jpg" alt="Bogiki Logo" class="footer-logo" />
+    </div>
+  </footer>
 </template>
-<script>
 
+<script>
 import baseRequest from '../../../../src/core/baseRequest';
 
 export default {
   data() {
     return {
       productTypes: [], // [{id, ten_loai, products: []}]
-      windowWidth: window.innerWidth 
+      windowWidth: window.innerWidth,
+      list_link : [],
+      windowHeight: window.innerHeight
     };
   },
-   computed: {
+  computed: {
     isMobile() {
-      return this.windowWidth <= 820; // Dùng computed
+      return this.windowWidth <= 820;
+    },
+    deviceType() {
+      const width = this.windowWidth;
+      const height = this.windowHeight;
+      const aspectRatio = width / height;
+      
+      // Phân loại thiết bị chi tiết
+      if (width <= 375) return 'small-phone';      // iPhone SE, iPhone 12 mini
+      if (width <= 390) return 'pro-phone';      // iPhone SE, iPhone 12 mini
+      if (width <= 414) return 'medium-phone';     // iPhone XR, iPhone 12/13/14
+      if (width <= 480) return 'large-phone';      // iPhone 14 Pro Max, Pixel 7
+      if (width <= 768) return 'tablet-portrait';  // iPad portrait
+      if (width <= 820) return 'tablet-landscape'; // iPad landscape
+      if (width <= 1024) return 'small-tablet';    // iPad Air
+      if (width <= 1366) return 'laptop';          // Small laptops
+      return 'desktop';
     }
   },
   async mounted() {
+    this.loadlink();
     this.loadAllProductTypes();
-    // Gọi API đếm lượt truy cập trang home
     try {
       await baseRequest.get('api/frontend-page-visit/?page=home');
     } catch (err) {
-      // Có thể log lỗi hoặc bỏ qua
+      // Handle error
     }
-    window.addEventListener('resize', () => {
-      this.windowWidth = window.innerWidth;
-    });
+    window.addEventListener('resize', this.handleResize);
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.handleResize);
   },
   methods: {
-     handleResize() {
+    handleResize() {
       this.windowWidth = window.innerWidth;
+      this.windowHeight = window.innerHeight;
     },
    
+    // Enhanced calcMargin for multiple devices
     calcMargin(cardCount) {
-    if (this.windowWidth <= 820) {
-    if (cardCount <= 2) return -115;      // 1–2 card
-    if (cardCount <= 4) return 160;     // 3–4 card
-    if (cardCount <= 6) return 430;     // 5–6 card
-    if (cardCount <= 8) return 700;     // 7–8 card
-    if (cardCount <= 10) return 970;    // 9–10 card
-    if (cardCount <= 12) return 1240;    // 11–12 card
-    if (cardCount <= 14) return 560;    // 13–14 card
-    if (cardCount <= 16) return 640;    // 15–16 card
-    if (cardCount <= 18) return 720;    // 17–18 card
-    if (cardCount <= 20) return 800;    // 19–20 card
-    return Math.ceil(cardCount / 2) * 80;
+      const deviceType = this.deviceType;
+      const width = this.windowWidth;
+     
+     switch (deviceType) {
+  case 'small-phone': // iPhone SE (375px)
+    if (cardCount <= 2) return -110;
+    if (cardCount <= 4) return 160;
+    if (cardCount <= 6) return 440;
+    if (cardCount <= 8) return 700;
+    if (cardCount <= 10) return 980;
+    if (cardCount <= 12) return 1250;
+    if (cardCount <= 14) return 1520;
+    if (cardCount <= 16) return 1790;
+    if (cardCount <= 18) return 2060;
+    if (cardCount <= 20) return 2330;
+  case 'pro-phone': // iPhone 12pro (390px)
+    if (cardCount <= 2) return -110;
+    if (cardCount <= 4) return 180;
+    if (cardCount <= 6) return 450;
+    if (cardCount <= 8) return 730;
+    if (cardCount <= 10) return 1000;
+    if (cardCount <= 12) return 1280 ;
+    if (cardCount <= 14) return 1560;
+    if (cardCount <= 16) return 1835;
+    if (cardCount <= 18) return 2120;
+    if (cardCount <= 20) return 2400;
 
-  }
-    if (cardCount <= 2) return 90;    // 1–2 card
+  case 'medium-phone': // iPhone XR, 12/13/14 (414px)
+    if (cardCount <= 2) return -90;
+    if (cardCount <= 4) return 200;
+    if (cardCount <= 6) return 480;
+    if (cardCount <= 8) return 770;
+    if (cardCount <= 10) return 1070;
+    if (cardCount <= 12) return 1350;
+    if (cardCount <= 14) return 1640;
+    if (cardCount <= 16) return 1920;
+    if (cardCount <= 18) return 2210;
+    if (cardCount <= 20) return 2500;
+
+  case 'large-phone': // iPhone 14 Pro Max, Pixel 7 (428-480px)
+    if (cardCount <= 2) return -88;
+    if (cardCount <= 4) return 220;
+    if (cardCount <= 6) return 520;
+    if (cardCount <= 8) return 820;
+    if (cardCount <= 10) return 1120;
+    if (cardCount <= 12) return 1420;
+    if (cardCount <= 14) return 1720;
+    if (cardCount <= 16) return 2020;
+    if (cardCount <= 18) return 2320;
+    if (cardCount <= 20) return 2620;
+
+  case 'tablet-portrait': // iPad portrait (768px)
+    if (cardCount <= 2) return 90;
+    if (cardCount <= 4) return 590;
+    if (cardCount <= 6) return 1080;
+    if (cardCount <= 8) return 1560;
+    if (cardCount <= 10) return 2070;
+    if (cardCount <= 12) return 2550;
+    if (cardCount <= 14) return 3040;
+    if (cardCount <= 16) return 3530;
+    if (cardCount <= 18) return 4020;
+    if (cardCount <= 20) return 4510;
+
+  case 'tablet-landscape': // iPad landscape (820px)
+    if (cardCount <= 2) return 110;
+    if (cardCount <= 4) return 630;
+    if (cardCount <= 6) return 1160;
+    if (cardCount <= 8) return 1670;
+    if (cardCount <= 10) return 2170;
+    if (cardCount <= 12) return 2680;
+    if (cardCount <= 14) return 3190;
+    if (cardCount <= 16) return 3700;
+    if (cardCount <= 18) return 4210;
+    if (cardCount <= 20) return 4720;
+
+  case 'small-tablet': // iPad Air (1024px)
+    if (cardCount <= 3) return 90;
+    if (cardCount <= 6) return 1070;
+    if (cardCount <= 9) return 1550;
+    if (cardCount <= 12) return 2050;
+    if (cardCount <= 15) return 2530;
+    if (cardCount <= 18) return 3010;
+    if (cardCount <= 21) return 3490;
+
+  default: // Desktop (1920px+)
+    if (cardCount <= 2) return 90;     // 1–2 card
     if (cardCount <= 4) return 555;    // 3–4 card
-    if (cardCount <= 6) return 1100;    // 5–6 card
-    if (cardCount <= 8) return 1550;   // 7–8 card
+    if (cardCount <= 6) return 1050;   // 5–6 card
+    if (cardCount <= 8) return 1530;   // 7–8 card
     if (cardCount <= 10) return 2010;  // 9–10 card
     if (cardCount <= 12) return 2490;  // 11–12 card
     if (cardCount <= 14) return 2980;  // 13–14 card
-    if (cardCount <= 16) return 3470;  // 15–16 card
+    if (cardCount <= 16) return 3460;  // 15–16 card
     if (cardCount <= 18) return 3950;  // 17–18 card
     if (cardCount <= 20) return 4440;  // 19–20 card
-    
-    
-    // và cứ thế tăng tiếp
-    return Math.ceil(cardCount / 2) * 275;
-  },
-  calcResponsiveMargin(cardCount) {
-  // Check if we're on mobile (you can also use window.innerWidth)
-  const isMobile = window.innerWidth <= 820;
-  
-  if (isMobile) {
-    // Mobile: Much smaller margins
-    if (cardCount <= 2) return 20;    // 1–2 cards
-    if (cardCount <= 4) return 30;    // 3–4 cards
-    if (cardCount <= 6) return 40;    // 5–6 cards
-    if (cardCount <= 8) return 50;    // 7–8 cards
-    if (cardCount <= 10) return 60;   // 9–10 cards
-    
-    // For more cards, increase by 10px per 2 cards
-    return Math.ceil(cardCount / 2) * 10 + 10;
-  } else {
-    // Desktop: Original logic
-    if (cardCount <= 2) return 275;
-    if (cardCount <= 4) return 550;
-    if (cardCount <= 6) return 825;
-    if (cardCount <= 8) return 1100;
-    if (cardCount <= 10) return 1375;
-    if (cardCount <= 12) return 1650;
-    if (cardCount <= 14) return 1925;
-    if (cardCount <= 16) return 2200;
-    if (cardCount <= 18) return 2475;
-    if (cardCount <= 20) return 2750;
-    if (cardCount <= 22) return 3025;
-    if (cardCount <= 24) return 3300;
-    if (cardCount <= 26) return 3575;
-    if (cardCount <= 28) return 3850;
-    if (cardCount <= 30) return 4125;
-    
-    return Math.ceil(cardCount / 2) * 275;
-  }
-},
+}
+     
+      
+    },
+
+    // Alternative method: calcMargin with aspect ratio consideration
+    calcMarginWithAspectRatio(cardCount) {
+      const width = this.windowWidth;
+      const height = this.windowHeight;
+      const aspectRatio = width / height;
+      const isPortrait = aspectRatio < 1;
+      const isSquareish = aspectRatio >= 1 && aspectRatio <= 1.3;
+      const isWide = aspectRatio > 1.3;
+
+      // Base margin calculation
+      let baseMargin;
+      if (width <= 375) baseMargin = 80;
+      else if (width <= 414) baseMargin = 90;
+      else if (width <= 480) baseMargin = 100;
+      else if (width <= 768) baseMargin = 140;
+      else if (width <= 1024) baseMargin = 170;
+      else baseMargin = 200;
+
+      // Adjust based on aspect ratio
+      let aspectMultiplier = 1;
+      if (isPortrait) aspectMultiplier = 0.9;  // Tighter spacing for portrait
+      else if (isWide) aspectMultiplier = 1.2; // More spacing for wide screens
+
+      const rows = Math.ceil(cardCount / 2);
+      return Math.round(baseMargin * aspectMultiplier * (rows - 0.5));
+    },
+
+    // Method with device pixel ratio consideration
+    calcMarginWithDPR(cardCount) {
+      const width = this.windowWidth;
+      const dpr = window.devicePixelRatio || 1;
+      
+      // Adjust for high-DPI displays
+      let dpiMultiplier = 1;
+      if (dpr >= 3) dpiMultiplier = 0.85;      // iPhone retina
+      else if (dpr >= 2) dpiMultiplier = 0.9; // Most modern phones
+      
+      // Base calculation
+      let margin;
+      if (width <= 414) {
+        margin = Math.ceil(cardCount / 2) * 95 * dpiMultiplier;
+      } else if (width <= 768) {
+        margin = Math.ceil(cardCount / 2) * 140 * dpiMultiplier;
+      } else {
+        margin = Math.ceil(cardCount / 4) * 170 * dpiMultiplier;
+      }
+      
+      return Math.round(margin);
+    },
+
     async loadAllProductTypes() {
       try {
-        // Lấy danh sách loại sản phẩm
         const resType = await baseRequest.get('products/type/list/');
         const types = resType.data.filter(type => type.tinh_trang == 1);
-        // For từng loại, lấy sản phẩm theo id loại
         const promises = types.map(async (type) => {
           const resProduct = await baseRequest.get(`products/type/${type.id}/`);
           return {
@@ -180,18 +281,36 @@ export default {
         this.productTypes = [];
       }
     },
+    
     async handleClick(productId) {
       try {
         const res = await baseRequest.post(`san-pham/${productId}/click/`);
-        console.log(res.data); // => {success: true, message: "..."}
+        console.log(res.data);
       } catch (error) {
         console.error("Lỗi khi gửi click:", error);
       }
+    },
+    loadlink() {
+      baseRequest
+        .get("api/links/")
+        .then((res) => {
+          if (res.data && res.data.data) {
+            this.list_link = res.data.data;
+          } else if (Array.isArray(res.data)) {
+            this.list_link = res.data;
+          } else {
+            this.list_link = {};
+          }
+        })
+        .catch(() => {
+          this.list_link = {};
+        });
+    },
   }
 }
-}
 </script>
- <style>
+
+<style>
     @media (max-width: 600px) {
       body { font-size: 14px; }
       .bogiki-linktree { padding: 4px 1px 4px 1px; gap: 2px; }
@@ -448,17 +567,20 @@ export default {
     border-radius: 16px 16px 0 0;
     }
     .product-name {
-      font-weight: 700;
-      font-size: clamp(1rem, 2.2vw, 1.2rem);
-      text-align: center;
-      margin: 6px 6px 2px;
-      display: -webkit-box;       /* tạo hộp linh hoạt */
-      -webkit-line-clamp: 1;      /* giới hạn 2 dòng */
-      -webkit-box-orient: vertical;
-      overflow: hidden;           /* ẩn phần dư */
-      text-overflow: ellipsis;    /* dấu … nếu quá dài */
-      line-height: 1.2em;         /* chỉnh khoảng cách dòng */
-    }
+        font-weight: 700;
+        font-size: clamp(1rem, 2.2vw, 1.2rem);
+        text-align: center;
+        margin: 6px 6px 2px;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;      /* tối đa 2 dòng */
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.2em;         /* khoảng cách dòng */
+        
+        /* thêm để giữ đúng 2 dòng luôn */
+        /* min-height: calc(1.2em * 2);  chiều cao bằng 2 dòng */
+      }
     .product-price {
       color: var(--accent);
       font-weight: 800;
@@ -529,7 +651,8 @@ export default {
   overflow: hidden;
   display: flex; }
   .card-img-top  { width: 100%; height: 100%; display: block; flex: 1 0 0;}
-  .product-name  { font-size: 1rem; margin: 4px 0 2px; }
+  .product-name  { font-size: 1rem; margin: 4px 0 2px;   }
+  
   .product-price { font-size: 1.05rem; }
 }
 

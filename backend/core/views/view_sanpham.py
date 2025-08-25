@@ -6,20 +6,22 @@ from rest_framework.response import Response
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, parser_classes
 import logging
 from datetime import timedelta
 from django.db.models import Count
 from django.utils.timezone import now
 
 logger = logging.getLogger(__name__)
-
+from rest_framework.parsers import MultiPartParser, FormParser
 
 
 @require_GET
 def top_san_pham(request):
     loai = request.GET.get("loai", "ngay")  # giá trị: "ngay", "thang", "nam"
+    print(f"Received loai parameter: {loai}")
     today = now().date()
+    print(f"Today: {today}") 
 
     if loai == "ngay":
         start = today
@@ -32,13 +34,14 @@ def top_san_pham(request):
         start = today.replace(month=1, day=1)
     else:
         return JsonResponse({"error": "Tham số 'loai' không hợp lệ"}, status=400)
-
+    print(f"Start date: {start}") 
     views = (
         SanPhamView.objects.filter(created_at__date__gte=start)
         .values("san_pham__id", "san_pham__ten_san_pham", "san_pham__anh_dai_dien")
         .annotate(so_luot=Count("id"))
         .order_by("-so_luot")[:10]
     )
+    print(f"Query count: {views.count()}") 
     data = [
         {
             "id": v["san_pham__id"],
@@ -48,6 +51,7 @@ def top_san_pham(request):
         }
         for v in views
     ]
+    print(f"Response data: {data}")
     return JsonResponse(data, safe=False)
 
 
@@ -88,27 +92,58 @@ def change_san_pham(request):
             'message': str(e)
         }, status=status.HTTP_400_BAD_REQUEST)
 @api_view(['POST'])
+@parser_classes([MultiPartParser, FormParser])  # QUAN TRỌNG: Thêm parser cho file upload
 def create_san_pham(request):
     try:
         ten_san_pham = request.data.get('ten_san_pham')
-        duong_dan_ngoai = request.data.get('duong_dan_ngoai')  # Mặc định là 0 nếu không 
-        gia_mac_dinh = request.data.get('gia_mac_dinh')  # Mặc định là 0 nếu không có
-        anh_dai_dien = request.data.get('anh_dai_dien')  #
-        tinh_trang = request.data.get('tinh_trang', 0)  # Mặc định là 0 nếu không có
-        loai_san_pham_id = request.data.get('loai_san_pham')  # Mặc định là 0 nếu không có
+        duong_dan_ngoai = request.data.get('duong_dan_ngoai')
+        gia_mac_dinh = request.data.get('gia_mac_dinh')
+        
+        # THAY ĐỔI CHÍNH: Lấy file từ request.FILES thay vì request.data
+        anh_dai_dien = request.FILES.get('anh_dai_dien')  # File object, không phải string
+        
+        tinh_trang = request.data.get('tinh_trang', 0)
+        loai_san_pham_id = request.data.get('loai_san_pham')
         loai_san_pham = LoaiSanPham.objects.get(id=loai_san_pham_id) if loai_san_pham_id else None        
         
-        SanPham.objects.create(
+        # Validate file nếu cần
+        if anh_dai_dien:
+            # Kiểm tra kích thước file
+            if anh_dai_dien.size > 5 * 1024 * 1024:  # 5MB
+                return JsonResponse({'status': False, 'error': 'File quá lớn (>5MB)'}, status=400)
+            
+            # Kiểm tra định dạng file
+            allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp']
+            file_extension = anh_dai_dien.name.split('.')[-1].lower()
+            if file_extension not in allowed_extensions:
+                return JsonResponse({
+                    'status': False, 
+                    'error': f'Định dạng file không được hỗ trợ. Chỉ chấp nhận: {", ".join(allowed_extensions)}'
+                }, status=400)
+        
+        san_pham = SanPham.objects.create(
             ten_san_pham=ten_san_pham,
             duong_dan_ngoai=duong_dan_ngoai,
             gia_mac_dinh=gia_mac_dinh,
-            anh_dai_dien=anh_dai_dien,
+            anh_dai_dien=anh_dai_dien,  # File object - Django tự động lưu
             tinh_trang=tinh_trang,
             loai_san_pham=loai_san_pham
         )
-        return JsonResponse({'status': True, 'message': 'thêm loại sản phẩm thành công.'})
+        
+        # Trả về thông tin bao gồm URL của ảnh đã upload
+        response_data = {
+            'status': True, 
+            'message': 'Thêm sản phẩm thành công.',
+            'data': {
+                'id': san_pham.id,
+                'ten_san_pham': san_pham.ten_san_pham,
+                'anh_dai_dien_url': san_pham.anh_dai_dien.url if san_pham.anh_dai_dien else None
+            }
+        }
+        return JsonResponse(response_data)
+        
     except Exception as e:
-            return JsonResponse({'status': False, 'error': str(e)}, status=400)
+        return JsonResponse({'status': False, 'error': str(e)}, status=400)
 @api_view(['POST'])
 def delete_san_pham(request, id):
     try:
@@ -128,6 +163,8 @@ def update_san_pham(request, id):
         data.anh_dai_dien = request.data.get('anh_dai_dien')
         data.loai_san_pham_id = request.data.get('loai_san_pham')  # Cập nhật loại sản phẩm nếu có
         data.save()
+        
+        print(type(data.gia_mac_dinh))
         return Response({
             'status': True,
             'message': 'Đã cập nhật loại sản phẩm thành công!'
