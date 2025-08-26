@@ -398,60 +398,126 @@ export default {
     },
     
     createSanPham() {
-      if (!this.create_san_pham.ten_san_pham || this.create_san_pham.ten_san_pham.trim() === "") {
-        toaster.error("Vui lòng nhập tên sản phẩm");
-        return;
+  if (!this.create_san_pham.ten_san_pham || this.create_san_pham.ten_san_pham.trim() === "") {
+    toaster.error("Vui lòng nhập tên sản phẩm");
+    return;
+  }
+  
+  // Tạo FormData để gửi file
+  const formData = new FormData();
+  formData.append('ten_san_pham', this.create_san_pham.ten_san_pham);
+  formData.append('duong_dan_ngoai', this.create_san_pham.duong_dan_ngoai || '');
+  formData.append('gia_mac_dinh', this.create_san_pham.gia_mac_dinh || '0');
+  formData.append('tinh_trang', this.create_san_pham.tinh_trang || '0');
+  formData.append('loai_san_pham', this.create_san_pham.loai_san_pham || '');
+  
+  // Thêm file nếu có
+  if (this.create_san_pham.anh_dai_dien) {
+    formData.append('anh_dai_dien', this.create_san_pham.anh_dai_dien);
+  }
+  
+  // Gửi với FormData (không set Content-Type, browser tự set)
+  baseRequest
+    .post("products/create/", formData, {
+      headers: {
+        // Không set Content-Type, để browser tự động set multipart/form-data
       }
-      
-      baseRequest
-        .post(
-          "products/create/",
-          this.create_san_pham
-        )
-        .then((res) => {
-          if (res.data.status) {
-            toaster.success(res.data.message);
-            this.create_san_pham = {};
-            this.loadSanPham();
-          } else {
-            toaster.error(res.data.message);
-          }
-        })
-        .catch((res) => {
-          if (res.response && res.response.data && res.response.data.errors) {
-            const errors = Object.values(res.response.data.errors);
-            errors.forEach((v) => {
-              toaster.error(v[0]);
-            });
-          } else {
-            toaster.error("Có lỗi xảy ra khi thêm mới");
-          }
+    })
+    .then((res) => {
+      if (res.data.status) {
+        toaster.success(res.data.message);
+        this.create_san_pham = {};
+        // Reset file input
+        document.querySelector('input[type="file"]').value = '';
+        this.loadSanPham();
+      } else {
+        toaster.error(res.data.message);
+      }
+    })
+    .catch((res) => {
+      if (res.response && res.response.data && res.response.data.errors) {
+        const errors = Object.values(res.response.data.errors);
+        errors.forEach((v) => {
+          toaster.error(v[0]);
         });
-    },
+      } else {
+        toaster.error("Có lỗi xảy ra khi thêm mới");
+      }
+    });
+},
     
     capNhatSanPham() {
-      baseRequest
-        .post(`products/update/${this.edit_san_pham.id}/`, this.edit_san_pham)
-        .then((res) => {
-          if (res.data.status) {
-            toaster.success(res.data.message);
-            this.loadSanPham();
+  if (!this.edit_san_pham.ten_san_pham || this.edit_san_pham.ten_san_pham.trim() === "") {
+    toaster.error("Vui lòng nhập tên sản phẩm");
+    return;
+  }
 
-          } else {
-            toaster.error(res.data.message);
-          }
-        })
-        .catch((res) => {
-          if (res.response && res.response.data && res.response.data.errors) {
-            const errors = Object.values(res.response.data.errors);
-            errors.forEach((v) => {
-              toaster.error(v[0]);
-            });
-          } else {
-            toaster.error("Có lỗi xảy ra khi cập nhật");
-          }
-        });
-    },
+  let requestData;
+  let requestConfig = {};
+
+  // Kiểm tra có file mới không
+  const hasNewFile = this.edit_san_pham.new_image;
+  
+  if (hasNewFile) {
+    // Có file mới -> dùng FormData
+    requestData = new FormData();
+    requestData.append('ten_san_pham', this.edit_san_pham.ten_san_pham);
+    requestData.append('duong_dan_ngoai', this.edit_san_pham.duong_dan_ngoai || '');
+    requestData.append('gia_mac_dinh', this.edit_san_pham.gia_mac_dinh || '0');
+    requestData.append('tinh_trang', this.edit_san_pham.tinh_trang || '0');
+    requestData.append('loai_san_pham', this.edit_san_pham.loai_san_pham || '');
+    
+    // Thêm file mới
+    requestData.append('anh_dai_dien', this.edit_san_pham.new_image);
+    
+    // Không set Content-Type, để browser tự động set multipart/form-data
+  } else {
+    // Không có file mới -> dùng JSON
+    const { new_image, ...dataToSend } = this.edit_san_pham; // Loại bỏ new_image khỏi data
+    requestData = dataToSend;
+    requestConfig.headers = {
+      'Content-Type': 'application/json'
+    };
+  }
+
+  baseRequest
+    .post(`products/update/${this.edit_san_pham.id}/`, requestData, requestConfig)
+    .then((res) => {
+      if (res.data.status) {
+        toaster.success(res.data.message);
+        
+        // Reset form và file input
+        this.edit_san_pham = {};
+        const editFileInput = document.querySelector('#editModal input[type="file"]');
+        if (editFileInput) {
+          editFileInput.value = '';
+        }
+        
+        this.loadSanPham();
+      } else {
+        toaster.error(res.data.message);
+      }
+    })
+    .catch((res) => {
+      console.error('Update error:', res);
+      if (res.response && res.response.data) {
+        if (res.response.data.errors) {
+          const errors = Object.values(res.response.data.errors);
+          errors.forEach((v) => {
+            toaster.error(Array.isArray(v) ? v[0] : v);
+          });
+        } else if (res.response.data.error) {
+          toaster.error(res.response.data.error);
+        } else if (res.response.data.message) {
+          toaster.error(res.response.data.message);
+        } else {
+          toaster.error("Có lỗi xảy ra khi cập nhật");
+        }
+      } else {
+        toaster.error("Có lỗi xảy ra khi cập nhật: " + (res.message || 'Unknown error'));
+      }
+    });
+},
     
     xoaLoaiSanPham() {
       baseRequest

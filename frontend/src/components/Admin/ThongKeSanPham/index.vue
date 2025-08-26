@@ -79,7 +79,14 @@
           
             <div class="rank">{{ index + 1 }}</div>
              <div class="card">
-            <img :src="sp.anh" class="card-img-top" @error="handleImageError" alt="...">
+             <img 
+                :src="getFullImageUrl(sp.anh)"
+                :alt="sp.ten || 'Sản phẩm'"
+                class="product-image"
+                @error="handleImageError"
+                @click="showImagePreview(getFullImageUrl(sp.anh))"
+                loading="lazy"
+              />
             <div class="card-body">
               <h4 class="product-name">{{ sp.ten }}</h4>
               <div class="views">
@@ -107,7 +114,13 @@
         >
           <div class="rank">{{ index + 1 }}</div>
           <div class="thumbnail">
-            <img :src="sp.anh" :alt="sp.ten" @error="handleImageError" />
+            <img 
+                :src="getFullImageUrl(sp.anh)"
+                :alt="sp.ten || 'Sản phẩm'"
+                @error="handleImageError"
+                @click="showImagePreview(getFullImageUrl(sp.anh))"
+                loading="lazy"
+              />
           </div>
           <div class="details">
             <h4>{{ sp.ten }}</h4>
@@ -138,6 +151,7 @@ export default {
       error: null,
       activeTab: 'ngay',
       viewMode: 'grid',
+      baseUrl: '',
       tabs: [
         { key: 'ngay', label: 'Hôm nay', icon: '📅' },
         { key: 'tuan', label: 'Tuần này', icon: '🗓️' }, 
@@ -158,6 +172,7 @@ export default {
   },
   
   methods: {
+    
     handleTabClick(tabKey) {
       console.log('Tab clicked:', tabKey);
       
@@ -238,17 +253,67 @@ export default {
       if (index === 2) return 'rank-3';
       return '';
     },
-    
-    handleImageError(event) {
-      event.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik03NSA3NUgxMjVWMTI1SDc1Vjc1WiIgZmlsbD0iI0Q1RDlERCIvPgo8L3N2Zz4K';
-    },
-    
     retry() {
       this.loadTop(this.activeTab);
-    }
+    },
+    getFullImageUrl(imagePath) {
+  if (!imagePath) {
+    console.log('No image path provided');
+    return this.getSimpleDefaultImage();
+  }
+  
+  // Nếu đã là URL đầy đủ thì return luôn
+  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+    return imagePath;
+  }
+  
+  // Nếu không có baseUrl thì khởi tạo lại
+  if (!this.baseUrl) {
+    this.initializeBaseUrl();
+  }
+  
+  // Xử lý đường dẫn để thêm /media
+  let processedPath = imagePath;
+  
+  // Nếu không bắt đầu bằng / thì thêm vào
+  if (!processedPath.startsWith('/')) {
+    processedPath = '/' + processedPath;
+  }
+  
+  // Nếu không có /media ở đầu thì thêm vào
+  if (!processedPath.startsWith('/media/')) {
+    processedPath = '/media' + processedPath;
+  }
+  
+  const fullUrl = this.baseUrl + processedPath;
+  console.log('Full image URL:', fullUrl);
+  return fullUrl;
+},
+    showImagePreview(imageUrl) {
+      this.previewImageUrl = imageUrl;
+      // Sử dụng Bootstrap modal
+      const modal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
+      modal.show();
+    },
+    handleImageError(event) {
+      event.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0zMCAyMEMyNi42ODYzIDIwIDI0IDIyLjY4NjMgMjQgMjZDMjQgMjkuMzEzNyAyNi42ODYzIDMyIDMwIDMyQzMzLjMxMzcgMzIgMzYgMjkuMzEzNyAzNiAyNkMzNiAyMi42ODYzIDMzLjMxMzcgMjAgMzAgMjBaIiBmaWxsPSIjOUNBM0FGIi8+CjxwYXRoIGQ9Ik0xNiA0MEw0NCA0MEw0MCAzNkwzNiAzMkwyOCAzNkwyMCAzMkwxNiAzNloiIGZpbGw9IiM5Q0EzQUYiLz4KPC9zdmc+';
+      event.target.alt = 'Không thể tải ảnh';
+    },
+     initializeBaseUrl() {
+      // Lấy baseURL từ baseRequest
+      this.baseUrl = baseRequest.defaults?.baseURL || 
+                    baseRequest.defaults?.url || 
+                    baseRequest.config?.baseURL ||
+                    'http://localhost:8000'; // fallback
+      
+      // Bỏ dấu / cuối nếu có
+      this.baseUrl = this.baseUrl.replace(/\/$/, '');
+      console.log('Base URL:', this.baseUrl); // Debug
+    },
   },
   
   mounted() {
+    this.initializeBaseUrl();
     console.log('Component mounted');
     console.log('Tabs data:', this.tabs);
     this.loadTop("ngay");

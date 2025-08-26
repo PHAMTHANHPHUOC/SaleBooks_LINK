@@ -1,10 +1,10 @@
 <template>
   <div class="card">
     <div class="row">
-      <div class="col">
-        <h3 class="card-title">Danh sách sản phẩm</h3>
+      <div class="col m-2">
+        <h3 class="card-title">Danh sách sản phẩm </h3><h5 style="color: brown;" >(Không Nên xóa link nào vì nó ảnh hường đến hệ thống)</h5>
       </div>
-      <div class="col text-end">
+      <div class="col text-end m-2">
         <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#exampleModal">
           Thêm Sản Phẩm
         </button>

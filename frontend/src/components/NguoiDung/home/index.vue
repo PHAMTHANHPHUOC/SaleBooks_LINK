@@ -39,7 +39,10 @@
       <div class="product-list">
         <a v-for="product in type.products" :key="product.id" :href="product.duong_dan_ngoai"  @click="handleClick(product.id)" target="_blank" class="product-link">
           <div class="card">
-            <img :src="product.anh_dai_dien" class="card-img-top" alt="...">
+            <img :src="getFullImageUrl(product.anh_dai_dien)" 
+                                     class="card-img-top" 
+                                     @error="handleImageError"
+                                     @click="showImagePreview(getFullImageUrl(product.anh_dai_dien))" />
             <div class="card-body">
               <div class="product-name">{{ product.ten_san_pham }}</div>
               <div class="product-price">${{ product.gia_mac_dinh }}</div>
@@ -57,6 +60,17 @@
   <footer class="footer">
     <div class="footer-inner">
       <img src="../../../assets/images/TINY.jpg" alt="Bogiki Logo" class="footer-logo" />
+    <a 
+  :href="list_link.Email" 
+  target="_blank" 
+  rel="noopener" 
+  class="text-decoration-none fw-bold fs-5 text-darkz"
+  
+>
+  hello@tinydaisycoloring.com
+</a>
+
+
     </div>
   </footer>
 </template>
@@ -70,7 +84,8 @@ export default {
       productTypes: [], // [{id, ten_loai, products: []}]
       windowWidth: window.innerWidth,
       list_link : [],
-      windowHeight: window.innerHeight
+      windowHeight: window.innerHeight,
+      baseUrl: '',
     };
   },
   computed: {
@@ -95,6 +110,7 @@ export default {
     }
   },
   async mounted() {
+    this.initializeBaseUrl();
     this.loadlink();
     this.loadAllProductTypes();
     try {
@@ -306,6 +322,43 @@ export default {
           this.list_link = {};
         });
     },
+    getFullImageUrl(imagePath) {
+      if (!imagePath) return '';
+      
+      // Nếu đã là URL đầy đủ thì return luôn
+      if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+        return imagePath;
+      }
+      
+      // Nếu không bắt đầu bằng / thì thêm vào
+      if (!imagePath.startsWith('/')) {
+        imagePath = '/' + imagePath;
+      }
+      
+      return this.baseUrl + imagePath;
+    },
+    showImagePreview(imageUrl) {
+      this.previewImageUrl = imageUrl;
+      // Sử dụng Bootstrap modal
+      const modal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
+      modal.show();
+    },
+    handleImageError(event) {
+      event.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0zMCAyMEMyNi42ODYzIDIwIDI0IDIyLjY4NjMgMjQgMjZDMjQgMjkuMzEzNyAyNi42ODYzIDMyIDMwIDMyQzMzLjMxMzcgMzIgMzYgMjkuMzEzNyAzNiAyNkMzNiAyMi42ODYzIDMzLjMxMzcgMjAgMzAgMjBaIiBmaWxsPSIjOUNBM0FGIi8+CjxwYXRoIGQ9Ik0xNiA0MEw0NCA0MEw0MCAzNkwzNiAzMkwyOCAzNkwyMCAzMkwxNiAzNloiIGZpbGw9IiM5Q0EzQUYiLz4KPC9zdmc+';
+      event.target.alt = 'Không thể tải ảnh';
+    },
+     initializeBaseUrl() {
+      // Lấy baseURL từ baseRequest
+      this.baseUrl = baseRequest.defaults?.baseURL || 
+                    baseRequest.defaults?.url || 
+                    baseRequest.config?.baseURL ||
+                    'http://localhost:8000'; // fallback
+      
+      // Bỏ dấu / cuối nếu có
+      this.baseUrl = this.baseUrl.replace(/\/$/, '');
+      console.log('Base URL:', this.baseUrl); // Debug
+    },
+    
   }
 }
 </script>

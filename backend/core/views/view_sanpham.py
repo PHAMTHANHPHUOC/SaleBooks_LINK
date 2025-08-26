@@ -152,28 +152,112 @@ def delete_san_pham(request, id):
         return Response({'status': True,'message': 'Đã xóa thành công'})
     except SanPham.DoesNotExist:
         return Response({'status': False,'message': 'Không tìm thấy loại sản phẩm'}, status=status.HTTP_404_NOT_FOUND)
-@api_view(['POST'])  
+from rest_framework.decorators import api_view, parser_classes
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+from rest_framework.response import Response
+from rest_framework import status
+import os
+
+@api_view(['POST'])
+@parser_classes([MultiPartParser, FormParser, JSONParser])
 def update_san_pham(request, id):
     try:
         data = SanPham.objects.get(id=id)
-        data.ten_san_pham = request.data.get('ten_san_pham')
-        data.duong_dan_ngoai = request.data.get('duong_dan_ngoai')
-        data.gia_mac_dinh = request.data.get('gia_mac_dinh')
-        data.tinh_trang = request.data.get('tinh_trang', 0)  # Mặc định là 0 nếu không có
-        data.anh_dai_dien = request.data.get('anh_dai_dien')
-        data.loai_san_pham_id = request.data.get('loai_san_pham')  # Cập nhật loại sản phẩm nếu có
+        
+        # Chỉ cập nhật field khi có dữ liệu
+        ten_san_pham = request.data.get('ten_san_pham')
+        if ten_san_pham:
+            data.ten_san_pham = ten_san_pham
+            
+        duong_dan_ngoai = request.data.get('duong_dan_ngoai')
+        if duong_dan_ngoai is not None:  # Cho phép empty string
+            data.duong_dan_ngoai = duong_dan_ngoai
+            
+        gia_mac_dinh = request.data.get('gia_mac_dinh')
+        if gia_mac_dinh is not None:
+            try:
+                data.gia_mac_dinh = float(gia_mac_dinh)
+            except (ValueError, TypeError):
+                return Response({
+                    'status': False,
+                    'error': 'Giá tiền phải là số'
+                }, status=status.HTTP_400_BAD_REQUEST)
+                
+        tinh_trang = request.data.get('tinh_trang')
+        if tinh_trang is not None:
+            data.tinh_trang = int(tinh_trang)
+            
+        # Xử lý loại sản phẩm (foreign key)
+        loai_san_pham_id = request.data.get('loai_san_pham')
+        if loai_san_pham_id:
+            try:
+                loai_san_pham = LoaiSanPham.objects.get(id=loai_san_pham_id)
+                data.loai_san_pham = loai_san_pham
+            except LoaiSanPham.DoesNotExist:
+                return Response({
+                    'status': False,
+                    'error': 'Loại sản phẩm không tồn tại'
+                }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Xử lý file upload - QUAN TRỌNG: Lấy từ request.FILES
+        anh_dai_dien = request.FILES.get('anh_dai_dien')
+        if anh_dai_dien:
+            # Validate file
+            if anh_dai_dien.size > 5 * 1024 * 1024:  # 5MB
+                return Response({
+                    'status': False,
+                    'error': 'File quá lớn (>5MB)'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Validate file extension
+            allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp']
+            file_extension = anh_dai_dien.name.split('.')[-1].lower()
+            if file_extension not in allowed_extensions:
+                return Response({
+                    'status': False, 
+                    'error': f'Định dạng file không được hỗ trợ. Chỉ chấp nhận: {", ".join(allowed_extensions)}'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Xóa file cũ nếu có
+            if data.anh_dai_dien:
+                try:
+                    if os.path.exists(data.anh_dai_dien.path):
+                        os.remove(data.anh_dai_dien.path)
+                except Exception as e:
+                    print(f"Error deleting old file: {e}")
+            
+            # Gán file mới
+            data.anh_dai_dien = anh_dai_dien
+        
+        # Validate trước khi save
+        if not data.ten_san_pham or data.ten_san_pham.strip() == "":
+            return Response({
+                'status': False,
+                'error': 'Tên sản phẩm không được để trống'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
         data.save()
         
-        print(type(data.gia_mac_dinh))
         return Response({
             'status': True,
-            'message': 'Đã cập nhật loại sản phẩm thành công!'
+            'message': 'Đã cập nhật sản phẩm thành công!',
+            'data': {
+                'id': data.id,
+                'ten_san_pham': data.ten_san_pham,
+                'anh_dai_dien_url': data.anh_dai_dien.url if data.anh_dai_dien else None
+            }
         }, status=status.HTTP_200_OK)
+        
     except SanPham.DoesNotExist:
         return Response({
             'status': False,
             'message': 'Không tìm được sản phẩm để cập nhật!'
         }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({
+            'status': False,
+            'error': str(e)
+        }, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def change_loai_san_pham(request):
