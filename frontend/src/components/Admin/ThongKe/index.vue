@@ -189,13 +189,15 @@ export default {
       currentVisitor: {
         ip: null,
         country: null,
+        country_code: null,
         country_name: null
       },
       activeTab: 'today',
       hourlyChart: null,
       dailyChart: null,
       countryChart: null,
-      refreshInterval: null
+      refreshInterval: null,
+      mockMode: false
     }
   },
   computed: {
@@ -239,8 +241,11 @@ export default {
     this.destroyCharts()
   },
   methods: {
+   
     async initializeTracking() {
       try {
+        // Dev mock via query string (does not call backend)
+
         // Bước 1: Lấy thông tin visitor và ghi nhận lượt truy cập
         await this.detectAndTrackVisitor()
         
@@ -257,19 +262,20 @@ export default {
 
     async detectAndTrackVisitor() {
       try {
-        // ✅ Gọi API Django để lấy IP + location
-        const response = await baseRequest.get("location/?ip=14.241.120.176")
+        // ✅ Gọi API Django để lấy IP + location (không hardcode IP)
+        const response = await baseRequest.get("location/")
 
         const geoData = response.data
         this.currentVisitor = {
           ip: geoData.ip,
-          country: geoData.country,
+          country: geoData.country_code || "VN",
+          country_code: geoData.country_code || "VN",
+          country_name: geoData.country || geoData.country_name || "Vietnam",
           city: geoData.city,
           region: geoData.region
         }
 
-        // ✅ Gửi thông tin về server tracking
-        await this.trackVisit(this.currentVisitor)
+        // ❌ Không gửi tracking từ trang quản trị để tránh tăng lượt khi F5
 
       } catch (error) {
         console.error("Error detecting visitor location:", error)
@@ -279,7 +285,7 @@ export default {
       try {
         const trackingData = {
           ...visitorData,
-          page: 'homepage',
+          page: 'home',
           timestamp: new Date().toISOString(),
           user_agent: navigator.userAgent,
           referrer: document.referrer,
@@ -298,7 +304,7 @@ export default {
 
     async fetchVisitStats() {
       try {
-        const response = await baseRequest.get("api/visits/?page=home&include_countries=true/")
+        const response = await baseRequest.get("api/visits/?page=home&include_countries=true")
         const data = response.data
         
         this.stats = data

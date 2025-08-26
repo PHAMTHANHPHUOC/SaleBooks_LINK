@@ -104,7 +104,8 @@ def coloring_book_detail(request, book_id):
 
 def frontend_page_visit(request):
     """API tính và trả về lượt truy cập cho bất kỳ trang frontend nào (dùng query param 'page')"""
-    page_name = request.GET.get('page', 'frontend_home')
+    # Đồng bộ với dashboard (index.vue) đang đọc thống kê mặc định cho 'home'
+    page_name = request.GET.get('page', 'home')
     counter = update_visit_counter(request, page_name)
     stats = get_visit_stats(page_name)
     return JsonResponse(stats)
@@ -122,17 +123,19 @@ def track_visit(request):
         data = json.loads(request.body)
         
         # Lấy thông tin cơ bản
-        page_name = data.get('page', 'homepage')
-        ip_address = get_client_ip(request)
+        page_name = data.get('page', 'home')
+        # Ưu tiên IP từ payload (được client xác định qua dịch vụ geo) nếu có
+        ip_address = data.get('ip') or get_client_ip(request)
         user_agent = request.META.get('HTTP_USER_AGENT', '')
-        
+        print("Received tracking data:", data)
+
         # Tạo VisitLog mới với thông tin từ frontend
         visit_log = VisitLog.objects.create(
             ip_address=ip_address,
             user_agent=user_agent,
             page_visited=page_name,
             # Thêm các trường mới từ frontend
-            country_code=data.get('country'),
+            country_code=(data.get('country_code') or 'UN')[:2],
             country_name=data.get('country_name'),
             city=data.get('city'),
             region=data.get('region'),

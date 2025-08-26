@@ -1,6 +1,6 @@
 import axios from "axios";
-// const apiUrl = 'http://127.0.0.1:8000/';
-const apiUrl = 'http://192.168.1.28:8000/';
+const apiUrl = 'http://127.0.0.1:8000/';
+// const apiUrl = 'http://192.168.1.28:8000/';
 import { createToaster } from "@meforma/vue-toaster";
 const toaster = createToaster({ position: "top-right" });
 

@@ -4,14 +4,33 @@ from ..models import VisitCounter, VisitLog
 from datetime import date
 from datetime import datetime, timedelta
 from django.db.models import Count
+import geoip2
+import ipaddress
+import os
+from django.conf import settings
+def _is_public_ip(ip_str: str) -> bool:
+    try:
+        ip_obj = ipaddress.ip_address(ip_str)
+        return not (ip_obj.is_private or ip_obj.is_loopback or ip_obj.is_reserved or ip_obj.is_link_local)
+    except Exception:
+        return False
+
 def get_client_ip(request):
-    """Lấy IP thật của user"""
+    """Lấy IP thật của user, ưu tiên IP công khai từ các header phổ biến."""
+    # 1) Cloudflare / Proxy headers
+    for header in ['HTTP_CF_CONNECTING_IP', 'HTTP_X_REAL_IP']:
+        candidate = request.META.get(header)
+        if candidate and _is_public_ip(candidate.strip()):
+            return candidate.strip()
+    # 2) X-Forwarded-For (chuỗi danh sách)
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
     if x_forwarded_for:
-        ip = x_forwarded_for.split(',')[0]
-    else:
-        ip = request.META.get('REMOTE_ADDR')
-    return ip
+        for part in [p.strip() for p in x_forwarded_for.split(',')]:
+            if _is_public_ip(part):
+                return part
+    # 3) REMOTE_ADDR
+    remote_ip = request.META.get('REMOTE_ADDR')
+    return remote_ip
 
 def update_visit_counter(request: HttpRequest, page_name='homepage'):
     """Cập nhật counter và log visit"""
@@ -37,11 +56,40 @@ def update_visit_counter(request: HttpRequest, page_name='homepage'):
     counter.today_visits += 1
     counter.save()
     
-    # Log visit (optional - để tracking chi tiết)
+    # Log visit (ghi kèm thông tin quốc gia để thống kê đồng bộ với total)
+    ip_address = get_client_ip(request)
+    country_code = None
+    country_name = None
+    city_name = None
+    region_name = None
+
+    # Chỉ tra cứu GeoIP khi IP là công khai. Nếu không, gán UN để tránh sai lệch.
+    if ip_address and _is_public_ip(ip_address):
+        try:
+            mmdb_path_primary = os.path.join(settings.BASE_DIR, 'GeoLite2-City.mmdb')
+            mmdb_path_alt = os.path.join(settings.BASE_DIR, 'backend', 'GeoLite2-City.mmdb')
+            mmdb_path = mmdb_path_primary if os.path.exists(mmdb_path_primary) else mmdb_path_alt
+            reader = geoip2.database.Reader(mmdb_path)
+            response = reader.city(ip_address)
+            iso = response.country.iso_code or 'UN'
+            country_code = iso[:2]
+            country_name = response.country.name or 'Unknown'
+            city_name = response.city.name
+            region_name = response.subdivisions.most_specific.name
+        except Exception:
+            country_code = 'UN'
+            country_name = 'Unknown'
+    else:
+        country_code = 'UN'
+        country_name = 'Unknown'
     VisitLog.objects.create(
-        ip_address=get_client_ip(request),
+        ip_address=ip_address,
         user_agent=request.META.get('HTTP_USER_AGENT', ''),
         page_visited=page_name,
+        country_code=country_code,
+        country_name=country_name,
+        city=city_name,
+        region=region_name,
     )
     return 
 
@@ -139,14 +187,7 @@ def get_visit_stats(page_name='homepage'):
             'month_visits': 0,
             'last_update': None,
         }
-def get_client_ip(request):
-    """Lấy IP thật của user"""
-    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-    if x_forwarded_for:
-        ip = x_forwarded_for.split(',')[0]
-    else:
-        ip = request.META.get('REMOTE_ADDR')
-    return ip
+## DO NOT redefine get_client_ip below; we use the robust version above.
 
 def update_visit_counter_from_data(page_name):
     """Cập nhật counter không cần request object"""
