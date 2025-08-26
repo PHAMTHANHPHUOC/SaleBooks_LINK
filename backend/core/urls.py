@@ -1,5 +1,5 @@
 from django.urls import path,re_path
-from .views import view_count,view_sanpham,view_admin,view_link
+from .views import view_count,view_sanpham,view_admin,view_link,view_location
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -9,7 +9,11 @@ urlpatterns = [
 path('', view_count.homepage, name='homepage'),
 path('book/<int:book_id>/', view_count.coloring_book_detail, name='book_detail'),
 path('api/visits/', view_count.get_visit_count_api, name='visit_api'),
+path('api/visits/track/', view_count.track_visit, name='track_visit'),
 path('api/frontend-page-visit/', view_count.frontend_page_visit, name='frontend_page_visit'),
+path('location/', view_location.get_location, name='get_location'),
+
+
 
 
 path('products/data/', view_sanpham.product_data, name='product_data'),

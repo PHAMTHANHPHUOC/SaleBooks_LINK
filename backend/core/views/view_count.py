@@ -1,25 +1,30 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-from .utils import update_visit_counter, get_visit_stats,calculate_growth_rate
+from .utils import update_visit_counter, get_visit_stats,calculate_growth_rate,get_client_ip,update_visit_counter_from_data,get_country_stats
  # Lấy thêm dữ liệu khác
 from datetime import datetime, timedelta
 from django.db.models import Count
 from core.models.VisitCounter import VisitLog, VisitCounter
-
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
+import json
+import traceback
 def homepage(request):
     """API tính lượt truy cập cho trang frontend http://localhost:5173/"""
     counter = update_visit_counter(request, 'frontend_home')
     stats = get_visit_stats('frontend_home')
     return JsonResponse(stats)
-
 def get_visit_count_api(request):
-    """API trả về đầy đủ dữ liệu cho frontend"""
+    """
+    API GET /api/visits/ - Trả về đầy đủ dữ liệu cho frontend Vue.js
+    Cần include_countries=true để có dữ liệu country_stats
+    """
     page_name = request.GET.get('page', 'home')
+    include_countries = request.GET.get('include_countries', 'false').lower() == 'true'
+    
     stats = get_visit_stats(page_name)
     
-   
-    
-    # Thống kê theo giờ (24h qua)
+    # Thống kê theo giờ (24h qua) 
     hourly_stats = []
     now = datetime.now()
     for i in range(24):
@@ -33,11 +38,6 @@ def get_visit_count_api(request):
             'hour': hour_start.strftime('%H:00'),
             'visits': count
         })
-    
-    # Top pages được truy cập nhiều nhất
-    top_pages = VisitCounter.objects.order_by('-total_visits')[:5].values(
-        'page_name', 'total_visits', 'today_visits'
-    )
     
     # Thống kê theo ngày (7 ngày qua)
     daily_stats = []
@@ -58,47 +58,23 @@ def get_visit_count_api(request):
         visit_time__date=now.date()
     ).values('ip_address').distinct().count()
     
-    # Browser stats
-    from collections import Counter
-    user_agents = VisitLog.objects.filter(
-        page_visited=page_name,
-        visit_time__gte=now - timedelta(days=7)
-    ).values_list('user_agent', flat=True)
-    
-    browser_stats = []
-    for agent in user_agents[:50]:  # Lấy 50 record gần nhất
-        if 'Chrome' in agent:
-            browser_stats.append('Chrome')
-        elif 'Firefox' in agent:
-            browser_stats.append('Firefox')
-        elif 'Safari' in agent:
-            browser_stats.append('Safari')
-        elif 'Edge' in agent:
-            browser_stats.append('Edge')
-        else:
-            browser_stats.append('Other')
-    
-    browser_count = dict(Counter(browser_stats))
-    
-    # Kết quả đầy đủ
+    # Kết quả cơ bản
     result = {
-        # Visit counters cơ bản
+        # Dữ liệu cơ bản mà frontend cần
         'total_visits': int(stats.get('total_visits', 0)),
         'today_visits': int(stats.get('today_visits', 0)),
         'week_visits': int(stats.get('week_visits', 0)),
         'month_visits': int(stats.get('month_visits', 0)),
         'unique_today': unique_today,
-        'last_update': stats.get('last_update').strftime('%Y-%m-%dT%H:%M:%S') if stats.get('last_update') else '',
+        'last_update': stats.get('last_update').isoformat() if stats.get('last_update') else now.isoformat(),
         
-        # Thống kê chi tiết
-        'hourly_stats': hourly_stats[:12],  # 12h gần nhất
+        # Dữ liệu charts
+        'hourly_stats': list(reversed(hourly_stats[:24])),  # 24h, mới nhất sau
         'daily_stats': list(reversed(daily_stats)),  # 7 ngày, mới nhất trước
-        'top_pages': list(top_pages),
-        'browser_stats': browser_count,
         
         # Metadata
         'page_name': page_name,
-        'server_time': now.strftime('%Y-%m-%dT%H:%M:%S'),
+        'server_time': now.isoformat(),
         'timezone': 'UTC+7',
         
         # Growth rates
@@ -109,8 +85,11 @@ def get_visit_count_api(request):
         }
     }
     
+    # Thêm country_stats nếu được yêu cầu
+    if include_countries:
+        result['country_stats'] = get_country_stats(page_name)
+    
     return JsonResponse(result, json_dumps_params={'ensure_ascii': False})
-
 def coloring_book_detail(request, book_id):
     """Chi tiết sách - có counter riêng"""
     page_name = f'book_{book_id}'
@@ -129,3 +108,59 @@ def frontend_page_visit(request):
     counter = update_visit_counter(request, page_name)
     stats = get_visit_stats(page_name)
     return JsonResponse(stats)
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def track_visit(request):
+    """
+    API POST /api/visits/track - Nhận thông tin tracking từ frontend
+    Đây là endpoint mà frontend Vue.js đang cố gửi request tới
+    """
+    try:
+        # Parse JSON data từ frontend
+        data = json.loads(request.body)
+        
+        # Lấy thông tin cơ bản
+        page_name = data.get('page', 'homepage')
+        ip_address = get_client_ip(request)
+        user_agent = request.META.get('HTTP_USER_AGENT', '')
+        
+        # Tạo VisitLog mới với thông tin từ frontend
+        visit_log = VisitLog.objects.create(
+            ip_address=ip_address,
+            user_agent=user_agent,
+            page_visited=page_name,
+            # Thêm các trường mới từ frontend
+            country_code=data.get('country'),
+            country_name=data.get('country_name'),
+            city=data.get('city'),
+            region=data.get('region'),
+            referrer=data.get('referrer'),
+            screen_resolution=data.get('screen_resolution'),
+            language=data.get('language'),
+            # session_id nếu có
+        )
+        
+        # Cập nhật counter
+        update_visit_counter_from_data(page_name)
+        
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Visit tracked successfully',
+            'visit_id': visit_log.id,
+            'timestamp': visit_log.visit_time.isoformat()
+        })
+        
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Invalid JSON data'
+        }, status=400)
+    except Exception as e:
+        print("Error in track_visit:", str(e))
+        traceback.print_exc()
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        }, status=500)

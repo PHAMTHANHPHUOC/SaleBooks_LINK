@@ -2,7 +2,8 @@ from django.utils import timezone
 from django.http import HttpRequest
 from ..models import VisitCounter, VisitLog
 from datetime import date
-
+from datetime import datetime, timedelta
+from django.db.models import Count
 def get_client_ip(request):
     """Lấy IP thật của user"""
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
@@ -43,6 +44,7 @@ def update_visit_counter(request: HttpRequest, page_name='homepage'):
         page_visited=page_name,
     )
     return 
+
 
 def calculate_growth_rate(page_name, period):
     """Tính tỷ lệ tăng trưởng"""
@@ -137,3 +139,82 @@ def get_visit_stats(page_name='homepage'):
             'month_visits': 0,
             'last_update': None,
         }
+def get_client_ip(request):
+    """Lấy IP thật của user"""
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
+def update_visit_counter_from_data(page_name):
+    """Cập nhật counter không cần request object"""
+    from django.utils import timezone
+    
+    # Lấy hoặc tạo counter record
+    counter, created = VisitCounter.objects.get_or_create(
+        page_name=page_name,
+        defaults={
+            'total_visits': 0,
+            'today_visits': 0,
+            'last_visit_date': timezone.now().date()
+        }
+    )
+    
+    # Kiểm tra ngày mới
+    today = timezone.now().date()
+    if counter.last_visit_date < today:
+        counter.today_visits = 0
+        counter.last_visit_date = today
+    
+    # Tăng counter
+    counter.total_visits += 1
+    counter.today_visits += 1
+    counter.save()
+    
+    return counter
+
+def get_country_stats(page_name):
+    """Lấy thống kê theo quốc gia cho các khoảng thời gian"""
+    from django.utils import timezone
+    now = timezone.now()
+    
+    def get_period_stats(period):
+        if period == 'today':
+            start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
+            queryset = VisitLog.objects.filter(
+                page_visited=page_name,
+                visit_time__gte=start_date
+            )
+        elif period == 'week':
+            start_date = now - timedelta(days=now.weekday())
+            start_date = start_date.replace(hour=0, minute=0, second=0, microsecond=0)
+            queryset = VisitLog.objects.filter(
+                page_visited=page_name,
+                visit_time__gte=start_date
+            )
+        elif period == 'month':
+            start_date = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            queryset = VisitLog.objects.filter(
+                page_visited=page_name,
+                visit_time__gte=start_date
+            )
+        else:  # all
+            queryset = VisitLog.objects.filter(page_visited=page_name)
+        
+        # Group by country và đếm
+        stats = queryset.values('country_code', 'country_name').annotate(
+            visits=Count('id')
+        ).exclude(
+            country_code__isnull=True
+        ).order_by('-visits')
+        
+        return list(stats)
+    
+    return {
+        'today': get_period_stats('today'),
+        'week': get_period_stats('week'),
+        'month': get_period_stats('month'),
+        'all': get_period_stats('all')
+    }

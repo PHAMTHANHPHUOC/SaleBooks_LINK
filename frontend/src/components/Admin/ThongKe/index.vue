@@ -3,10 +3,15 @@
     <!-- Header -->
     <div class="header">
       <h1>Thống kê lượt truy cập</h1>
+      <div class="visitor-info" v-if="currentVisitor.country">
+        <span class="visitor-flag">{{ getCountryFlag(currentVisitor.country) }}</span>
+        <span class="visitor-text">Bạn đang truy cập từ: {{ currentVisitor.country_name || currentVisitor.country }}</span>
+      </div>
     </div>
 
     <!-- Loading State -->
     <div v-if="loading" class="loading">
+      <div class="loading-spinner"></div>
       <p>⏳ Đang tải thống kê...</p>
     </div>
 
@@ -58,25 +63,25 @@
             :class="['tab-button', { active: activeTab === 'today' }]" 
             @click="activeTab = 'today'"
           >
-            Hôm nay
+            Hôm nay ({{ getTotalVisitsForPeriod('today') }})
           </button>
           <button 
             :class="['tab-button', { active: activeTab === 'week' }]" 
             @click="activeTab = 'week'"
           >
-            Tuần này
+            Tuần này ({{ getTotalVisitsForPeriod('week') }})
           </button>
           <button 
             :class="['tab-button', { active: activeTab === 'month' }]" 
             @click="activeTab = 'month'"
           >
-            Tháng này
+            Tháng này ({{ getTotalVisitsForPeriod('month') }})
           </button>
           <button 
             :class="['tab-button', { active: activeTab === 'all' }]" 
             @click="activeTab = 'all'"
           >
-            Tất cả
+            Tất cả ({{ getTotalVisitsForPeriod('all') }})
           </button>
         </div>
         
@@ -85,6 +90,7 @@
             v-for="country in getCurrentCountryData" 
             :key="country.country_code"
             class="country-item"
+            :class="{ 'current-visitor': country.country_code === currentVisitor.country }"
           >
             <div class="country-flag">
               {{ getCountryFlag(country.country_code) }}
@@ -92,6 +98,7 @@
             <div class="country-info">
               <span class="country-name">{{ country.country_name }}</span>
               <span class="country-code">({{ country.country_code }})</span>
+              <span v-if="country.country_code === currentVisitor.country" class="current-badge">Bạn ở đây</span>
             </div>
             <div class="country-stats">
               <span class="visit-count">{{ country.visits }} lượt</span>
@@ -104,10 +111,14 @@
               <span class="percentage">{{ getPercentage(country.visits) }}%</span>
             </div>
           </div>
+          
+          <div v-if="getCurrentCountryData.length === 0" class="no-data">
+            <p>📊 Chưa có dữ liệu truy cập cho khoảng thời gian này</p>
+          </div>
         </div>
 
         <!-- Country Chart -->
-        <div class="chart-container" style="margin-top: 30px;">
+        <div class="chart-container" style="margin-top: 30px;" v-if="getCurrentCountryData.length > 0">
           <canvas ref="countryChart"></canvas>
         </div>
       </div>
@@ -143,12 +154,16 @@
           <span>{{ getCountryFlag(country.country_code) }} {{ country.country_name }}</span>
           <strong>{{ country.visits }} lượt</strong>
         </div>
+        <div v-if="topCountriesToday.length === 0" class="no-top-countries">
+          <p>📊 Chưa có dữ liệu hôm nay</p>
+        </div>
       </div>
       <div class="additional-stat-card">
         <h4>⏱️ Thông tin hệ thống</h4>
         <p>Múi giờ: <strong>{{ stats.timezone || 'UTC+7' }}</strong></p>
         <p>Thời gian server: <strong>{{ serverTime }}</strong></p>
         <p>Trang hiện tại: <strong>{{ stats.page_name || 'homepage' }}</strong></p>
+        <p>IP của bạn: <strong>{{ currentVisitor.ip || 'Đang lấy...' }}</strong></p>
       </div>
     </div>
   </div>
@@ -171,6 +186,11 @@ export default {
         month: [],
         all: []
       },
+      currentVisitor: {
+        ip: null,
+        country: null,
+        country_name: null
+      },
       activeTab: 'today',
       hourlyChart: null,
       dailyChart: null,
@@ -184,32 +204,21 @@ export default {
         const date = new Date(this.stats.last_update)
         return date.toLocaleTimeString('vi-VN', {hour: '2-digit', minute: '2-digit'})
       }
-      return '--:--'
+      return new Date().toLocaleTimeString('vi-VN', {hour: '2-digit', minute: '2-digit'})
     },
     serverTime() {
       if (this.stats.server_time) {
         const serverTime = new Date(this.stats.server_time)
         return serverTime.toLocaleString('vi-VN')
       }
-      return '--'
+      return new Date().toLocaleString('vi-VN')
     },
     totalCountries() {
       return this.countryStats.all?.length || 0
     },
-     getCurrentCountryData() {
-      return this.countryStats[this.activeTab] || []
-    },
-    totalVisitsFromCountries() {
-      return this.getCurrentCountryData.reduce((sum, country) => sum + country.visits, 0)
-    },
-    // Tính toán số liệu thực từ dữ liệu quốc gia
-    calculatedStats() {
-      return {
-        today: this.countryStats.today?.reduce((sum, c) => sum + c.visits, 0) || 0,
-        week: this.countryStats.week?.reduce((sum, c) => sum + c.visits, 0) || 0,
-        month: this.countryStats.month?.reduce((sum, c) => sum + c.visits, 0) || 0,
-        total: this.countryStats.all?.reduce((sum, c) => sum + c.visits, 0) || 0
-      }
+    getCurrentCountryData() {
+      const data = this.countryStats[this.activeTab] || []
+      return data.sort((a, b) => b.visits - a.visits)
     },
     topCountriesToday() {
       return [...(this.countryStats.today || [])].sort((a, b) => b.visits - a.visits)
@@ -223,22 +232,78 @@ export default {
     }
   },
   mounted() {
-    this.fetchVisitStats()
-    this.startAutoRefresh()
+    this.initializeTracking()
   },
   beforeUnmount() {
     this.stopAutoRefresh()
     this.destroyCharts()
   },
   methods: {
+    async initializeTracking() {
+      try {
+        // Bước 1: Lấy thông tin visitor và ghi nhận lượt truy cập
+        await this.detectAndTrackVisitor()
+        
+        // Bước 2: Lấy thống kê
+        await this.fetchVisitStats()
+        
+        // Bước 3: Tự động refresh
+        this.startAutoRefresh()
+      } catch (error) {
+        console.error('Error initializing tracking:', error)
+        this.showFallbackData()
+      }
+    },
+
+    async detectAndTrackVisitor() {
+      try {
+        // ✅ Gọi API Django để lấy IP + location
+        const response = await baseRequest.get("location/?ip=14.241.120.176")
+
+        const geoData = response.data
+        this.currentVisitor = {
+          ip: geoData.ip,
+          country: geoData.country,
+          city: geoData.city,
+          region: geoData.region
+        }
+
+        // ✅ Gửi thông tin về server tracking
+        await this.trackVisit(this.currentVisitor)
+
+      } catch (error) {
+        console.error("Error detecting visitor location:", error)
+      }
+    },
+    async trackVisit(visitorData) {
+      try {
+        const trackingData = {
+          ...visitorData,
+          page: 'homepage',
+          timestamp: new Date().toISOString(),
+          user_agent: navigator.userAgent,
+          referrer: document.referrer,
+          screen_resolution: `${screen.width}x${screen.height}`,
+          language: navigator.language
+        }
+
+        // Gửi data tracking về API
+        await baseRequest.post('api/visits/track/', trackingData)
+        
+      } catch (error) {
+        console.error('Error tracking visit:', error)
+        // Không throw error để không block việc hiển thị dashboard
+      }
+    },
+
     async fetchVisitStats() {
       try {
-        const response = await baseRequest.get("api/visits/?page=home&include_countries=true")
+        const response = await baseRequest.get("api/visits/?page=home&include_countries=true/")
         const data = response.data
         
         this.stats = data
         this.growth = data.growth || {}
-        this.countryStats = data.country_stats || this.getSampleCountryData()
+        this.countryStats = data.country_stats || { today: [], week: [], month: [], all: [] }
         this.loading = false
         
         this.$nextTick(() => {
@@ -249,8 +314,13 @@ export default {
         
       } catch (error) {
         console.error('Error fetching stats:', error)
-        this.showSampleData()
+        this.showFallbackData()
       }
+    },
+
+    getTotalVisitsForPeriod(period) {
+      const data = this.countryStats[period] || []
+      return data.reduce((sum, country) => sum + country.visits, 0)
     },
 
     createHourlyChart(hourlyData) {
@@ -348,11 +418,12 @@ export default {
       const ctx = this.$refs.countryChart?.getContext('2d')
       if (!ctx) return
       
-      const currentData = this.getCurrentCountryData.slice(0, 10) // Top 10 countries
+      const currentData = this.getCurrentCountryData.slice(0, 10)
+      if (currentData.length === 0) return
+      
       const labels = currentData.map(item => item.country_name)
       const data = currentData.map(item => item.visits)
       
-      // Generate colors for each country
       const colors = [
         '#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#f0932b',
         '#eb4d4b', '#6c5ce7', '#a29bfe', '#fd79a8', '#00b894'
@@ -390,7 +461,8 @@ export default {
         'VN': '🇻🇳', 'US': '🇺🇸', 'JP': '🇯🇵', 'KR': '🇰🇷', 'CN': '🇨🇳',
         'TH': '🇹🇭', 'SG': '🇸🇬', 'MY': '🇲🇾', 'ID': '🇮🇩', 'PH': '🇵🇭',
         'IN': '🇮🇳', 'AU': '🇦🇺', 'GB': '🇬🇧', 'DE': '🇩🇪', 'FR': '🇫🇷',
-        'IT': '🇮🇹', 'ES': '🇪🇸', 'BR': '🇧🇷', 'CA': '🇨🇦', 'RU': '🇷🇺'
+        'IT': '🇮🇹', 'ES': '🇪🇸', 'BR': '🇧🇷', 'CA': '🇨🇦', 'RU': '🇷🇺',
+        'Unknown': '🌐'
       }
       return flags[countryCode] || '🌐'
     },
@@ -417,90 +489,40 @@ export default {
       return `${num > 0 ? '+' : ''}${num}%`
     },
 
-    getSampleCountryData() {
-      return {
-        today: [
-          { country_code: 'VN', country_name: 'Việt Nam', visits: 25 },
-          { country_code: 'US', country_name: 'Hoa Kỳ', visits: 8 },
-          { country_code: 'JP', country_name: 'Nhật Bản', visits: 5 },
-          { country_code: 'KR', country_name: 'Hàn Quốc', visits: 4 },
-          { country_code: 'SG', country_name: 'Singapore', visits: 3 }
-        ],
-        week: [
-          { country_code: 'VN', country_name: 'Việt Nam', visits: 180 },
-          { country_code: 'US', country_name: 'Hoa Kỳ', visits: 45 },
-          { country_code: 'JP', country_name: 'Nhật Bản', visits: 32 },
-          { country_code: 'KR', country_name: 'Hàn Quốc', visits: 28 },
-          { country_code: 'TH', country_name: 'Thái Lan', visits: 15 },
-          { country_code: 'SG', country_name: 'Singapore', visits: 12 }
-        ],
-        month: [
-          { country_code: 'VN', country_name: 'Việt Nam', visits: 650 },
-          { country_code: 'US', country_name: 'Hoa Kỳ', visits: 180 },
-          { country_code: 'JP', country_name: 'Nhật Bản', visits: 125 },
-          { country_code: 'KR', country_name: 'Hàn Quốc', visits: 98 },
-          { country_code: 'TH', country_name: 'Thái Lan', visits: 76 },
-          { country_code: 'SG', country_name: 'Singapore', visits: 54 },
-          { country_code: 'MY', country_name: 'Malaysia', visits: 43 }
-        ],
-        all: [
-          { country_code: 'VN', country_name: 'Việt Nam', visits: 1200 },
-          { country_code: 'US', country_name: 'Hoa Kỳ', visits: 320 },
-          { country_code: 'JP', country_name: 'Nhật Bản', visits: 285 },
-          { country_code: 'KR', country_name: 'Hàn Quốc', visits: 198 },
-          { country_code: 'TH', country_name: 'Thái Lan', visits: 156 },
-          { country_code: 'SG', country_name: 'Singapore', visits: 134 },
-          { country_code: 'MY', country_name: 'Malaysia', visits: 87 },
-          { country_code: 'ID', country_name: 'Indonesia', visits: 65 }
-        ]
-      }
-    },
-
-    showSampleData() {
-      const sampleData = {
-        total_visits: 1247,
-        today_visits: 45,
-        week_visits: 312,
-        month_visits: 1089,
-        unique_today: 32,
+    showFallbackData() {
+      // Hiển thị dữ liệu cơ bản khi không có API hoặc lỗi
+      this.stats = {
+        total_visits: 0,
+        today_visits: 0,
+        week_visits: 0,
+        month_visits: 0,
+        unique_today: 0,
         last_update: new Date().toISOString(),
-        hourly_stats: [
-          {hour: "00:00", visits: 2}, {hour: "01:00", visits: 1}, {hour: "02:00", visits: 0},
-          {hour: "03:00", visits: 1}, {hour: "04:00", visits: 3}, {hour: "05:00", visits: 5},
-          {hour: "06:00", visits: 8}, {hour: "07:00", visits: 12}, {hour: "08:00", visits: 15},
-          {hour: "09:00", visits: 18}, {hour: "10:00", visits: 14}, {hour: "11:00", visits: 11}
-        ],
-        daily_stats: [
-          {date: "15/08", visits: 42}, {date: "16/08", visits: 38}, {date: "17/08", visits: 55},
-          {date: "18/08", visits: 47}, {date: "19/08", visits: 61}, {date: "20/08", visits: 39},
-          {date: "21/08", visits: 45}
-        ],
-        growth: {
-          today_vs_yesterday: 15,
-          this_week_vs_last_week: -5,
-          this_month_vs_last_month: 23
-        },
         timezone: "UTC+7",
         server_time: new Date().toISOString(),
         page_name: "homepage"
       }
-
-      this.stats = sampleData
-      this.growth = sampleData.growth
-      this.countryStats = this.getSampleCountryData()
+      
+      this.growth = {
+        today_vs_yesterday: 0,
+        this_week_vs_last_week: 0,
+        this_month_vs_last_month: 0
+      }
+      
+      this.countryStats = { today: [], week: [], month: [], all: [] }
       this.loading = false
       
       this.$nextTick(() => {
-        this.createHourlyChart(sampleData.hourly_stats)
-        this.createDailyChart(sampleData.daily_stats)
+        this.createHourlyChart([])
+        this.createDailyChart([])
         this.createCountryChart()
       })
     },
 
     startAutoRefresh() {
       this.refreshInterval = setInterval(() => {
-        this.fetchVisitStats()
-      }, 5 * 60 * 1000)
+        this.fetchVisitStats() // Chỉ refresh stats, không track lại
+      }, 5 * 60 * 1000) // 5 phút
     },
 
     stopAutoRefresh() {
