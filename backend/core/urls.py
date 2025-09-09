@@ -51,6 +51,7 @@ path('logout-all/',view_admin.logout_all),
 
 path('api/links/', view_link.get_links_api, name='get_links'),
 path('api/links/list/', view_link.get_list_links, name='get_list_links'),
+path('api/links/list/data/', view_link.get_list_links_data, name='get_list_links_data'),
 path('api/link/create/',view_link.create_link,name='create_link'),
 path('api/link/delete/<int:id>/',view_link.delete_link,name='delete_link'),
 path('api/link/update/<int:id>/',view_link.update_link,name='update_link'),

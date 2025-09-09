@@ -69,7 +69,7 @@ export default {
                     if (res.data.status) {
                         toaster.success(res.data.message);
                         localStorage.setItem("chia_khoa", "");
-                        this.$router.push("dang-nhap");
+                        this.$router.push("/admin/dang-nhap");
                     } else {
                         toaster.error(res.data.message);
                     }
@@ -87,7 +87,7 @@ export default {
                     if (res.data.status) {
                         toaster.success(res.data.message);
                         localStorage.setItem("chia_khoa", "");
-                        this.$router.push("dang-nhap");
+                        this.$router.push("/admin/dang-nhap");
                     } else {
                         toaster.error(res.data.message);
                     }

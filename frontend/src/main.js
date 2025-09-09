@@ -3,6 +3,8 @@ import App from './App.vue'
 import router from './router'
 import Client from './layout/wrapper/ClientMaster.vue'
 import Blank from './layout/wrapper/index_blank.vue'
+import './assets/css/global.css'
+
 
 const app = createApp(App)
 

@@ -6,7 +6,7 @@ const routes = [
         path: '/', component: () => import('../components/NguoiDung/home/index.vue'), 
     },
     {
-        path: '/admin/quan-ly-loai-san-pham', component: () => import('../components/Admin/LoaiSanPham/index.vue'), 
+        path: '/admin', component: () => import('../components/Admin/LoaiSanPham/index.vue'), 
         meta : {layout : 'client'},
         beforeEnter: KiemTraAdmin,
     },

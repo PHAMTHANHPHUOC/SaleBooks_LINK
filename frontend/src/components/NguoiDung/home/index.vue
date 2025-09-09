@@ -5,33 +5,29 @@
       <div class="avatar-circle">
         <img class="avatar-img" src="../../../assets/images/TINY.jpg" alt="Avatar" />
         </div>
-      <h1 class="brand">Tiny Daisy</h1>
+      <!-- <h1 class="brand">Tiny Daisy</h1> -->
     </div>
 
     <!-- Social Icons -->
     <div class="section-title">Connect with us</div>
     <div class="social-list">
-      <a target="_blank" rel="noopener"  :href="list_link.Facebook" class="social-btn" aria-label="Facebook"><img src="https://img.icons8.com/color/96/000000/facebook.png" alt="Facebook" /></a>
-      <a target="_blank" rel="noopener"  :href="list_link.Instagram" class="social-btn" aria-label="Instagram"><img src="https://img.icons8.com/color/96/000000/instagram-new.png" alt="Instagram" /></a>
-      <a target="_blank" rel="noopener"  :href="list_link.YouTube" class="social-btn" aria-label="YouTube"><img src="https://img.icons8.com/color/96/000000/youtube-play.png" alt="YouTube" /></a>
-      <a target="_blank" rel="noopener"  :href="list_link.TikTok" class="social-btn" aria-label="TikTok"><img src="https://img.icons8.com/color/96/000000/tiktok--v1.png" alt="TikTok" /></a>
+      <a target="_blank" rel="noopener" :href="list_link.Facebook.link" class="social-btn" aria-label="Facebook"><img :src="getFullImageUrl(list_link.Facebook.avatar)"class="card-img-top"@error="handleImageError"@click="showImagePreview(getFullImageUrl(list_link.Facebook.avatar))"/></a>
+      <a target="_blank" rel="noopener"  :href="list_link.Instagram.link" class="social-btn" aria-label="Instagram"><img :src="getFullImageUrl(list_link.Instagram.avatar)"class="card-img-top"@error="handleImageError"@click="showImagePreview(getFullImageUrl(list_link.Instagram.avatar))"/></a>
+      <a target="_blank" rel="noopener"  :href="list_link.YouTube.link" class="social-btn" aria-label="YouTube"><img :src="getFullImageUrl(list_link.YouTube.avatar)"class="card-img-top"@error="handleImageError"@click="showImagePreview(getFullImageUrl(list_link.YouTube.avatar))"/></a>
+      <a target="_blank" rel="noopener"  :href="list_link.TikTok.link" class="social-btn" aria-label="TikTok"><img :src="getFullImageUrl(list_link.TikTok.avatar)"class="card-img-top"@error="handleImageError"@click="showImagePreview(getFullImageUrl(list_link.TikTok.avatar))"/></a>
     </div>
 
     <!-- Shop Now -->
     <div class="section-title">Shop now on</div>
-    <a class="main-btn" :href="list_link.Amazon" target="_blank" rel="noopener">
-      <img class="btn-icon" src="https://img.icons8.com/color/96/000000/amazon.png" alt="Amazon" />
-      Amazon
-    </a>
-    <a class="main-btn" :href="list_link.Website" target="_blank" rel="noopener">
+    <a class="main-btn" :href="list_link.Website.link" target="_blank" rel="noopener">
       <img class="btn-icon" src="https://img.icons8.com/color/96/000000/internet--v1.png" alt="Website" />
-      tinydaisycoloring.com
+      Website
     </a>
 
     <!-- Community -->
     <div class="section-title">Connect with me</div>
-    <a class="main-btn" :href="list_link.Bogiki" target="_blank" rel="noopener">Bogiki Coloring Community</a>
-    <a class="main-btn" :href="list_link.FreeDigital" target="_blank" rel="noopener">Free Digital Coloring Pages</a>
+    <a class="main-btn" :href="list_link.GroupsFacebook.link" target="_blank" rel="noopener">Tiny Daisy Community</a>
+    <a class="main-btn" :href="list_link.FreeDigital.link" target="_blank" rel="noopener">40 Free Digital Pages</a>
 
     <!-- Product Section: For từng loại sản phẩm -->
     <div v-for="type in productTypes" :key="type.id" class="product-section">
@@ -59,18 +55,9 @@
   
   <footer class="footer">
     <div class="footer-inner">
-      <img src="../../../assets/images/TINY.jpg" alt="Bogiki Logo" class="footer-logo" />
-    <a 
-  :href="list_link.Email" 
-  target="_blank" 
-  rel="noopener" 
-  class="text-decoration-none fw-bold fs-5 text-darkz"
-  
->
-  hello@tinydaisycoloring.com
-</a>
-
-
+      <img src="../../../assets/images/TINY.jpg" alt="Bogiki Logo" class="avatar-circle" />
+      <p class="text-decoration-none fw-bold fs-5 text-darkz" >{{ list_link.Email.link }}</p>
+    
     </div>
   </footer>
 </template>
@@ -375,7 +362,7 @@ export default {
         font-size: 0.9rem;
       }
       .avatar-circle { width: 50px; height: 50px; }
-      .avatar-img { width: 30px; height: 30px; }
+      .avatar-img { width: 100%; height: 100%; }
       .brand { font-size: 0.9rem; }
       .section-title, .product-title { font-size: 0.9rem; margin: 4px 0 2px 0; }
       .social-list { gap: 2px; }
@@ -392,6 +379,7 @@ export default {
   grid-column: 1 / -1;
   margin-top: 20px; /* Cố định 20px cho mobile */
 }
+
       .card {
         min-height: 60px;
         border-radius: 4px;
@@ -494,19 +482,20 @@ export default {
       width: 180px;
       height: 180px;
       border-radius: 50%;
-      background: #fff;
+      background: transparent;
       display: flex;
       align-items: center;
       justify-content: center;
       box-shadow: 0 4px 20px rgba(0,0,0,0.08);
       margin: 0 auto var(--gap);
+      overflow: hidden;
     }
     .avatar-img {
-      width: 140px;
-      height: 140px;
-      object-fit: contain;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
       border-radius: 50%;
-      background: #fff;
+      background: transparent;
       display: block;
     }
     .brand {
@@ -693,7 +682,7 @@ export default {
   }
 
   .avatar-circle { width: 120px; height: 120px; }
-  .avatar-img { width: 90px; height: 90px; }
+  .avatar-img { width: 100%; height: 100%; }
   .brand { font-size: 1.5rem; }
   .section-title, .product-title { font-size: 1.1rem; margin: 12px 0 6px; }
   .social-list { gap: 8px; }

@@ -68,7 +68,7 @@ export default {
             localStorage.setItem('chia_khoa', res.data.chia_khoa);
             localStorage.setItem('ten_kh', res.data.ten_kh);
             this.khach_hang = {};
-            this.$router.push('/admin/quan-ly-loai-san-pham');
+            this.$router.push('/admin');
           } else if (res.data.status == 2) {
             toaster.warning(res.data.message);
           } else {

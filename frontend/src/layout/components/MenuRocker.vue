@@ -16,8 +16,8 @@
     <nav class="navbar navbar-expand-xl w-100">
       <ul class="navbar-nav justify-content-start flex-grow-1 gap-1">
         <li class="nav-item">
-          <router-link to="/admin/quan-ly-loai-san-pham">
-            <a class="nav-link" href="/admin/quan-ly-loai-san-pham">
+          <router-link to="/admin">
+            <a class="nav-link" href="/admin">
               <div class="parent-icon"><i class="fa-brands fa-product-hunt"></i></div>
               <div class="menu-title">Quản Lý Loại Sản Phẩm</div>
             </a>

@@ -29,6 +29,10 @@
               <label class="form-label">Link</label>
               <input v-model="create_link.links" type="url" class="form-control" />
             </div>
+            <div class="mb-2">
+              <label class="form-label">Ảnh bìa</label>
+              <input type="file" class="form-control" @change="onFileChange" />
+            </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
@@ -119,6 +123,7 @@
               <th class="text-center align-middle text-nowrap">#</th>
               <th class="text-center align-middle text-nowrap">Tên Link</th>
               <th class="text-center align-middle text-nowrap">Link</th>
+              <th class="text-center align-middle text-nowrap">Icon</th>
               <th class="text-center align-middle text-nowrap">Action</th>
             </tr>
           </thead>
@@ -129,6 +134,19 @@
             <td class="align-middle" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
               {{ linkItem.links }}
             </td>
+            <td>
+              <div v-if="linkItem.anh_dai_dien" class="image-container">
+                <img :src="getFullImageUrl(linkItem.anh_dai_dien)" 
+                  class="product-image img-thumbnail" 
+                  @error="handleImageError"
+                  @click="showImagePreview(getFullImageUrl(linkItem.anh_dai_dien))" />
+              </div>
+              <div v-else class="no-image">
+                <i class="bx bx-image text-muted"></i>
+                <small class="text-muted">Chưa có ảnh</small>
+              </div>
+            </td>
+
             <td class="text-center align-middle text-nowrap">
               <button class="btn btn-info me-2" @click="prepareEdit(linkItem)" data-bs-toggle="modal" data-bs-target="#editModal">Cập Nhật</button>
               <button class="btn btn-danger" @click="prepareDelete(linkItem)" data-bs-toggle="modal" data-bs-target="#deleteModal">Xóa Bỏ</button>
@@ -155,19 +173,77 @@ export default {
       edit_link: {},
       delete_link: {},
       loading: false,
-      api_response: null
+      debug_mode: true, // Bật debug mode để kiểm tra
+      api_response: null,
+      previewImageUrl: '', // Thêm để preview ảnh
+      baseUrl: '' // Thêm base URL
 
 
     };
   },
   mounted() {
     this.loadlink();
+    this.initializeBaseUrl();
+
   },
   methods: {
+    initializeBaseUrl() {
+      // Giả sử baseRequest có thuộc tính baseURL hoặc defaults.baseURL
+      this.baseUrl = baseRequest.defaults?.baseURL || 'http://192.168.1.28:8000';
+      // Đảm bảo không có dấu / cuối
+      this.baseUrl = this.baseUrl.replace(/\/$/, '');
+    },
+     getFullImageUrl(imagePath) {
+      if (!imagePath) return '';
+      
+      // Nếu đã là URL đầy đủ thì return luôn
+      if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+        return imagePath;
+      }
+      
+      // Nếu không bắt đầu bằng / thì thêm vào
+      if (!imagePath.startsWith('/')) {
+        imagePath = '/' + imagePath;
+      }
+      
+      return this.baseUrl + imagePath;
+    },
+
+    // Xử lý lỗi khi không tải được ảnh
+    handleImageError(event) {
+      event.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0zMCAyMEMyNi42ODYzIDIwIDI0IDIyLjY4NjMgMjQgMjZDMjQgMjkuMzEzNyAyNi42ODYzIDMyIDMwIDMyQzMzLjMxMzcgMzIgMzYgMjkuMzEzNyAzNiAyNkMzNiAyMi42ODYzIDMzLjMxMzcgMjAgMzAgMjBaIiBmaWxsPSIjOUNBM0FGIi8+CjxwYXRoIGQ9Ik0xNiA0MEw0NCA0MEw0MCAzNkwzNiAzMkwyOCAzNkwyMCAzMkwxNiAzNloiIGZpbGw9IiM5Q0EzQUYiLz4KPC9zdmc+';
+      event.target.alt = 'Không thể tải ảnh';
+    },
+
+    // Hiển thị preview ảnh
+    showImagePreview(imageUrl) {
+      this.previewImageUrl = imageUrl;
+      // Sử dụng Bootstrap modal
+      const modal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
+      modal.show();
+    },
+
+    // Xử lý file upload cho thêm mới
+    onFileChange(event) {
+      const file = event.target.files[0];
+      if (file) {
+        // Có thể thêm logic upload file ở đây
+        this.create_san_pham.anh_dai_dien = file;
+      }
+    },
+
+    // Xử lý file upload cho chỉnh sửa
+    onEditFileChange(event) {
+      const file = event.target.files[0];
+      if (file) {
+        // Có thể thêm logic upload file ở đây
+        this.edit_san_pham.new_image = file;
+      }
+    },
     loadlink() {
       this.loading = true;
       baseRequest
-        .get("api/links/list/")
+        .get("api/links/list/data/")
         .then((res) => {
           console.log("API Response:", res.data); 
           this.api_response = JSON.stringify(res.data);

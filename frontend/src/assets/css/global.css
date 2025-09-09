@@ -1,0 +1,11 @@
+@font-face {
+  font-family: 'Handineat';
+  src: url('../../../assets/fonts/Handineat.otf') format('opentype');
+}
+
+.section-title,
+.product-title,
+.shop-now-btn,
+.text-decoration-none.fw-bold.fs-5.text-darkz {
+  font-family: 'Handineat', sans-serif;
+}

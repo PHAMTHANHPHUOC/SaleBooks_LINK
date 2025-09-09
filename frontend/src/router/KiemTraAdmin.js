@@ -11,7 +11,7 @@ export default function (to, from, next) {
     return;
   }
   axios
-    .get("http://127.0.0.1:8000/check_login/", {
+    .get("http://192.168.1.28:8000/check_login/", {
       headers: {
         Authorization: "Token " + token,
       },
