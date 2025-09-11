@@ -330,48 +330,61 @@ export default {
     },
 
     createHourlyChart(hourlyData) {
-      if (this.hourlyChart) {
-        this.hourlyChart.destroy()
-      }
-      
-      const ctx = this.$refs.hourlyChart?.getContext('2d')
-      if (!ctx) return
-      
-      const labels = hourlyData.map(item => item.hour)
-      const data = hourlyData.map(item => item.visits)
-      
-      this.hourlyChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: 'Lượt truy cập',
-            data: data,
-            borderColor: '#4ecdc4',
-            backgroundColor: 'rgba(78, 205, 196, 0.1)',
-            tension: 0.4,
-            fill: true
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              display: false
-            }
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              ticks: {
-                stepSize: 1
-              }
-            }
-          }
-        }
-      })
+  if (this.hourlyChart) {
+    this.hourlyChart.destroy();
+  }
+
+  const ctx = this.$refs.hourlyChart?.getContext('2d');
+  if (!ctx) return;
+
+  // Tạo mảng 24 giờ gần nhất theo giờ Việt Nam (UTC+7)
+  const now = new Date();
+  const hours = [];
+  for (let i = 23; i >= 0; i--) {
+    const d = new Date(now.getTime() - i * 60 * 60 * 1000);
+    const hourVN = d.getHours().toString().padStart(2, '0') + ':00';
+    hours.push(hourVN);
+  }
+
+  // Chuyển đổi dữ liệu backend từ UTC sang giờ Việt Nam
+  const hourlyMap = {};
+  hourlyData.forEach(item => {
+    // item.hour là dạng 'HH:00' UTC
+    let hourUTC = parseInt(item.hour.split(':')[0], 10);
+    let hourVN = (hourUTC + 7) % 24;
+    let hourVNStr = hourVN.toString().padStart(2, '0') + ':00';
+    hourlyMap[hourVNStr] = item.visits;
+  });
+
+  // Tạo mảng visits đủ 24 giờ, nếu thiếu thì điền 0
+  const data = hours.map(h => hourlyMap[h] || 0);
+
+  this.hourlyChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: hours,
+      datasets: [{
+        label: 'Lượt truy cập',
+        data: data,
+        borderColor: '#4ecdc4',
+        backgroundColor: 'rgba(78, 205, 196, 0.1)',
+        tension: 0.4,
+        fill: true
+      }]
     },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        x: { ticks: { autoSkip: true, maxTicksLimit: 12 } },
+        y: { beginAtZero: true, ticks: { stepSize: 1 } }
+      }
+    }
+  });
+},
 
     createDailyChart(dailyData) {
       if (this.dailyChart) {

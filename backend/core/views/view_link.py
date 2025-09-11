@@ -166,7 +166,25 @@ def delete_link(request, id):
 def update_link(request, id):
     try:
         data = LinkProfile.objects.get(id=id)
-        data.links = request.data.get('links')  
+        data.links = request.data.get('links')
+        data.name = request.data.get('name', data.name)  # Nếu có cập nhật tên
+
+        # Xử lý cập nhật ảnh đại diện nếu có file mới
+        anh_dai_dien = request.FILES.get('anh_dai_dien')
+        if anh_dai_dien:
+            # Kiểm tra kích thước file
+            if anh_dai_dien.size > 5 * 1024 * 1024:  # 5MB
+                return Response({'status': False, 'message': 'File quá lớn (>5MB)'}, status=status.HTTP_400_BAD_REQUEST)
+            # Kiểm tra định dạng file
+            allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp']
+            file_extension = anh_dai_dien.name.split('.')[-1].lower()
+            if file_extension not in allowed_extensions:
+                return Response({
+                    'status': False,
+                    'message': f'Định dạng file không được hỗ trợ. Chỉ chấp nhận: {", ".join(allowed_extensions)}'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            data.anh_dai_dien = anh_dai_dien
+
         data.save()
         return Response({
             'status': True,

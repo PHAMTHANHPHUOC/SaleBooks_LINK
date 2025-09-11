@@ -61,6 +61,16 @@
               <label class="form-label">Links</label>
               <input v-model="edit_link.links" type="url" class="form-control" />
             </div>
+            <div class="mb-2">
+              <label class="form-label">Icon hiên tại</label>
+              <div v-if="edit_link.anh_dai_dien" class="mb-2">
+                  <img :src="getFullImageUrl(edit_link.anh_dai_dien)" 
+                        class="img-thumbnail" 
+                        style="max-width: 100px; max-height: 100px;" 
+                        @error="handleImageError" />
+              </div>
+              <input type="file" class="form-control" @change="onEditFileChange" />
+          </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
@@ -131,12 +141,12 @@
           <tr v-for="(linkItem, k) in list_link" :key="linkItem.id || k">
             <td class="align-middle text-nowrap">{{ k + 1 }}</td> <!-- số thứ tự -->
             <td class="align-middle text-nowrap">{{ linkItem.name }}</td>
-            <td class="align-middle" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+            <td class="align-middle" style="width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
               {{ linkItem.links }}
             </td>
             <td>
               <div v-if="linkItem.anh_dai_dien" class="image-container">
-                <img :src="getFullImageUrl(linkItem.anh_dai_dien)" 
+                <img  :src="getFullImageUrl(linkItem.anh_dai_dien)" 
                   class="product-image img-thumbnail" 
                   @error="handleImageError"
                   @click="showImagePreview(getFullImageUrl(linkItem.anh_dai_dien))" />
@@ -193,7 +203,17 @@ export default {
       // Đảm bảo không có dấu / cuối
       this.baseUrl = this.baseUrl.replace(/\/$/, '');
     },
-     getFullImageUrl(imagePath) {
+    resetCreateModal() {
+    this.create_link = {};
+    const input = document.querySelector('#exampleModal input[type="file"]');
+    if (input) input.value = '';
+    },
+    resetEditModal() {
+      this.edit_link.new_image = null;
+      const input = document.querySelector('#editModal input[type="file"]');
+      if (input) input.value = '';
+    },
+    getFullImageUrl(imagePath) {
       if (!imagePath) return '';
       
       // Nếu đã là URL đầy đủ thì return luôn
@@ -228,7 +248,7 @@ export default {
       const file = event.target.files[0];
       if (file) {
         // Có thể thêm logic upload file ở đây
-        this.create_san_pham.anh_dai_dien = file;
+        this.create_link.anh_dai_dien = file;
       }
     },
 
@@ -237,7 +257,7 @@ export default {
       const file = event.target.files[0];
       if (file) {
         // Có thể thêm logic upload file ở đây
-        this.edit_san_pham.new_image = file;
+        this.edit_link.new_image = file;
       }
     },
     loadlink() {
@@ -281,14 +301,24 @@ export default {
         toaster.error("Vui lòng nhập tên sản phẩm");
         return;
       }
-      
+
+      const formData = new FormData();
+      formData.append("name", this.create_link.name);
+      formData.append("links", this.create_link.links);
+      if (this.create_link.anh_dai_dien) {
+        formData.append("anh_dai_dien", this.create_link.anh_dai_dien);
+      }
+
       baseRequest
-        .post("api/link/create/", this.create_link)
+        .post("api/link/create/", formData, {
+          headers: { "Content-Type": "multipart/form-data" }
+        })
         .then((res) => {
           if (res.data.status) {
             toaster.success(res.data.message);
             this.create_link = {};
             this.loadlink();
+            this.resetCreateModal();
           } else {
             toaster.error(res.data.message);
           }
@@ -313,16 +343,24 @@ export default {
     return;
   }
 
-  
+  const formData = new FormData();
+  formData.append("name", this.edit_link.name);
+  formData.append("links", this.edit_link.links);
+
+  // Nếu có ảnh mới thì gửi lên, nếu không thì bỏ qua
+  if (this.edit_link.new_image) {
+    formData.append("anh_dai_dien", this.edit_link.new_image);
+  }
+
   baseRequest
-    .post(`api/link/update/${idToUse}/`, {
-      name: this.edit_link.name,
-      links: this.edit_link.links
+    .post(`api/link/update/${idToUse}/`, formData, {
+      headers: { "Content-Type": "multipart/form-data" }
     })
     .then((res) => {
       if (res.data.status) {
         toaster.success(res.data.message);
         this.loadlink();
+        this.resetEditModal();
       } else {
         toaster.error(res.data.message);
       }
@@ -331,6 +369,10 @@ export default {
       toaster.error("Có lỗi xảy ra khi cập nhật");
     });
 },
+prepareEdit(linkItem) {
+    this.edit_link = { ...linkItem, new_image: null };
+    this.$nextTick(() => this.resetEditModal());
+  },
 
 deleteLink() {
   const idToUse = this.delete_link.database_id || this.delete_link.id;

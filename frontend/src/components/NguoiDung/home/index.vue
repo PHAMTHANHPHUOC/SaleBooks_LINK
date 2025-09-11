@@ -4,30 +4,42 @@
     <div class="profile">
       <div class="avatar-circle">
         <img class="avatar-img" src="../../../assets/images/TINY.jpg" alt="Avatar" />
-        </div>
+      </div>
       <!-- <h1 class="brand">Tiny Daisy</h1> -->
     </div>
 
     <!-- Social Icons -->
     <div class="section-title">Connect with us</div>
     <div class="social-list">
-      <a target="_blank" rel="noopener" :href="list_link.Facebook.link" class="social-btn" aria-label="Facebook"><img :src="getFullImageUrl(list_link.Facebook.avatar)"class="card-img-top"@error="handleImageError"@click="showImagePreview(getFullImageUrl(list_link.Facebook.avatar))"/></a>
-      <a target="_blank" rel="noopener"  :href="list_link.Instagram.link" class="social-btn" aria-label="Instagram"><img :src="getFullImageUrl(list_link.Instagram.avatar)"class="card-img-top"@error="handleImageError"@click="showImagePreview(getFullImageUrl(list_link.Instagram.avatar))"/></a>
-      <a target="_blank" rel="noopener"  :href="list_link.YouTube.link" class="social-btn" aria-label="YouTube"><img :src="getFullImageUrl(list_link.YouTube.avatar)"class="card-img-top"@error="handleImageError"@click="showImagePreview(getFullImageUrl(list_link.YouTube.avatar))"/></a>
-      <a target="_blank" rel="noopener"  :href="list_link.TikTok.link" class="social-btn" aria-label="TikTok"><img :src="getFullImageUrl(list_link.TikTok.avatar)"class="card-img-top"@error="handleImageError"@click="showImagePreview(getFullImageUrl(list_link.TikTok.avatar))"/></a>
+      <a v-if="list_link.Facebook" target="_blank" rel="noopener" :href="list_link.Facebook.link" class="social-btn" aria-label="Facebook">
+        <img :src="getFullImageUrl(list_link.Facebook.avatar)" class="icon-connect" @error="handleImageError" @click="showImagePreview(getFullImageUrl(list_link.Facebook.avatar))"/>
+      </a>
+      <a v-if="list_link.Instagram" target="_blank" rel="noopener" :href="list_link.Instagram.link" class="social-btn" aria-label="Instagram">
+        <img :src="getFullImageUrl(list_link.Instagram.avatar)" class="icon-connect"  @error="handleImageError" @click="showImagePreview(getFullImageUrl(list_link.Instagram.avatar))"/>
+      </a>
+      <a v-if="list_link.YouTube" target="_blank" rel="noopener" :href="list_link.YouTube.link" class="social-btn" aria-label="YouTube">
+        <img :src="getFullImageUrl(list_link.YouTube.avatar)" class="icon-connect"  @error="handleImageError" @click="showImagePreview(getFullImageUrl(list_link.YouTube.avatar))"/>
+      </a>
+      <a v-if="list_link.TikTok" target="_blank" rel="noopener" :href="list_link.TikTok.link" class="social-btn" aria-label="TikTok">
+        <img :src="getFullImageUrl(list_link.TikTok.avatar)" class="icon-connect"  @error="handleImageError" @click="showImagePreview(getFullImageUrl(list_link.TikTok.avatar))"/>
+      </a>
     </div>
 
     <!-- Shop Now -->
     <div class="section-title">Shop now on</div>
-    <a class="main-btn" :href="list_link.Website.link" target="_blank" rel="noopener">
-      <img class="btn-icon" src="https://img.icons8.com/color/96/000000/internet--v1.png" alt="Website" />
+    <a v-if="list_link.Website" class="main-btn" :href="list_link.Website.link" target="_blank" rel="noopener">
+       <img :src="getFullImageUrl(list_link.Website.avatar)" class="btn-icon"   @error="handleImageError" @click="showImagePreview(getFullImageUrl(list_link.Website.avatar))"/>
       Website
+    </a>
+    <a v-if="list_link.Website" class="main-btn" :href="list_link.Amazon.link" target="_blank" rel="noopener">
+       <img :src="getFullImageUrl(list_link.Amazon.avatar)" class="btn-icon"   @error="handleImageError" @click="showImagePreview(getFullImageUrl(list_link.Amazon.avatar))"/>
+      Amazon 
     </a>
 
     <!-- Community -->
     <div class="section-title">Connect with me</div>
-    <a class="main-btn" :href="list_link.GroupsFacebook.link" target="_blank" rel="noopener">Tiny Daisy Community</a>
-    <a class="main-btn" :href="list_link.FreeDigital.link" target="_blank" rel="noopener">40 Free Digital Pages</a>
+    <a v-if="list_link.GroupsFacebook" class="main-btn" :href="list_link.GroupsFacebook.link" target="_blank" rel="noopener">Tiny Daisy Community</a>
+    <a v-if="list_link.FreeDigital" class="main-btn" :href="list_link.FreeDigital.link" target="_blank" rel="noopener">40 Free Digital Pages</a>
 
     <!-- Product Section: For từng loại sản phẩm -->
     <div v-for="type in productTypes" :key="type.id" class="product-section">
@@ -36,9 +48,9 @@
         <a v-for="product in type.products" :key="product.id" :href="product.duong_dan_ngoai"  @click="handleClick(product.id)" target="_blank" class="product-link">
           <div class="card">
             <img :src="getFullImageUrl(product.anh_dai_dien)" 
-                                     class="card-img-top" 
-                                     @error="handleImageError"
-                                     @click="showImagePreview(getFullImageUrl(product.anh_dai_dien))" />
+                 class="card-img-top" 
+                 @error="handleImageError"
+                 @click="showImagePreview(getFullImageUrl(product.anh_dai_dien))" />
             <div class="card-body">
               <div class="product-name">{{ product.ten_san_pham }}</div>
               <div class="product-price">${{ product.gia_mac_dinh }}</div>
@@ -48,7 +60,7 @@
       </div>
       <!-- Enhanced calcMargin for multiple devices -->
       <div :style="{ marginTop: calcMargin(type.products.length) + 'px' }" class="shop-now-wrapper">
-        <a target="_blank" rel="noopener" :href="type.link_danh_muc" class="shop-now-btn">SHOP NOW</a>
+        <a v-if="type.link_danh_muc" target="_blank" rel="noopener" :href="type.link_danh_muc" class="shop-now-btn">SHOP NOW</a>
       </div>
     </div>
   </div>
@@ -56,8 +68,7 @@
   <footer class="footer">
     <div class="footer-inner">
       <img src="../../../assets/images/TINY.jpg" alt="Bogiki Logo" class="avatar-circle" />
-      <p class="text-decoration-none fw-bold fs-5 text-darkz" >{{ list_link.Email.link }}</p>
-    
+      <p v-if="list_link.Email" class="text-decoration-none fw-bold fs-5 text-darkz">{{ list_link.Email.link }}</p>
     </div>
   </footer>
 </template>
@@ -70,7 +81,7 @@ export default {
     return {
       productTypes: [], // [{id, ten_loai, products: []}]
       windowWidth: window.innerWidth,
-      list_link : [],
+      list_link : {},
       windowHeight: window.innerHeight,
       baseUrl: '',
     };
@@ -297,6 +308,7 @@ export default {
       baseRequest
         .get("api/links/")
         .then((res) => {
+           console.log('Links:', res.data); 
           if (res.data && res.data.data) {
             this.list_link = res.data.data;
           } else if (Array.isArray(res.data)) {
@@ -304,9 +316,11 @@ export default {
           } else {
             this.list_link = {};
           }
+          console.log('list_link:', this.list_link);
         })
         .catch(() => {
           this.list_link = {};
+          console.error('Error loading links:', err);
         });
     },
     getFullImageUrl(imagePath) {
@@ -346,14 +360,20 @@ export default {
       console.log('Base URL:', this.baseUrl); // Debug
     },
     
+    
   }
 }
 </script>
 
 <style>
     @media (max-width: 600px) {
-      body { font-size: 14px; }
-      .bogiki-linktree { padding: 4px 1px 4px 1px; gap: 2px; }
+      body { font-size: 14px; max-width: 100vw;
+    overflow-x: hidden; }
+      .bogiki-linktree { padding: 4px 1px 4px 1px;
+    gap: 2px;
+    max-width: 100vw;
+    width: 100vw;
+    overflow-x: hidden;}
       .main-btn { gap: 2px; border-radius: 10px; margin-bottom: 2px; font-size: 0.9rem; padding: 6px 8px; }
       .btn-icon { width: 14px; height: 14px; }
       .shop-now-btn {
@@ -379,7 +399,6 @@ export default {
   grid-column: 1 / -1;
   margin-top: 20px; /* Cố định 20px cho mobile */
 }
-
       .card {
         min-height: 60px;
         border-radius: 4px;
@@ -523,23 +542,36 @@ export default {
       width: 100%;
       display: flex;
       justify-content: center;
-      gap: clamp(12px, 2vw, 22px);
+      gap: clamp(12px, 2vw, 35px);
       flex-wrap: wrap;
     }
-    .social-btn {
-      background: var(--card);
-      border-radius: 999px;
-      width: clamp(56px, 8vw, 72px);
-      height: clamp(56px, 8vw, 72px);
-      display: grid;
-      place-items: center;
-      box-shadow: var(--shadow-soft);
-      transition: transform .18s ease, box-shadow .18s ease, outline-color .18s ease;
-      outline: 0 solid transparent;
-    }
+  .social-btn {
+    background: var(--card);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-soft);
+    transition: transform .18s, box-shadow .18s, outline-color .18s;
+    outline: none;
+    border: none;
+    padding: 0;
+    margin: 0 8px;
+}
     .social-btn:hover { transform: translateY(-3px) scale(1.04); box-shadow: var(--shadow-hover); }
     .social-btn:focus-visible { outline: 4px solid var(--ring); }
-    .social-btn img { width: clamp(30px, 4.5vw, 40px); height: clamp(30px, 4.5vw, 40px); }
+    .social-btn img.icon-connect {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    outline: none;
+    object-fit: cover;
+    box-shadow: none;
+}
 
     /* Main CTAs */
     .main-btn {
@@ -570,7 +602,19 @@ export default {
       transition: transform .18s ease, box-shadow .18s ease, background .18s ease, color .18s ease;
     }
     .main-btn:active { transform: translateY(0); }
-    .btn-icon { width: clamp(26px, 3.8vw, 34px); height: clamp(26px, 3.8vw, 34px); flex: 0 0 auto; }
+    .btn-icon {
+        width: clamp(26px, 3.8vw, 45px);
+        height: clamp(26px, 3.8vw, 45px);
+        flex: 0 0 auto;
+        border-radius: 50%;
+        object-fit: cover;
+        background: transparent;
+        border: none;
+        outline: none;
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: 12px;
+      }
 
     /* Product grid */
     .product-section { width: 100%; }
@@ -667,7 +711,7 @@ export default {
   body { font-size: 16.5px; }
   .bogiki-linktree { padding: 10px 8px 20px; max-width: 100vw; gap: 12px; }
   .main-btn { gap: 10px; border-radius: 18px; margin: 0 auto 8px; }
-  .btn-icon { width: 22px; height: 22px; }
+  .btn-icon { width: 32px; height: 32px; }
   .shop-now-btn {
     padding: 10px 22px;
     border: 2px solid #2563eb;
@@ -680,15 +724,25 @@ export default {
     color: #fff;
     box-shadow: 0 4px 16px rgba(37,99,235,0.13);
   }
+  .social-btn img.icon-connect {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    outline: none;
+    object-fit: cover;
+    box-shadow: none;
+}
 
   .avatar-circle { width: 120px; height: 120px; }
   .avatar-img { width: 100%; height: 100%; }
   .brand { font-size: 1.5rem; }
   .section-title, .product-title { font-size: 1.1rem; margin: 12px 0 6px; }
-  .social-list { gap: 8px; }
+  .social-list { gap: 25px; }
   .social-btn { width: 38px; height: 38px; }
-  .social-btn img { width: 22px; height: 22px; }
-  .product-list { grid-template-columns: 1fr 1fr; }
+  .social-btn img { width: 40px; height: 40px; }
+  .product-list { grid-template-columns: 0.5fr 0.5fr; }
   .card { width: 100%;
   overflow: hidden;
   display: flex; }
@@ -698,7 +752,6 @@ export default {
   .product-price { font-size: 1.05rem; }
 }
 
-/* Subtle animation */
 @keyframes floatIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
