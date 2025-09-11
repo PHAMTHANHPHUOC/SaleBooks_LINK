@@ -27,13 +27,15 @@
 
     <!-- Shop Now -->
     <div class="section-title">Shop now on</div>
-    <a v-if="list_link.Website" class="main-btn" :href="list_link.Website.link" target="_blank" rel="noopener">
-       <img :src="getFullImageUrl(list_link.Website.avatar)" class="btn-icon"   @error="handleImageError" @click="showImagePreview(getFullImageUrl(list_link.Website.avatar))"/>
-      Website
+    <a v-if="list_link.Website" class="main-btn "  :href="list_link.Website.link" target="_blank" rel="noopener">
+      <span style="margin-right: 64px;" >
+         <img :src="getFullImageUrl(list_link.Website.avatar)"   class="btn-icon "   @error="handleImageError" @click="showImagePreview(getFullImageUrl(list_link.Website.avatar))"/>
+      Website 
+      </span>
     </a>
     <a v-if="list_link.Website" class="main-btn" :href="list_link.Amazon.link" target="_blank" rel="noopener">
        <img :src="getFullImageUrl(list_link.Amazon.avatar)" class="btn-icon"   @error="handleImageError" @click="showImagePreview(getFullImageUrl(list_link.Amazon.avatar))"/>
-      Amazon 
+      Amazon Store 
     </a>
 
     <!-- Community -->
@@ -548,8 +550,8 @@ export default {
   .social-btn {
     background: var(--card);
     border-radius: 50%;
-    width: 50px;
-    height: 50px;
+    width: 65px;
+    height: 65px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -575,23 +577,24 @@ export default {
 
     /* Main CTAs */
     .main-btn {
-      width: 100%;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 14px;
-      text-decoration: none;
-      padding: clamp(18px, 2.8vw, 26px) clamp(18px, 3vw, 28px);
-      background: var(--card);
-      color: var(--text);
-      font-weight: 800;
-      font-size: clamp(1.05rem, 2.6vw, 1.45rem);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow-soft);
-      letter-spacing: .03em;
-      transition: transform .18s ease, box-shadow .18s ease, background .18s ease, color .18s ease;
-      will-change: transform;
-    }
+  width: 100%;
+  display: flex; /* Đổi từ inline-flex sang flex */
+  align-items: center; /* Căn giữa icon và text theo chiều dọc */
+  justify-content: flex-start; /* Icon và text nằm cạnh nhau, bắt đầu từ trái */
+  gap: 14px;
+  text-decoration: none;
+  padding: clamp(18px, 2.8vw, 26px) clamp(18px, 3vw, 28px);
+  background: var(--card);
+  color: var(--text);
+  font-weight: 800;
+  font-size: clamp(1.05rem, 2.6vw, 1.45rem);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-soft);
+  letter-spacing: .03em;
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease, color .18s ease;
+  will-change: transform;
+  justify-content: center;
+}
     .main-btn:hover {
       font-size: clamp(1.1rem, 2.7vw, 1.5rem); 
       background: #ffeefdff;
@@ -614,6 +617,13 @@ export default {
         display: inline-block;
         vertical-align: middle;
         margin-right: 12px;
+        flex: 0 0 auto;
+        margin-right: 12px;
+      }
+      .main-btn span {
+        flex: 1;
+        text-align: center; /* căn giữa text */
+        display: block;
       }
 
     /* Product grid */
@@ -647,6 +657,9 @@ export default {
       flex-direction: column;
       align-items: center;
       transition: transform .18s ease, box-shadow .18s ease;
+      border: none !important;         /* Xóa viền Bootstrap */
+      box-shadow: none !important;     /* Xóa bóng viền nếu có */
+      background: transparent !important;  /* Nền trong suốt */
     }
     .card:hover { transform: translateY(-6px); box-shadow: var(--shadow-hover); }
     .card-img-top {
@@ -739,7 +752,7 @@ export default {
   .avatar-img { width: 100%; height: 100%; }
   .brand { font-size: 1.5rem; }
   .section-title, .product-title { font-size: 1.1rem; margin: 12px 0 6px; }
-  .social-list { gap: 25px; }
+  .social-list { gap: 30px; }
   .social-btn { width: 38px; height: 38px; }
   .social-btn img { width: 40px; height: 40px; }
   .product-list { grid-template-columns: 0.5fr 0.5fr; }
