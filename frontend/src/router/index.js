@@ -6,7 +6,7 @@ const routes = [
         path: '/', component: () => import('../components/NguoiDung/home/index.vue'), 
     },
     {
-        path: '/admin', component: () => import('../components/Admin/LoaiSanPham/index.vue'), 
+        path: '/admin/loai-san-pham', component: () => import('../components/Admin/LoaiSanPham/index.vue'), 
         meta : {layout : 'client'},
         beforeEnter: KiemTraAdmin,
     },
@@ -27,6 +27,11 @@ const routes = [
     },
     {
         path: '/admin/quan-ly-thong-ke-san-pham', component: () => import('../components/Admin/ThongKeSanPham/index.vue'), 
+        meta : {layout : 'client'},
+        beforeEnter: KiemTraAdmin,
+    },
+    {
+        path: '/admin', component: () => import('../components/Admin/QuanLyHome/index.vue'), 
         meta : {layout : 'client'},
         beforeEnter: KiemTraAdmin,
     },

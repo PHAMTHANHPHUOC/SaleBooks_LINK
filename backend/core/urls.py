@@ -1,5 +1,5 @@
 from django.urls import path,re_path
-from .views import view_count,view_sanpham,view_admin,view_link,view_location
+from .views import view_count,view_sanpham,view_admin,view_link,view_location,view_styles
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -55,6 +55,12 @@ path('api/links/list/data/', view_link.get_list_links_data, name='get_list_links
 path('api/link/create/',view_link.create_link,name='create_link'),
 path('api/link/delete/<int:id>/',view_link.delete_link,name='delete_link'),
 path('api/link/update/<int:id>/',view_link.update_link,name='update_link'),
+
+path('api/styles/list/', view_styles.get_list_styles, name='get_list_styles'),
+path('api/styles/list/data/', view_styles.get_data_styles, name='get_list_styles'),
+path('api/styles/create/',view_styles.create_styles,name='create_styles'),
+path('api/styles/delete/<int:id>/',view_styles.delete_styles,name='delete_styles'),
+path('api/styles/update/<int:id>/',view_styles.update_styles,name='update_styles'),
 
 
     

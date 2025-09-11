@@ -2,14 +2,14 @@
 <div class="bogiki-linktree">
     <!-- Avatar & Name -->
     <div class="profile">
-      <div class="avatar-circle">
+      <h1 class="avatar-circle">
         <img class="avatar-img" src="../../../assets/images/TINY.jpg" alt="Avatar" />
-      </div>
+      </h1>
       <!-- <h1 class="brand">Tiny Daisy</h1> -->
     </div>
 
     <!-- Social Icons -->
-    <div class="section-title">Connect with us</div>
+    <h2 :style="getStyle('h2')"  >Connect with us</h2>
     <div class="social-list">
       <a v-if="list_link.Facebook" target="_blank" rel="noopener" :href="list_link.Facebook.link" class="social-btn" aria-label="Facebook">
         <img :src="getFullImageUrl(list_link.Facebook.avatar)" class="icon-connect" @error="handleImageError" @click="showImagePreview(getFullImageUrl(list_link.Facebook.avatar))"/>
@@ -26,7 +26,7 @@
     </div>
 
     <!-- Shop Now -->
-    <div class="section-title">Shop now on</div>
+    <h2 class="section-title">Shop now on</h2>
     <a v-if="list_link.Website" class="main-btn "  :href="list_link.Website.link" target="_blank" rel="noopener">
       <span style="margin-right: 64px;" >
          <img :src="getFullImageUrl(list_link.Website.avatar)"   class="btn-icon "   @error="handleImageError" @click="showImagePreview(getFullImageUrl(list_link.Website.avatar))"/>
@@ -39,13 +39,13 @@
     </a>
 
     <!-- Community -->
-    <div class="section-title">Connect with me</div>
+    <h2 class="section-title">Connect with me</h2>
     <a v-if="list_link.GroupsFacebook" class="main-btn" :href="list_link.GroupsFacebook.link" target="_blank" rel="noopener">Tiny Daisy Community</a>
     <a v-if="list_link.FreeDigital" class="main-btn" :href="list_link.FreeDigital.link" target="_blank" rel="noopener">40 Free Digital Pages</a>
 
     <!-- Product Section: For từng loại sản phẩm -->
     <div v-for="type in productTypes" :key="type.id" class="product-section">
-      <div class="product-title">{{ type.ten_loai }}</div>
+      <h3 class="product-title">{{ type.ten_loai }}</h3>
       <div class="product-list">
         <a v-for="product in type.products" :key="product.id" :href="product.duong_dan_ngoai"  @click="handleClick(product.id)" target="_blank" class="product-link">
           <div class="card">
@@ -54,23 +54,23 @@
                  @error="handleImageError"
                  @click="showImagePreview(getFullImageUrl(product.anh_dai_dien))" />
             <div class="card-body">
-              <div class="product-name">{{ product.ten_san_pham }}</div>
-              <div class="product-price">${{ product.gia_mac_dinh }}</div>
+              <h4 class="product-name">{{ product.ten_san_pham }}</h4>
+              <h4 class="product-price">${{ product.gia_mac_dinh }}</h4>
             </div>
           </div>
         </a>
       </div>
       <!-- Enhanced calcMargin for multiple devices -->
-      <div :style="{ marginTop: calcMargin(type.products.length) + 'px' }" class="shop-now-wrapper">
+      <h4 :style="{ marginTop: calcMargin(type.products.length) + 'px' }" class="shop-now-wrapper">
         <a v-if="type.link_danh_muc" target="_blank" rel="noopener" :href="type.link_danh_muc" class="shop-now-btn">SHOP NOW</a>
-      </div>
+      </h4>
     </div>
   </div>
   
   <footer class="footer">
     <div class="footer-inner">
       <img src="../../../assets/images/TINY.jpg" alt="Bogiki Logo" class="avatar-circle" />
-      <p v-if="list_link.Email" class="text-decoration-none fw-bold fs-5 text-darkz">{{ list_link.Email.link }}</p>
+      <h4 v-if="list_link.Email" class="text-decoration-none fw-bold fs-5 text-darkz">{{ list_link.Email.link }}</h4>
     </div>
   </footer>
 </template>
@@ -86,6 +86,7 @@ export default {
       list_link : {},
       windowHeight: window.innerHeight,
       baseUrl: '',
+      list_style: {},
     };
   },
   computed: {
@@ -325,6 +326,34 @@ export default {
           console.error('Error loading links:', err);
         });
     },
+    loadStyle() {
+      baseRequest
+        .get("api/styles/list/data/")
+        .then((res) => {
+           console.log('Links:', res.data); 
+          if (res.data && res.data.data) {
+            this.list_style = res.data.data;
+          } else if (Array.isArray(res.data)) {
+            this.list_style = res.data;
+          } else {
+            this.list_style = {};
+          }
+          console.log('list_style:', this.list_style);
+        })
+        .catch(() => {
+          this.list_style = {};
+          console.error('Error loading links:', err);
+        });
+    },
+        getStyle(tag) {
+          const style = this.list_style[tag] || {};
+          return {
+            fontFamily: style.font_family || undefined,
+            fontSize: style.font_size || undefined,
+            color: style.color || undefined,
+            background: style.background || undefined,
+          };
+        },
     getFullImageUrl(imagePath) {
       if (!imagePath) return '';
       
@@ -386,7 +415,7 @@ export default {
       .avatar-circle { width: 50px; height: 50px; }
       .avatar-img { width: 100%; height: 100%; }
       .brand { font-size: 0.9rem; }
-      .section-title, .product-title { font-size: 0.9rem; margin: 4px 0 2px 0; }
+      .section-title, .product-title { font-size: 1.5rem; margin: 4px 0 2px 0; }
       .social-list { gap: 2px; }
       .social-btn { width: 18px; height: 18px; }
       .social-btn img { width: 10px; height: 10px; }
@@ -451,9 +480,9 @@ export default {
     html, body { height: 100%; }
 
     body {
-        font-family: 'Comic Neue', cursive;
+        /* font-family: 'Comic Neue', cursive; */
         font-weight: 400;
-        background: #fff7fbff;
+        background: #fffef3;
         color: #4b4040ff;
       }
     /* Container */
@@ -533,7 +562,7 @@ export default {
       color: var(--brand);
       font-weight: auto;
       text-align: center;
-      font-size: clamp(1.05rem, 2.4vw, 1.35rem);
+      font-size: clamp(1.9rem, 2.4vw, 1.35rem);
       letter-spacing: .06em;
       margin: calc(var(--gap) * 0.6) 0 .2rem;
       text-transform: uppercase;
@@ -577,24 +606,24 @@ export default {
 
     /* Main CTAs */
     .main-btn {
-  width: 100%;
-  display: flex; /* Đổi từ inline-flex sang flex */
-  align-items: center; /* Căn giữa icon và text theo chiều dọc */
-  justify-content: flex-start; /* Icon và text nằm cạnh nhau, bắt đầu từ trái */
-  gap: 14px;
-  text-decoration: none;
-  padding: clamp(18px, 2.8vw, 26px) clamp(18px, 3vw, 28px);
-  background: var(--card);
-  color: var(--text);
-  font-weight: 800;
-  font-size: clamp(1.05rem, 2.6vw, 1.45rem);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-soft);
-  letter-spacing: .03em;
-  transition: transform .18s ease, box-shadow .18s ease, background .18s ease, color .18s ease;
-  will-change: transform;
-  justify-content: center;
-}
+      width: 100%;
+      display: flex; /* Đổi từ inline-flex sang flex */
+      align-items: center; /* Căn giữa icon và text theo chiều dọc */
+      justify-content: flex-start; /* Icon và text nằm cạnh nhau, bắt đầu từ trái */
+      gap: 14px;
+      text-decoration: none;
+      padding: clamp(10px, 2.8vw, 26px) clamp(10px, 3vw, 28px);
+      background: var(--card);
+      color: var(--text);
+      font-weight: 800;
+      font-size: clamp(1.05rem, 2.6vw, 1.45rem);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-soft);
+      letter-spacing: .03em;
+      transition: transform .18s ease, box-shadow .18s ease, background .18s ease, color .18s ease;
+      will-change: transform;
+      justify-content: center;
+    }
     .main-btn:hover {
       font-size: clamp(1.1rem, 2.7vw, 1.5rem); 
       background: #ffeefdff;
@@ -723,7 +752,7 @@ export default {
 @media (max-width: 820px) {
   body { font-size: 16.5px; }
   .bogiki-linktree { padding: 10px 8px 20px; max-width: 100vw; gap: 12px; }
-  .main-btn { gap: 10px; border-radius: 18px; margin: 0 auto 8px; }
+  .main-btn { gap: 10px; border-radius: 18px; margin: 0 auto 8px; width: 90%;}
   .btn-icon { width: 32px; height: 32px; }
   .shop-now-btn {
     padding: 10px 22px;
@@ -752,8 +781,8 @@ export default {
   .avatar-img { width: 100%; height: 100%; }
   .brand { font-size: 1.5rem; }
   .section-title, .product-title { font-size: 1.1rem; margin: 12px 0 6px; }
-  .social-list { gap: 30px; }
-  .social-btn { width: 38px; height: 38px; }
+  .social-list { gap: 20px; }
+  .social-btn { width: 55px; height: 55px; }
   .social-btn img { width: 40px; height: 40px; }
   .product-list { grid-template-columns: 0.5fr 0.5fr; }
   .card { width: 100%;

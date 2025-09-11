@@ -18,6 +18,14 @@
         <li class="nav-item">
           <router-link to="/admin">
             <a class="nav-link" href="/admin">
+              <div class="parent-icon"><i class="fa-solid fa-house"></i></div>
+              <div class="menu-title">Quản Lý Home</div>
+            </a>
+          </router-link>
+        </li>
+        <li class="nav-item">
+          <router-link to="/admin/loai-san-pham">
+            <a class="nav-link" href="/admin/loai-san-pham">
               <div class="parent-icon"><i class="fa-brands fa-product-hunt"></i></div>
               <div class="menu-title">Quản Lý Loại Sản Phẩm</div>
             </a>
