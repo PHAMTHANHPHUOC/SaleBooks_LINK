@@ -61,6 +61,7 @@ path('api/styles/list/data/', view_styles.get_data_styles, name='get_list_styles
 path('api/styles/create/',view_styles.create_styles,name='create_styles'),
 path('api/styles/delete/<int:id>/',view_styles.delete_styles,name='delete_styles'),
 path('api/styles/update/<int:id>/',view_styles.update_styles,name='update_styles'),
+path('api/styles/background/',view_styles.site_background,name='update_styles'),
 
 
     

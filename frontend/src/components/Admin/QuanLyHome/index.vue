@@ -1,334 +1,283 @@
 <template>
-  <div class="card">
-    <div class="row">
-      <div class="col m-2">
-        <h3 class="card-title">Danh sách thẻ </h3>
+  <div class="card mt-2">
+    <!-- Header -->
+   
+
+    <!-- Form chỉnh màu nền -->
+    <div class="card mb-4">
+      <div class="card-body">
+         <div class="row align-items-center mb-3">
+      <div class="col">
+        <h2 class="card-title mt-3 ">Quản lý Style hệ thống</h2>
+        <h5 style="color: red;">Lưu ý : không nên xóa bất kỳ Tag nào vì nó ảnh hưởng đến hệ thống</h5 style="color: red;">
       </div>
-      <div class="col text-end m-2">
-        <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#exampleModal">
-          Thêm thẻ mới
+      <div class="col text-end">
+        <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#addStyleModal">
+          Thêm Style mới
         </button>
       </div>
     </div>
+        <h5 class="card-title">Thay đổi màu nền hệ thống</h5>
+        <div class="row align-items-center">
+          <div class="col-md-6">
+            <input v-model="site_background" type="text" class="form-control" placeholder="#fffef3" />
+          </div>
+          <div class="col-md-4">
+            <button class="btn btn-success" @click="updateBackground">Cập nhật màu nền</button>
+          </div>
+          <div class="col-md-2 text-end">
+           <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#ghichumodel">
+         Ghi chú
+        </button>
+          </div>
 
-    <!-- Modal Thêm Mới -->
-   <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
+        </div>
+      </div>
+    </div>
+   <div class="modal fade" id="ghichumodel" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl"> <!-- Thay modal-xl để bảng to hơn -->
     <div class="modal-content">
       <div class="modal-header">
         <h1 class="modal-title fs-5" id="exampleModalLabel">
-          Thêm Mới Style
+          Ghi chú
         </h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <div class="mb-2">
-          <label class="form-label">Tag</label>
-          <input v-model="create_san_pham.tag" type="text" class="form-control" />
-        </div>
-        <div class="mb-2">
-          <label class="form-label">Font Family</label>
-          <input v-model="create_san_pham.font_family" type="text" class="form-control" />
-        </div>
-        <div class="mb-2">
-          <label class="form-label">Font Size</label>
-          <input v-model="create_san_pham.font_size" type="text" class="form-control" />
-        </div>
-        <div class="mb-2">
-          <label class="form-label">Color</label>
-          <input v-model="create_san_pham.color" type="text" class="form-control" />
-        </div>
-        <div class="mb-2">
-          <label class="form-label">Background</label>
-          <input v-model="create_san_pham.background" type="text" class="form-control" />
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-bordered align-middle">
+              <tbody>
+                <tr>
+                  <th>tieude</th>
+                  <td>Connect with us, Shop now on, Connect with me</td>
+                </tr>
+                <tr>
+                  <th>button</th>
+                  <td>Website, Amazon Store, Tiny Daisy Community, 40 Free Digital Pages</td>
+                </tr>
+                <tr>
+                  <th>loai-san-pham</th>
+                  <td>Fantasy, Fuzzy Buddies (tên của loại sản phẩm)</td>
+                </tr>
+                <tr>
+                  <th>san-pham</th>
+                  <td>Tên Sản phẩm</td>
+                </tr>
+                <tr>
+                  <th>button-shop-now</th>
+                  <td>button SHOP NOW</td>
+                </tr>
+                <tr>
+                  <th>email</th>
+                  <td>Email</td>
+                </tr>
+                <tr>
+                  <th>price</th>
+                  <td>Giá Sản phẩm</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
           Close
         </button>
-        <button @:click="create_style()" class="btn btn-primary" data-bs-dismiss="modal">
-          Thêm Mới
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" >
+          Xác nhận
         </button>
       </div>
     </div>
   </div>
 </div>
 
-    <!-- Modal Cập Nhật -->
-     <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="editModalLabel">
-          Cập Nhật Style
-        </h1>
-      </div>
-      <div class="modal-body">
-        <div class="mb-2">
-          <label class="form-label">Tag</label>
-          <input v-model="edit_san_pham.tag" type="text" class="form-control" />
-        </div>
-        <div class="mb-2">
-          <label class="form-label">Font Family</label>
-          <input v-model="edit_san_pham.font_family" type="text" class="form-control" />
-        </div>
-        <div class="mb-2">
-          <label class="form-label">Font Size</label>
-          <input v-model="edit_san_pham.font_size" type="text" class="form-control" />
-        </div>
-        <div class="mb-2">
-          <label class="form-label">Color</label>
-          <input v-model="edit_san_pham.color" type="text" class="form-control" />
-        </div>
-        <div class="mb-2">
-          <label class="form-label">Background</label>
-          <input v-model="edit_san_pham.background" type="text" class="form-control" />
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-          Close
-        </button>
-        <button @click="update_style()" class="btn btn-primary" data-bs-dismiss="modal">
-          Cập Nhật
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-    
-    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h1 class="modal-title fs-5" id="exampleModalLabel">
-              Xóa tag
-            </h1>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <div class="alert alert-danger border-0 bg-danger alert-dismissible fade show py-2">
-              <div class="d-flex align-items-center">
-                <div class="font-35 text-white">
-                  <i class="bx bxs-message-square-x"></i>
-                </div>
-                <div class="ms-1">
-                  <h6 class="mb-1 text-white">
-                    Bạn chắc chắc xóa link
-                    <b>{{ delete_san_pham.tag }}</b> này chứ !!!
-                  </h6>
-                  <div class="text-white text-nowrap">
-                    <b>LƯU Ý !!!</b> Điều này không thể khôi phục khi ấn xác
-                    nhận
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-              Close
-            </button>
-            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" v-on:click="delete_style()">
-              Xác nhận
-            </button>
-          </div>
-        </div>
-      </div>
-    </div> 
-
-    <!-- Bảng dữ liệu -->
+    <!-- Bảng style -->
     <div class="card-body">
       <div class="table-responsive">
-        <table class="table table-bordered">
-          <thead>
+        <table class="table table-bordered align-middle">
+          <thead class="table-light">
             <tr>
-              <th class="text-center align-middle text-nowrap">#</th>
-              <th class="text-center align-middle text-nowrap">Tag</th>
-              <th class="text-center align-middle text-nowrap">Font_family</th>
-              <th class="text-center align-middle text-nowrap">Font_size</th>
-              <th class="text-center align-middle text-nowrap">Color</th>
-              <th class="text-center align-middle text-nowrap">background</th>
-              <th class="text-center align-middle text-nowrap">Action</th>
+              <th>Tag</th>
+              <th>Font Family (Google Fonts)</th>
+              <!-- <th>Font Size</th> -->
+              <th>Color</th>
+              <th class="text-center">Hành động</th>
             </tr>
           </thead>
-         <tbody>
-          <tr v-for="(linkItem, k) in list_style" :key="linkItem.id || k">
-            <td class="align-middle text-nowrap">{{ k + 1 }}</td> <!-- số thứ tự -->
-            <td class="align-middle text-nowrap">{{ linkItem.tag }}</td>
-            <td class="align-middle" >
-              {{ linkItem.font_family }}
-            </td>
-            <td class="align-middle" >
-              {{ linkItem.font_size }}
-            </td>
-            <td class="align-middle" >
-              {{ linkItem.color }}
-            </td>
-            <td class="align-middle" >
-              {{ linkItem.background }}
-            </td>
-            
-
-            <td class="text-center align-middle text-nowrap">
-              <button @click="setEditSanPham(linkItem)" class="btn btn-info me-2" data-bs-toggle="modal" data-bs-target="#editModal">Cập Nhật</button>
-              <button @click="setDeleteSanPham(linkItem)"  class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">Xóa Bỏ</button>
-            </td>
-          </tr>
-        </tbody>
-
+          <tbody>
+            <tr v-for="item in list_style" :key="item.id">
+              <td>{{ item.tag }}</td>
+              <td>{{ item.font_family }}</td>
+              <!-- <td>{{ item.font_size }}</td> -->
+              <td>
+                <span :style="{color: item.color}">{{ item.color }}</span>
+              </td>
+              <td class="text-center">
+                <button class="btn btn-info me-2" @click="setEditSanPham(item)" data-bs-toggle="modal" data-bs-target="#editStyleModal">Sửa</button>
+                <button class="btn btn-danger" @click="setDeleteSanPham(item)" data-bs-toggle="modal" data-bs-target="#deleteStyleModal">Xóa</button>
+              </td>
+            </tr>
+          </tbody>
         </table>
+      </div>
+    </div>
+
+    <!-- Modal Thêm Style -->
+    <div class="modal fade" id="addStyleModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header"><h5>Thêm Style mới</h5></div>
+          <div class="modal-body">
+            <input v-model="create_san_pham.tag" class="form-control mb-2" placeholder="Tag (ví dụ: h2, .main-btn)">
+            <input v-model="create_san_pham.font_family" class="form-control mb-2" placeholder="Font Family (ví dụ: Roboto)">
+            <!-- <input v-model="create_san_pham.font_size" class="form-control mb-2" placeholder="Font Size (ví dụ: 18px)"> -->
+            <input v-model="create_san_pham.color" class="form-control mb-2" placeholder="Color (ví dụ: #333)">
+            <small class="text-muted">Font Family có thể nhập bất kỳ, nếu là Google Fonts sẽ tự động tải.</small>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-primary" @click="create_style">Thêm mới</button>
+            <button class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Sửa Style -->
+    <div class="modal fade" id="editStyleModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header"><h5>Sửa Style</h5></div>
+          <div class="modal-body">
+            <label for="">	Font Family(Google Fonts)</label>
+            <input v-model="edit_san_pham.font_family" class="form-control mb-2" placeholder="Font Family">
+            <!-- <label for="">Font Size</label>
+            <input v-model="edit_san_pham.font_size" class="form-control mb-2" placeholder="Font Size"> -->
+            <label for="">Color</label>
+            <input v-model="edit_san_pham.color" class="form-control mb-2" placeholder="Color">
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-success" @click="update_style">Cập nhật</button>
+            <button class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Xóa Style -->
+    <div class="modal fade" id="deleteStyleModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header"><h5>Xóa Style</h5></div>
+          <div class="modal-body">
+            Bạn có chắc muốn xóa style <b>{{ delete_san_pham.tag }}</b>?
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-danger" @click="delete_style">Xóa</button>
+            <button class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
+
 <script>
 import { createToaster } from "@meforma/vue-toaster";
 const toaster = createToaster({ position: "top-right" });
 import baseRequest from '../../../../src/core/baseRequest';
-export default {
-    data() {
-        return {
-            list_style: [],
-            loading: false,
-            api_response: '',
-            create_san_pham: {},
-            edit_san_pham: {},
-            delete_san_pham: {},
 
-            
-        }
-    },
-    mounted() {
-        this.loadStyle();
-        
-    },
-    methods: {
-      loadStyle() {
+export default {
+  data() {
+    return {
+      list_style: [],
+      loading: false,
+      create_san_pham: {},
+      edit_san_pham: {},
+      delete_san_pham: {},
+      site_background: '',
+    }
+  },
+  mounted() {
+    this.loadStyle();
+    this.loadBackground();
+  },
+  methods: {
+    // Lấy danh sách style
+    loadStyle() {
       this.loading = true;
-      baseRequest
-        .get("api/styles/list/")
+      baseRequest.get("api/styles/list/")
         .then((res) => {
-          console.log("API Response:", res.data); 
-          this.api_response = JSON.stringify(res.data);
-          
-          // Kiểm tra cấu trúc response
-          if (res.data && res.data.data) {
-            this.list_style = res.data.data;
-          } else if (Array.isArray(res.data)) {
-            // Trường hợp API trả về trực tiếp array
-            this.list_style = res.data;
-          } else {
-            console.error("Unexpected response structure:", res.data);
-            this.list_style = [];
-          }
-          
-          if (res.data.status === 0) {
-            toaster.error(res.data.message);
-          }
+          this.list_style = res.data;
         })
-        .catch((error) => {
-          console.error("API Error:", error);
-          this.list_style = [];
-          if (toaster) {
-            toaster.error("Lỗi khi tải dữ liệu: " + error.message);
-          }
+        .catch(() => {
+          toaster.error("Lỗi khi tải style!");
         })
         .finally(() => {
           this.loading = false;
         });
-      },
-      create_style() {
-        // Chuẩn bị dữ liệu gửi lên API
-        const payload = {
-          tag: this.create_san_pham.tag,
-          font_family: this.create_san_pham.font_family,
-          font_size: this.create_san_pham.font_size,
-          color: this.create_san_pham.color,
-          background: this.create_san_pham.background,
-        };
-
-        baseRequest
-          .post("api/styles/create/", payload)
-          .then((res) => {
-            if (res.data.status) {
-              this.loadStyle(); // Load lại danh sách sau khi tạo mới
-              toaster.success(res.data.message || "Tạo style thành công!");
-            } else {
-              toaster.error(res.data.message || "Tạo style thất bại!");
-            }
-          })
-          .catch((error) => {
-            toaster.error("Lỗi khi tạo style: " + error.message);
-          });
-      },
-      update_style() {
-      // Chuẩn bị dữ liệu gửi lên API
-      const payload = {
-        tag: this.edit_san_pham.tag,
-        font_family: this.edit_san_pham.font_family,
-        font_size: this.edit_san_pham.font_size,
-        color: this.edit_san_pham.color,
-        background: this.edit_san_pham.background,
-      };
-
-      // Giả sử bạn đã có id của style cần cập nhật trong edit_san_pham.id
-      baseRequest
-        .post(`api/styles/update/${this.edit_san_pham.id}/`, payload)
-        .then((res) => {
-          if (res.data.status) {
-            this.loadStyle(); // Load lại danh sách sau khi cập nhật
-            toaster.success(res.data.message || "Cập nhật style thành công!");
-          } else {
-            toaster.error(res.data.message || "Cập nhật style thất bại!");
-          }
-        })
-        .catch((error) => {
-          toaster.error("Lỗi khi cập nhật style: " + error.message);
+    },
+    // Lấy màu nền hiện tại
+    loadBackground() {
+      baseRequest.get("api/styles/background/")
+        .then(res => {
+          this.site_background = res.data.background;
         });
     },
-      delete_style() {
-        // Giả sử bạn đã có id của style cần xóa trong delete_san_pham.id
-        baseRequest
-          .post(`api/styles/delete/${this.delete_san_pham.id}/`)
-          .then((res) => {
-            if (res.data.status) {
-              this.loadStyle(); // Load lại danh sách sau khi xóa
-              toaster.success(res.data.message || "Xóa style thành công!");
-            } else {
-              toaster.error(res.data.message || "Xóa style thất bại!");
-            }
-          })
-          .catch((error) => {
-            toaster.error("Lỗi khi xóa style: " + error.message);
-          });
-      },
-      setEditSanPham(item) {
-          // Copy toàn bộ dữ liệu từ item sang edit_san_pham để binding vào form sửa
-          this.edit_san_pham = {
-            id: item.id,
-            tag: item.tag,
-            font_family: item.font_family,
-            font_size: item.font_size,
-            color: item.color,
-            background: item.background,
-          };
-        },
-      setDeleteSanPham(item) {
-          // Copy toàn bộ dữ liệu từ item sang edit_san_pham để binding vào form sửa
-          this.delete_san_pham = {
-            id: item.id,
-            tag: item.tag,
-            font_family: item.font_family,
-            font_size: item.font_size,
-            color: item.color,
-            background: item.background,
-          };
-        },
-      
-    }
+    // Cập nhật màu nền
+    updateBackground() {
+      baseRequest.post("api/styles/background/", { background: this.site_background })
+        .then(res => {
+          if (res.data.status) {
+            toaster.success("Đã cập nhật màu nền!");
+            this.loadBackground();
+          } else {
+            toaster.error("Cập nhật thất bại!");
+          }
+        });
+    },
+    // Thêm style mới
+    create_style() {
+      baseRequest.post("api/styles/create/", this.create_san_pham)
+        .then(() => {
+          toaster.success("Thêm style thành công!");
+          this.loadStyle();
+        })
+        .catch(() => {
+          toaster.error("Lỗi khi thêm style!");
+        });
+    },
+    // Cập nhật style
+    update_style() {
+      baseRequest.post(`api/styles/update/${this.edit_san_pham.id}/`, this.edit_san_pham)
+        .then(() => {
+          toaster.success("Cập nhật style thành công!");
+          this.loadStyle();
+        })
+        .catch(() => {
+          toaster.error("Lỗi khi cập nhật style!");
+        });
+    },
+    // Xóa style
+    delete_style() {
+      baseRequest.post(`api/styles/delete/${this.delete_san_pham.id}/`)
+        .then(() => {
+          toaster.success("Xóa style thành công!");
+          this.loadStyle();
+        })
+        .catch(() => {
+          toaster.error("Lỗi khi xóa style!");
+        });
+    },
+    // Chọn style để sửa
+    setEditSanPham(item) {
+      this.edit_san_pham = { ...item };
+    },
+    // Chọn style để xóa
+    setDeleteSanPham(item) {
+      this.delete_san_pham = { ...item };
+    },
+  }
 }
 </script>
-<style >
-    
-</style>

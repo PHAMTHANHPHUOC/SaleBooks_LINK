@@ -1,70 +1,52 @@
-from django.http import JsonResponse
-from django.views.decorators.http import require_http_methods
-from django.views.decorators.csrf import csrf_exempt
-from core.models.StyleConfig import StyleConfig
-from django.views.decorators.http import require_http_methods
-from rest_framework.response import Response
-from rest_framework import status
-from django.shortcuts import get_object_or_404
-import json
 from rest_framework.decorators import api_view
-
+from rest_framework.response import Response
+from core.models.StyleConfig import StyleConfig, SiteConfig
+from django.http import JsonResponse
 @api_view(['GET'])
 def get_list_styles(request):
-    """
-    Trả về danh sách tất cả loại sản phẩm
-    """
     list_data = StyleConfig.objects.all()
     data = []
-    for loai in list_data:
+    for style in list_data:
         data.append({
-            'id': loai.id,
-            'tag': loai.tag,
-            'font_family': loai.font_family,  # Thêm trường link_danh_muc
-            'font_size': loai.font_size,
-            'color': loai.color,
-            'background': loai.background,
+            'id': style.id,
+            'tag': style.tag,
+            'font_family': style.font_family,
+            'font_size': style.font_size,
+            'color': style.color,
         })
     return Response(data)
-
-@api_view(['GET'])
 def get_data_styles(request):
-    """
-    Trả về danh sách tất cả loại sản phẩm dưới dạng dict {tag: {...style...}}
-    """
-    list_data = StyleConfig.objects.all()
+    styles = StyleConfig.objects.all()
     data = {}
-    for loai in list_data:
-        data[loai.tag] = {
-            'font_family': loai.font_family,
-            'font_size': loai.font_size,
-            'color': loai.color,
-            'background': loai.background,
+    for style in styles:
+        data[style.tag] = {
+            "font_family": style.font_family,
+            "font_size": style.font_size,
+            "color": style.color,
+            # Không lấy background ở đây!
         }
-    return Response(data)
-
+    # Nếu muốn trả về background, lấy từ SiteConfig
+    site_config = SiteConfig.objects.first()
+    background = site_config.background if site_config else "#fffef3"
+    return JsonResponse({"data": data, "background": background})
 @api_view(['POST'])
 def create_styles(request):
     try:
         tag = request.data.get('tag')
         font_family = request.data.get('font_family', '')  
         font_size = request.data.get('font_size', '')  
-        color = request.data.get('color', '')  
-        background = request.data.get('background', '')  
-        StyleConfig.objects.create(tag=tag,font_family=font_family,font_size=font_size,color=color,background=background)
-        return JsonResponse({'status': True, 'message': 'thêm tag thành công.'})
+        color = request.data.get('color', '')
+        StyleConfig.objects.create(
+            tag=tag,
+            font_family=font_family,
+            font_size=font_size,
+            color=color,
+        )
+        return Response({'status': True, 'message': 'Thêm style thành công.'})
     except Exception as e:
-            return JsonResponse({'status': False, 'error': str(e)}, status=400)
+        return Response({'status': False, 'error': str(e)}, status=400)
 
 @api_view(['POST'])
-def delete_styles(request, id):
-    try:
-        StyleConfig.objects.get(id=id).delete()
-        return Response({'status': True, 'message': 'Đã xóa thành công'})
-    except StyleConfig.DoesNotExist:
-        return Response({'status': False, 'message': 'Không tìm thấy tag'}, status=status.HTTP_404_NOT_FOUND)
-
-@api_view(['POST'])  
 def update_styles(request, id):
     try:
         data = StyleConfig.objects.get(id=id)
@@ -72,18 +54,28 @@ def update_styles(request, id):
         data.font_family = request.data.get('font_family', data.font_family)
         data.font_size = request.data.get('font_size', data.font_size)
         data.color = request.data.get('color', data.color)
-        data.background = request.data.get('background', data.background)
-
-
-        # Xử lý cập nhật ảnh đại diện nếu có file mới
-
         data.save()
-        return Response({
-            'status': True,
-            'message': 'Đã cập nhật link thành công!'
-        }, status=status.HTTP_200_OK)
+        return Response({'status': True, 'message': 'Đã cập nhật style thành công!'})
     except StyleConfig.DoesNotExist:
-        return Response({
-            'status': False,
-            'message': 'Không tìm được link để cập nhật!'
-        }, status=status.HTTP_404_NOT_FOUND)
+        return Response({'status': False, 'message': 'Không tìm được style để cập nhật!'}, status=404)
+
+@api_view(['POST'])
+def delete_styles(request, id):
+    try:
+        StyleConfig.objects.get(id=id).delete()
+        return Response({'status': True, 'message': 'Đã xóa thành công'})
+    except StyleConfig.DoesNotExist:
+        return Response({'status': False, 'message': 'Không tìm thấy tag'}, status=404)
+
+# API lấy màu nền chung
+@api_view(['GET', 'POST'])
+def site_background(request):
+    if request.method == 'GET':
+        config = SiteConfig.objects.first()
+        return Response({'background': config.background if config else '#fffef3'})
+    elif request.method == 'POST':
+        color = request.data.get('background', '#fffef3')
+        config, _ = SiteConfig.objects.get_or_create(id=1)
+        config.background = color
+        config.save()
+        return Response({'status': True, 'background': config.background})

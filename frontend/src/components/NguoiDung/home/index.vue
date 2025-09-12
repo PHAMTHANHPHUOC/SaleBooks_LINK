@@ -9,7 +9,7 @@
     </div>
 
     <!-- Social Icons -->
-    <h2 :style="getStyle('h2')"  >Connect with us</h2>
+    <h2 class="h2-title"  :style="getStyle('tieude')"  >Connect with us</h2>
     <div class="social-list">
       <a v-if="list_link.Facebook" target="_blank" rel="noopener" :href="list_link.Facebook.link" class="social-btn" aria-label="Facebook">
         <img :src="getFullImageUrl(list_link.Facebook.avatar)" class="icon-connect" @error="handleImageError" @click="showImagePreview(getFullImageUrl(list_link.Facebook.avatar))"/>
@@ -26,27 +26,27 @@
     </div>
 
     <!-- Shop Now -->
-    <h2 class="section-title">Shop now on</h2>
-    <a v-if="list_link.Website" class="main-btn "  :href="list_link.Website.link" target="_blank" rel="noopener">
-      <span style="margin-right: 64px;" >
+    <h2 class="h2-title" :style="getStyle('tieude')" >Shop now on</h2>
+    <a v-if="list_link.Website" :style="getStyle('button')" class="main-btn"  :href="list_link.Website.link" target="_blank" rel="noopener">
+      <span class="website-btn-content">
          <img :src="getFullImageUrl(list_link.Website.avatar)"   class="btn-icon "   @error="handleImageError" @click="showImagePreview(getFullImageUrl(list_link.Website.avatar))"/>
       Website 
       </span>
     </a>
-    <a v-if="list_link.Website" class="main-btn" :href="list_link.Amazon.link" target="_blank" rel="noopener">
+    <a v-if="list_link.Website" :style="getStyle('button')" class="main-btn" :href="list_link.Amazon.link" target="_blank" rel="noopener">
        <img :src="getFullImageUrl(list_link.Amazon.avatar)" class="btn-icon"   @error="handleImageError" @click="showImagePreview(getFullImageUrl(list_link.Amazon.avatar))"/>
       Amazon Store 
     </a>
 
     <!-- Community -->
-    <h2 class="section-title">Connect with me</h2>
-    <a v-if="list_link.GroupsFacebook" class="main-btn" :href="list_link.GroupsFacebook.link" target="_blank" rel="noopener">Tiny Daisy Community</a>
-    <a v-if="list_link.FreeDigital" class="main-btn" :href="list_link.FreeDigital.link" target="_blank" rel="noopener">40 Free Digital Pages</a>
+    <h2 class="h2-title" :style="getStyle('tieude')" >Connect with me</h2>
+    <a v-if="list_link.GroupsFacebook"  :style="getStyle('button')" class="main-btn" :href="list_link.GroupsFacebook.link" target="_blank" rel="noopener">Tiny Daisy Community</a>
+    <a v-if="list_link.FreeDigital" :style="getStyle('button')" class="main-btn" :href="list_link.FreeDigital.link" target="_blank" rel="noopener">40 Free Digital Pages</a>
 
     <!-- Product Section: For từng loại sản phẩm -->
     <div v-for="type in productTypes" :key="type.id" class="product-section">
-      <h3 class="product-title">{{ type.ten_loai }}</h3>
-      <div class="product-list">
+      <h3 :style="getStyle('loai-san-pham')" class="h3-title ">{{ type.ten_loai }}</h3>
+      <div class="product-list ">
         <a v-for="product in type.products" :key="product.id" :href="product.duong_dan_ngoai"  @click="handleClick(product.id)" target="_blank" class="product-link">
           <div class="card">
             <img :src="getFullImageUrl(product.anh_dai_dien)" 
@@ -54,15 +54,15 @@
                  @error="handleImageError"
                  @click="showImagePreview(getFullImageUrl(product.anh_dai_dien))" />
             <div class="card-body">
-              <h4 class="product-name">{{ product.ten_san_pham }}</h4>
-              <h4 class="product-price">${{ product.gia_mac_dinh }}</h4>
+              <h4 :style="getStyle('san-pham')" class="product-name">{{ product.ten_san_pham }}</h4>
+              <h4 :style="getStyle('price')" class="product-price">${{ product.gia_mac_dinh }}</h4>
             </div>
           </div>
         </a>
       </div>
       <!-- Enhanced calcMargin for multiple devices -->
       <h4 :style="{ marginTop: calcMargin(type.products.length) + 'px' }" class="shop-now-wrapper">
-        <a v-if="type.link_danh_muc" target="_blank" rel="noopener" :href="type.link_danh_muc" class="shop-now-btn">SHOP NOW</a>
+        <a v-if="type.link_danh_muc" target="_blank" rel="noopener" :href="type.link_danh_muc" :style="getStyle('button-shop-now')" class="shop-now-btn">SHOP NOW</a>
       </h4>
     </div>
   </div>
@@ -70,7 +70,7 @@
   <footer class="footer">
     <div class="footer-inner">
       <img src="../../../assets/images/TINY.jpg" alt="Bogiki Logo" class="avatar-circle" />
-      <h4 v-if="list_link.Email" class="text-decoration-none fw-bold fs-5 text-darkz">{{ list_link.Email.link }}</h4>
+      <h4 :style="getStyle('email')" v-if="list_link.Email" class="text-decoration-none fw-bold fs-5 text-darkz">{{ list_link.Email.link }}</h4>
     </div>
   </footer>
 </template>
@@ -87,6 +87,7 @@ export default {
       windowHeight: window.innerHeight,
       baseUrl: '',
       list_style: {},
+      resizeKey : 0,
     };
   },
   computed: {
@@ -114,6 +115,9 @@ export default {
     this.initializeBaseUrl();
     this.loadlink();
     this.loadAllProductTypes();
+    this.loadBackground();
+    await this.loadStyle();
+    this.loadFonts();
     try {
       await baseRequest.get('api/frontend-page-visit/?page=home');
     } catch (err) {
@@ -124,10 +128,19 @@ export default {
   beforeDestroy() {
     window.removeEventListener('resize', this.handleResize);
   },
+  watch: {
+    windowWidth() {
+      this.resizeKey++;
+    },
+    windowHeight() {
+      this.resizeKey++;
+    }
+  },
   methods: {
     handleResize() {
       this.windowWidth = window.innerWidth;
       this.windowHeight = window.innerHeight;
+      this.$forceUpdate();
     },
    
     // Enhanced calcMargin for multiple devices
@@ -258,6 +271,14 @@ export default {
       const rows = Math.ceil(cardCount / 2);
       return Math.round(baseMargin * aspectMultiplier * (rows - 0.5));
     },
+    async loadBackground() {
+    try {
+      const res = await baseRequest.get("api/styles/background/");
+      document.body.style.background = res.data.background || "#fffef3";
+    } catch (e) {
+      document.body.style.background = "#fffef3";
+    }
+  },
 
     // Method with device pixel ratio consideration
     calcMarginWithDPR(cardCount) {
@@ -326,25 +347,38 @@ export default {
           console.error('Error loading links:', err);
         });
     },
-    loadStyle() {
-      baseRequest
-        .get("api/styles/list/data/")
-        .then((res) => {
-           console.log('Links:', res.data); 
-          if (res.data && res.data.data) {
-            this.list_style = res.data.data;
-          } else if (Array.isArray(res.data)) {
-            this.list_style = res.data;
-          } else {
-            this.list_style = {};
-          }
-          console.log('list_style:', this.list_style);
-        })
-        .catch(() => {
+     async loadStyle() {
+    baseRequest
+      .get("api/styles/list/data/")
+      .then((res) => {
+        if (res.data && res.data.data) {
+          this.list_style = res.data.data;
+        } else if (Array.isArray(res.data)) {
+          this.list_style = res.data;
+        } else {
           this.list_style = {};
-          console.error('Error loading links:', err);
+        }
+        // Tự động tải font nếu có
+        Object.values(this.list_style).forEach(style => {
+          if (style.font_family) this.loadFont(style.font_family);
         });
-    },
+      })
+      .catch(() => {
+        this.list_style = {};
+      });
+  },
+      loadFont(fontFamily) {
+  if (!fontFamily) return;
+  // Google Fonts
+  const googleFontUrl = `https://fonts.googleapis.com/css?family=${fontFamily.replace(/ /g, '+')}:400,700&display=swap`;
+  // Kiểm tra đã tải chưa
+  if (!document.querySelector(`link[href="${googleFontUrl}"]`)) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = googleFontUrl;
+    document.head.appendChild(link);
+  }
+},
         getStyle(tag) {
           const style = this.list_style[tag] || {};
           return {
@@ -505,7 +539,6 @@ export default {
       border: 3px solid #2563eb;
       border-radius: 40px;
       background: #fff;
-      color: #1a1a1a;
       font-weight: 800;
       font-size: 1.18rem;
       letter-spacing: .04em;
@@ -525,6 +558,7 @@ export default {
       color: inherit;          /* giữ nguyên màu chữ như trong div */
       display: block;          /* để toàn bộ card clickable */
     }
+    
 
     /* Profile */
     .profile { text-align: center; }
@@ -576,6 +610,7 @@ export default {
       gap: clamp(12px, 2vw, 35px);
       flex-wrap: wrap;
     }
+    
   .social-btn {
     background: var(--card);
     border-radius: 50%;
@@ -633,6 +668,13 @@ export default {
       border: 2.5px solid #111;
       transition: transform .18s ease, box-shadow .18s ease, background .18s ease, color .18s ease;
     }
+    .h2-title{
+      font-size:40px;
+       font-weight: 550;
+    }
+    .website-btn-content{
+      margin-right: 64px; 
+    }
     .main-btn:active { transform: translateY(0); }
     .btn-icon {
         width: clamp(26px, 3.8vw, 45px);
@@ -657,14 +699,10 @@ export default {
 
     /* Product grid */
     .product-section { width: 100%; }
-    .product-title {
-      color: var(--brand);
+    
+    .h3-title {
       text-align: center;
       font-weight: 800;
-      letter-spacing: .05em;
-      font-size: clamp(1.25rem, 3vw, 1.9rem);
-      margin: calc(var(--gap) * .9) 0 calc(var(--gap) * .6);
-      text-transform: uppercase;
     }
     .product-list {
       display: grid;
@@ -678,6 +716,7 @@ export default {
   justify-content: center;
   margin-top: 16px; /* chỉ cần ít thôi */
 }
+
     .card {
       background: var(--card);
       border-radius: 16px;
@@ -710,7 +749,7 @@ export default {
         /* min-height: calc(1.2em * 2);  chiều cao bằng 2 dòng */
       }
     .product-price {
-      color: var(--accent);
+      
       font-weight: 800;
       text-align: center;
       font-size: clamp(1.05rem, 2.4vw, 1.3rem);
@@ -747,6 +786,7 @@ export default {
       font-size: 1rem;
       text-align: center;
     }
+    
     /* Animations */
        /* Responsive: all mobile under 820px */
 @media (max-width: 820px) {
@@ -761,6 +801,10 @@ export default {
     font-size: 1rem;
     box-shadow: 0 1px 6px rgba(37,99,235,0.07);
   }
+   .h2-title{
+      font-size:25px;
+      font-weight: 550;
+    }
   .shop-now-btn:hover {
     background: #2563eb;
     color: #fff;
@@ -776,6 +820,9 @@ export default {
     object-fit: cover;
     box-shadow: none;
 }
+ .website-btn-content{
+      margin-right: 47px; 
+    }
 
   .avatar-circle { width: 120px; height: 120px; }
   .avatar-img { width: 100%; height: 100%; }

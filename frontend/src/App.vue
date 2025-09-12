@@ -14,12 +14,7 @@
   font-style: normal;
   font-display: swap;
 }
-.section-title,
-.product-title,
-.shop-now-btn,
-.text-decoration-none.fw-bold.fs-5.text-darkz {
-  font-family: 'Handineat', sans-serif !important;
-}
+
 </style>
 
 <script>
