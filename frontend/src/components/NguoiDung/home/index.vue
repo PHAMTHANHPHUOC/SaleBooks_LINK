@@ -9,7 +9,7 @@
     </div>
 
     <!-- Social Icons -->
-    <h2 class="h2-title"  :style="getStyle('tieude')"  >Connect with us</h2>
+    <h2 class="h2-title"  :style="getStyle('tieude')"  >Relaxing Coloring Books </h2>
     <div class="social-list">
         <a
           v-for="item in Array_link.filter(link => link.loai === 0 && link.tinh_trang === 1)"
@@ -52,14 +52,15 @@
     target="_blank"
     rel="noopener"
   >
-    <span class="website-btn-content">
+    <span class="website-btn-content name-socal">
       <img
         :src="getFullImageUrl(item.anh_dai_dien)"
         class="btn-icon"
         @error="handleImageError"
         @click="showImagePreview(getFullImageUrl(item.anh_dai_dien))"
       />
-      {{ item.name }}
+    {{ item.name }}<br>
+    
     </span>
   </a>
 </div>
@@ -77,7 +78,8 @@
     target="_blank"
     rel="noopener"
   >
-    {{ item.name }}
+  <span class="website-btn-content name-socal">{{ item.name }}</span>
+  
   </a>
 </div>
 
@@ -108,8 +110,8 @@
   
   <footer class="footer">
     <div class="footer-inner">
-      <img src="../../../assets/images/TINY.jpg" alt="Tiny Logo" class="avatar-circle" />
-      <h4 :style="getStyle('email')" v-if="list_link.Email" class="text-decoration-none fw-bold fs-5 text-darkz">{{ list_link.Email.link }}</h4>
+      <img src="../../../assets/images/TINY.jpg" alt="Tiny Logo" class="avatar-footer" />
+      <h4 :style="getStyle('email')" v-if="list_link.Email" class="email-footer text-decoration-none fw-bold fs-5 text-darkz">{{ list_link.Email.link }}</h4>
     </div>
   </footer>
 </template>
@@ -528,7 +530,7 @@ export default {
       .avatar-img { width: 100%; height: 100%; }
       .brand { font-size: 0.9rem; }
       .section-title, .product-title { font-size: 1.5rem; margin: 4px 0 2px 0; }
-      .social-list { gap: 4px; flex-wrap: nowrap;  }
+      .social-list { gap: 4px; flex-wrap: nowrap; overflow-x: auto; }
       .social-btn { width: 18px; height: 18px; }
       .social-btn img { width: 10px; height: 10px; }
       .product-section { margin: 0 0 10px 0; }
@@ -648,16 +650,17 @@ export default {
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      /* box-shadow: 0 4px 20px rgba(0,0,0,0.08); */
       margin: 0 auto var(--gap);
       overflow: hidden;
     }
     .avatar-img {
-      width: 100%;
-      height: 100%;
+      width: 70%;
+      height: 70%;
       object-fit: cover;
       border-radius: 50%;
       background: transparent;
+      border: 1px solid #000000;
       display: block;
     }
     .brand {
@@ -679,6 +682,9 @@ export default {
       margin: calc(var(--gap) * 0.6) 0 .2rem;
       text-transform: uppercase;
     }
+    .name-socal {
+      font-weight: normal; 
+    }
 
     /* Socials */
     .social-list {
@@ -687,7 +693,7 @@ export default {
       justify-content: center;
       gap: clamp(8px, 1.5vw, 15px);
       flex-wrap: nowrap;
-      /* overflow-x: auto; */
+      overflow-x: auto;
     }
     
   .social-btn {
@@ -698,15 +704,28 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: var(--shadow-soft);
+   
     transition: transform .18s, box-shadow .18s, outline-color .18s;
     outline: none;
     border: none;
     padding: 0;
     margin: 0 8px;
-    text-decoration: none;
 }
-    .social-btn:hover { transform: translateY(-3px) scale(1.04); box-shadow: var(--shadow-hover); text-decoration: none; }
+.avatar-footer {
+  width: 4%;
+  height: 4%;
+  border-radius: 50%;
+  object-fit: cover;
+  background: transparent;
+  border: 1px solid #000000;
+  display: block;
+}
+.email-footer {
+  font-size: 0.5rem;
+  margin: 0;
+  text-align: center;
+}
+    .social-btn:hover { transform: translateY(-3px) scale(1.04);  }
     .social-btn:focus-visible { outline: 4px solid var(--ring); }
     .social-btn img.icon-connect {
     width: 55px;
@@ -746,16 +765,14 @@ export default {
       color: #725858ff;
       transform: translateY(-2px) scale(1.06); /* tăng scale để to ra hơn */
       box-shadow: var(--shadow-hover);
-      border: 2.5px solid #111;
+      /* border: 2.5px solid #fac2c2; */
       transition: transform .18s ease, box-shadow .18s ease, background .18s ease, color .18s ease;
     }
     .h2-title{
       font-size:40px;
        font-weight: 550;
     }
-    .website-btn-content{
-      /* margin-right: 50px; removed to allow full width */
-    }
+    
     .main-btn:active { transform: translateY(0); }
     .btn-icon {
         width: clamp(26px, 3.8vw, 45px);
@@ -901,15 +918,25 @@ export default {
     object-fit: cover;
     box-shadow: none;
 }
- .website-btn-content{
-      /* margin-right: 40px; removed to allow full width */
-    }
-
+ .avatar-footer {
+  width: 20%;
+  height: 20%;
+  border-radius: 50%;
+  object-fit: cover;
+  background: transparent;
+  border: 1px solid #000000;
+  display: block;
+}
+.email-footer {
+  font-size: 20px;
+  margin: 0;
+  text-align: center;
+}
   .avatar-circle { width: 120px; height: 120px; }
-  .avatar-img { width: 100%; height: 100%; }
+  .avatar-img { width: 70%; height: 70%; }
   .brand { font-size: 1.5rem; }
   .section-title, .product-title { font-size: 1.1rem; margin: 12px 0 6px; }
-  .social-list { gap: 12px; flex-wrap: nowrap; }
+  .social-list { gap: 12px; flex-wrap: nowrap; overflow-x: auto; }
   .social-btn { width: 55px; height: 55px; }
   .social-btn img { width: 40px; height: 40px; }
   .product-list { grid-template-columns: 0.5fr 0.5fr; }

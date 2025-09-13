@@ -29,6 +29,10 @@
               <input v-model="create_link.name" type="text" class="form-control" />
             </div>
             <div class="mb-2">
+              <label class="form-label">Sub title</label>
+              <input v-model="create_link.subtitle" type="text" class="form-control" />
+            </div>
+            <div class="mb-2">
               <label class="form-label">Link</label>
               <input v-model="create_link.links" type="url" class="form-control" />
             </div>
@@ -120,6 +124,10 @@
               <label class="form-label">Tên Link</label>
               <input v-model="edit_link.name" type="text" class="form-control" />
             </div>
+            <div class="mb-2">
+              <label class="form-label">Sub Title</label>
+              <input v-model="edit_link.subtitle" type="text" class="form-control" />
+            </div>
            
             <div class="mb-2">
               <label class="form-label">Links</label>
@@ -206,6 +214,7 @@
                   <tr>
                     <th class="text-center align-middle text-nowrap">#</th>
                     <th class="text-center align-middle text-nowrap">Tên Link</th>
+                    <th class="text-center align-middle text-nowrap">Sub title</th>
                     <th class="text-center align-middle text-nowrap">Link</th>
                     <th class="text-center align-middle text-nowrap">Icon</th>
                     <th class="text-center align-middle text-nowrap">Loai</th>
@@ -217,6 +226,7 @@
                 <tr v-for="(linkItem, k) in list_link" :key="linkItem.id || k">
                   <td class="align-middle text-nowrap">{{ k + 1 }}</td> <!-- số thứ tự -->
                   <td class="align-middle text-nowrap">{{ linkItem.name }}</td>
+                  <td class="align-middle text-nowrap">{{ linkItem.subtitle }}</td>
                   <td class="align-middle link-column" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
                     {{ linkItem.links }}
                   </td>
@@ -433,6 +443,7 @@
 
             const formData = new FormData();
             formData.append("name", this.create_link.name);
+            formData.append("name", this.create_link.subtitle || ''); // Gửi subtitle nếu có
             formData.append("links", this.create_link.links);
             formData.append("loai", this.create_link.loai);
             if (this.create_link.anh_dai_dien) {
@@ -475,6 +486,7 @@
 
         const formData = new FormData();
         formData.append("name", this.edit_link.name);
+        formData.append("name", this.edit_link.subtitle || ''); // Gửi subtitle nếu có
         formData.append("links", this.edit_link.links);
         formData.append("loai", this.edit_link.loai);
 

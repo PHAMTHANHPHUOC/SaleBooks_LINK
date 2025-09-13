@@ -51,6 +51,7 @@ def get_list_links_data(request):
         data.append({
             'id': loai.id,
             'name': loai.name,
+            'subtitle': loai.subtitle,
             'anh_dai_dien': anh_url,
             'loai': loai.loai,
             'tinh_trang': loai.tinh_trang,
@@ -105,6 +106,7 @@ def get_list_links(request):
         # Gán vào dict, bổ sung khóa Việt hóa và giữ tương thích ngược
         data[profile.name] = {
             "link": link_value,
+            "subtitle": profile.subtitle,
             "duong_dan": link_value,
             "avatar": avatar_url,
             "anh_dai_dien": avatar_url,
@@ -155,6 +157,7 @@ def get_links_api(request):
             # Đưa về dict, bổ sung loai và tinh_trang
             data[profile.name] = {
                 "link": link_value,
+                "subtitle": profile.subtitle,
                 "avatar": avatar_url,
                 "loai": profile.loai,
                 "tinh_trang": profile.tinh_trang
@@ -174,6 +177,7 @@ def get_links_api(request):
 def create_link(request):
     try:
         name = request.data.get('name')
+        subtitle = request.data.get('subtitle', '')  # Mặc định là chuỗi rỗng nếu không có
         links = request.data.get('links', '')  # Mặc định là rỗng nếu không có
         loai = request.data.get('loai', 0)  # Mặc định là 0 nếu không có
         tinh_trang = request.data.get('tinh_trang', 0)  #
@@ -192,7 +196,7 @@ def create_link(request):
                     'error': f'Định dạng file không được hỗ trợ. Chỉ chấp nhận: {", ".join(allowed_extensions)}'
                 }, status=400)
 
-        LinkProfile.objects.create(name=name,links=links,anh_dai_dien=anh_dai_dien, loai=loai, tinh_trang=tinh_trang)
+        LinkProfile.objects.create(name=name,subtitle=subtitle,links=links,anh_dai_dien=anh_dai_dien, loai=loai, tinh_trang=tinh_trang)
         return JsonResponse({'status': True, 'message': 'thêm link thành công.'})
     except Exception as e:
             return JsonResponse({'status': False, 'error': str(e)}, status=400)
@@ -210,6 +214,7 @@ def update_link(request, id):
     try:
         data = LinkProfile.objects.get(id=id)
         data.links = request.data.get('links')
+        data.subtitle = request.data.get('subtitle', data.subtitle)  # Nếu có cập nhật subtitle
         data.name = request.data.get('name', data.name)  # Nếu có cập nhật tên
         data.loai = request.data.get('loai', data.loai)  # Nếu có cập nhật loại
         data.tinh_trang = request.data.get('tinh_trang', data.tinh_trang)  # Nếu có cập nhật tình trạng
