@@ -12,7 +12,7 @@
     <h2 class="h2-title"  :style="getStyle('tieude')"  >Connect with us</h2>
     <div class="social-list">
         <a
-          v-for="item in Array_link.filter(link => link.loai === 0)"
+          v-for="item in Array_link.filter(link => link.loai === 0 && link.tinh_trang === 1)"
           :key="item.id"
           :href="item.links"
           target="_blank"
@@ -44,7 +44,7 @@
     </a> -->
     <div class="button-list">
   <a
-    v-for="item in Array_link.filter(link => link.loai === 1)"
+    v-for="item in Array_link.filter(link => link.loai === 1 && link.tinh_trang === 1)"
     :key="item.id"
     :style="getStyle('button')"
     class="main-btn"
@@ -69,7 +69,7 @@
     <!-- <h2 class="h2-title" :style="getStyle('tieude')" >Connect with me</h2> -->
    <div class="button-list">
   <a
-    v-for="item in Array_link.filter(link => link.loai === 2)"
+    v-for="item in Array_link.filter(link => link.loai === 2 && link.tinh_trang === 1)"
     :key="item.id"
     :style="getStyle('button')"
     class="main-btn"
@@ -528,7 +528,7 @@ export default {
       .avatar-img { width: 100%; height: 100%; }
       .brand { font-size: 0.9rem; }
       .section-title, .product-title { font-size: 1.5rem; margin: 4px 0 2px 0; }
-      .social-list { gap: 4px; flex-wrap: nowrap; overflow-x: auto; }
+      .social-list { gap: 4px; flex-wrap: nowrap;  }
       .social-btn { width: 18px; height: 18px; }
       .social-btn img { width: 10px; height: 10px; }
       .product-section { margin: 0 0 10px 0; }
@@ -687,7 +687,7 @@ export default {
       justify-content: center;
       gap: clamp(8px, 1.5vw, 15px);
       flex-wrap: nowrap;
-      overflow-x: auto;
+      /* overflow-x: auto; */
     }
     
   .social-btn {
@@ -704,8 +704,9 @@ export default {
     border: none;
     padding: 0;
     margin: 0 8px;
+    text-decoration: none;
 }
-    .social-btn:hover { transform: translateY(-3px) scale(1.04); box-shadow: var(--shadow-hover); }
+    .social-btn:hover { transform: translateY(-3px) scale(1.04); box-shadow: var(--shadow-hover); text-decoration: none; }
     .social-btn:focus-visible { outline: 4px solid var(--ring); }
     .social-btn img.icon-connect {
     width: 55px;
@@ -908,7 +909,7 @@ export default {
   .avatar-img { width: 100%; height: 100%; }
   .brand { font-size: 1.5rem; }
   .section-title, .product-title { font-size: 1.1rem; margin: 12px 0 6px; }
-  .social-list { gap: 12px; flex-wrap: nowrap; overflow-x: auto; }
+  .social-list { gap: 12px; flex-wrap: nowrap; }
   .social-btn { width: 55px; height: 55px; }
   .social-btn img { width: 40px; height: 40px; }
   .product-list { grid-template-columns: 0.5fr 0.5fr; }

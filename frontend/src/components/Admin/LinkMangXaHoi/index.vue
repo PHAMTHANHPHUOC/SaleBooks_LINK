@@ -2,11 +2,14 @@
   <div class="card">
     <div class="row">
       <div class="col m-2">
-        <h3 class="card-title">Danh sách sản phẩm </h3><h5 style="color: red;" >Lưu ý :Không Nên xóa link nào vì nó ảnh hường đến hệ thống</h5>
+        <h3 class="card-title">Danh sách sản phẩm </h3>
       </div>
-      <div class="col text-end m-2">
+      <div class="col text-end m-2 mt-2">
         <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#exampleModal">
           Thêm Sản Phẩm
+        </button>
+        <button class="btn btn-secondary m-2" data-bs-toggle="modal" data-bs-target="#ghichumodel">
+         Ghi chú
         </button>
       </div>
     </div>
@@ -55,6 +58,54 @@
       </div>
     </div>
 
+    <div class="modal fade" id="ghichumodel" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl"> <!-- Thay modal-xl để bảng to hơn -->
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">
+          Ghi chú
+        </h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-bordered align-middle">
+              <tbody>
+                <tr>
+                  <th>Liên hệ</th>
+                  <td>Là những link icon đầu</td>
+                </tr>
+                <tr>
+                  <th>Mạng Xã Hội (có icon)</th>
+                  <td>là button bên dưới, có icon bên trái</td>
+                </tr>
+                <tr>
+                  <th>Mạng Xã Hội</th>
+                  <td>là button bên dưới, không có icon bên trái</td>
+                </tr>
+                <tr>
+                  <th><p style="color: red;">Lưu ý</p></th>
+                  <td  style="color: red;">Edit theo loại</td>
+                </tr>
+                
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" >
+          Xác nhận
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
     <!-- Modal Cập Nhật -->
     <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
       <div class="modal-dialog">
@@ -65,6 +116,10 @@
             </h1>
           </div>
           <div class="modal-body">
+            <div class="mb-2">
+              <label class="form-label">Tên Link</label>
+              <input v-model="edit_link.name" type="text" class="form-control" />
+            </div>
            
             <div class="mb-2">
               <label class="form-label">Links</label>
