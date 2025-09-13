@@ -4,6 +4,8 @@ from django.http import JsonResponse
 class LinkProfile(models.Model):
     name = models.CharField(max_length=100, default="My Links")
     anh_dai_dien = models.ImageField(upload_to='avatars/', blank=True, null=True)
+    loai = models.IntegerField(default=0) 
+    tinh_trang = models.IntegerField(default=0) 
     links = models.TextField() 
    
 

@@ -50,7 +50,7 @@
               <tbody>
                 <tr>
                   <th>tieude</th>
-                  <td>Connect with us, Shop now on, Connect with me</td>
+                  <td>Connect with us</td>
                 </tr>
                 <tr>
                   <th>button</th>

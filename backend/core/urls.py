@@ -55,6 +55,9 @@ path('api/links/list/data/', view_link.get_list_links_data, name='get_list_links
 path('api/link/create/',view_link.create_link,name='create_link'),
 path('api/link/delete/<int:id>/',view_link.delete_link,name='delete_link'),
 path('api/link/update/<int:id>/',view_link.update_link,name='update_link'),
+path('api/link/change-status/', view_link.change_link, name='change_link'),
+
+
 
 path('api/styles/list/', view_styles.get_list_styles, name='get_list_styles'),
 path('api/styles/list/data/', view_styles.get_data_styles, name='get_list_styles'),

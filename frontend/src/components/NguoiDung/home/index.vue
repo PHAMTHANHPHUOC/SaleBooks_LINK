@@ -11,37 +11,76 @@
     <!-- Social Icons -->
     <h2 class="h2-title"  :style="getStyle('tieude')"  >Connect with us</h2>
     <div class="social-list">
-      <a v-if="list_link.Facebook" target="_blank" rel="noopener" :href="list_link.Facebook.link" class="social-btn" aria-label="Facebook">
-        <img :src="getFullImageUrl(list_link.Facebook.avatar)" class="icon-connect" @error="handleImageError" @click="showImagePreview(getFullImageUrl(list_link.Facebook.avatar))"/>
-      </a>
-      <a v-if="list_link.Instagram" target="_blank" rel="noopener" :href="list_link.Instagram.link" class="social-btn" aria-label="Instagram">
-        <img :src="getFullImageUrl(list_link.Instagram.avatar)" class="icon-connect"  @error="handleImageError" @click="showImagePreview(getFullImageUrl(list_link.Instagram.avatar))"/>
-      </a>
-      <a v-if="list_link.YouTube" target="_blank" rel="noopener" :href="list_link.YouTube.link" class="social-btn" aria-label="YouTube">
-        <img :src="getFullImageUrl(list_link.YouTube.avatar)" class="icon-connect"  @error="handleImageError" @click="showImagePreview(getFullImageUrl(list_link.YouTube.avatar))"/>
-      </a>
-      <a v-if="list_link.TikTok" target="_blank" rel="noopener" :href="list_link.TikTok.link" class="social-btn" aria-label="TikTok">
-        <img :src="getFullImageUrl(list_link.TikTok.avatar)" class="icon-connect"  @error="handleImageError" @click="showImagePreview(getFullImageUrl(list_link.TikTok.avatar))"/>
-      </a>
-    </div>
+        <a
+          v-for="item in Array_link.filter(link => link.loai === 0)"
+          :key="item.id"
+          :href="item.links"
+          target="_blank"
+          rel="noopener"
+          class="social-btn"
+          :aria-label="item.name"
+        >
+          <img
+            :src="getFullImageUrl(item.anh_dai_dien)"
+            class="icon-connect"
+            @error="handleImageError"
+            @click="showImagePreview(getFullImageUrl(item.anh_dai_dien))"
+          />
+        </a>
+</div>
+
 
     <!-- Shop Now -->
-    <h2 class="h2-title" :style="getStyle('tieude')" >Shop now on</h2>
-    <a v-if="list_link.Website" :style="getStyle('button')" class="main-btn"  :href="list_link.Website.link" target="_blank" rel="noopener">
+    <!-- <h2 class="h2-title" :style="getStyle('tieude')" >Shop now on</h2> -->
+    <!-- <a v-if="list_link.Website " :style="getStyle('button')" class="main-btn"  :href="list_link.Website.link" target="_blank" rel="noopener">
       <span class="website-btn-content">
          <img :src="getFullImageUrl(list_link.Website.avatar)"   class="btn-icon "   @error="handleImageError" @click="showImagePreview(getFullImageUrl(list_link.Website.avatar))"/>
-      Website 
+      WEBSITE
       </span>
     </a>
-    <a v-if="list_link.Website" :style="getStyle('button')" class="main-btn" :href="list_link.Amazon.link" target="_blank" rel="noopener">
+    <a v-if="list_link.Amazon" :style="getStyle('button')" class="main-btn" :href="list_link.Amazon.link" target="_blank" rel="noopener">
        <img :src="getFullImageUrl(list_link.Amazon.avatar)" class="btn-icon"   @error="handleImageError" @click="showImagePreview(getFullImageUrl(list_link.Amazon.avatar))"/>
       Amazon Store 
-    </a>
+    </a> -->
+    <div class="button-list">
+  <a
+    v-for="item in Array_link.filter(link => link.loai === 1)"
+    :key="item.id"
+    :style="getStyle('button')"
+    class="main-btn"
+    :href="item.links"
+    target="_blank"
+    rel="noopener"
+  >
+    <span class="website-btn-content">
+      <img
+        :src="getFullImageUrl(item.anh_dai_dien)"
+        class="btn-icon"
+        @error="handleImageError"
+        @click="showImagePreview(getFullImageUrl(item.anh_dai_dien))"
+      />
+      {{ item.name }}
+    </span>
+  </a>
+</div>
+
 
     <!-- Community -->
-    <h2 class="h2-title" :style="getStyle('tieude')" >Connect with me</h2>
-    <a v-if="list_link.GroupsFacebook"  :style="getStyle('button')" class="main-btn" :href="list_link.GroupsFacebook.link" target="_blank" rel="noopener">Tiny Daisy Community</a>
-    <a v-if="list_link.FreeDigital" :style="getStyle('button')" class="main-btn" :href="list_link.FreeDigital.link" target="_blank" rel="noopener">40 Free Digital Pages</a>
+    <!-- <h2 class="h2-title" :style="getStyle('tieude')" >Connect with me</h2> -->
+   <div class="button-list">
+  <a
+    v-for="item in Array_link.filter(link => link.loai === 2)"
+    :key="item.id"
+    :style="getStyle('button')"
+    class="main-btn"
+    :href="item.links"
+    target="_blank"
+    rel="noopener"
+  >
+    {{ item.name }}
+  </a>
+</div>
+
 
     <!-- Product Section: For từng loại sản phẩm -->
     <div v-for="type in productTypes" :key="type.id" class="product-section">
@@ -69,7 +108,7 @@
   
   <footer class="footer">
     <div class="footer-inner">
-      <img src="../../../assets/images/TINY.jpg" alt="Bogiki Logo" class="avatar-circle" />
+      <img src="../../../assets/images/TINY.jpg" alt="Tiny Logo" class="avatar-circle" />
       <h4 :style="getStyle('email')" v-if="list_link.Email" class="text-decoration-none fw-bold fs-5 text-darkz">{{ list_link.Email.link }}</h4>
     </div>
   </footer>
@@ -88,6 +127,10 @@ export default {
       baseUrl: '',
       list_style: {},
       resizeKey : 0,
+      Array_link : [],
+      api_response: null,
+      loading: false,
+
     };
   },
   computed: {
@@ -116,14 +159,15 @@ export default {
     this.loadlink();
     this.loadAllProductTypes();
     this.loadBackground();
+    this.loadlink_Array();
     await this.loadStyle();
-    this.loadFonts();
-    try {
-      await baseRequest.get('api/frontend-page-visit/?page=home');
-    } catch (err) {
-      // Handle error
-    }
-    window.addEventListener('resize', this.handleResize);
+    // this.loadFonts();
+  try {
+    const res = await baseRequest.get('api/frontend-page-visit/?page=home');
+  } catch (err) {
+    console.error(err);
+  }
+  window.addEventListener('resize', this.handleResize);
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.handleResize);
@@ -328,9 +372,43 @@ export default {
         console.error("Lỗi khi gửi click:", error);
       }
     },
+    loadlink_Array() {
+            this.loading = true;
+            baseRequest
+              .get("api/links/list/data/")
+              .then((res) => {
+                console.log("API Response:", res.data); 
+                this.api_response = JSON.stringify(res.data);
+                
+                // Kiểm tra cấu trúc response
+                if (res.data && res.data.data) {
+                  this.Array_link = res.data.data;
+                } else if (Array.isArray(res.data)) {
+                  // Trường hợp API trả về trực tiếp array
+                  this.Array_link = res.data;
+                } else {
+                  console.error("Unexpected response structure:", res.data);
+                  this.Array_link = [];
+                }
+                
+                if (res.data.status === 0) {
+                  toaster.error(res.data.message);
+                }
+              })
+              .catch((error) => {
+                console.error("API Error:", error);
+                this.Array_link = [];
+                if (toaster) {
+                  toaster.error("Lỗi khi tải dữ liệu: " + error.message);
+                }
+              })
+              .finally(() => {
+                this.loading = false;
+              });
+          },
     loadlink() {
       baseRequest
-        .get("api/links/")
+        .get("api/links/list/")
         .then((res) => {
            console.log('Links:', res.data); 
           if (res.data && res.data.data) {
@@ -439,7 +517,7 @@ export default {
     max-width: 100vw;
     width: 100vw;
     overflow-x: hidden;}
-      .main-btn { gap: 2px; border-radius: 10px; margin-bottom: 2px; font-size: 0.9rem; padding: 6px 8px; }
+      .main-btn { gap: 2px; border-radius: 10px; margin: 8px 0; font-size: 0.9rem; padding: 10px 8px; width: 250px; }
       .btn-icon { width: 14px; height: 14px; }
       .shop-now-btn {
         padding: 6px 10px;
@@ -450,7 +528,7 @@ export default {
       .avatar-img { width: 100%; height: 100%; }
       .brand { font-size: 0.9rem; }
       .section-title, .product-title { font-size: 1.5rem; margin: 4px 0 2px 0; }
-      .social-list { gap: 2px; }
+      .social-list { gap: 4px; flex-wrap: nowrap; overflow-x: auto; }
       .social-btn { width: 18px; height: 18px; }
       .social-btn img { width: 10px; height: 10px; }
       .product-section { margin: 0 0 10px 0; }
@@ -607,15 +685,16 @@ export default {
       width: 100%;
       display: flex;
       justify-content: center;
-      gap: clamp(12px, 2vw, 35px);
-      flex-wrap: wrap;
+      gap: clamp(8px, 1.5vw, 15px);
+      flex-wrap: nowrap;
+      overflow-x: auto;
     }
     
   .social-btn {
     background: var(--card);
     border-radius: 50%;
-    width: 65px;
-    height: 65px;
+    width: 70px;
+    height: 70px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -641,14 +720,16 @@ export default {
 
     /* Main CTAs */
     .main-btn {
-      width: 100%;
-      display: flex; /* Đổi từ inline-flex sang flex */
-      align-items: center; /* Căn giữa icon và text theo chiều dọc */
-      justify-content: flex-start; /* Icon và text nằm cạnh nhau, bắt đầu từ trái */
+      width: 500px;
+      height: 85px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       gap: 14px;
       text-decoration: none;
-      padding: clamp(10px, 2.8vw, 26px) clamp(10px, 3vw, 28px);
-      background: var(--card);
+      padding: clamp(0px, 3.2vw, 32px) clamp(10px, 3vw, 30px);
+      margin: 12px 0;
+      background: #ffe6ec;
       color: var(--text);
       font-weight: 800;
       font-size: clamp(1.05rem, 2.6vw, 1.45rem);
@@ -657,7 +738,6 @@ export default {
       letter-spacing: .03em;
       transition: transform .18s ease, box-shadow .18s ease, background .18s ease, color .18s ease;
       will-change: transform;
-      justify-content: center;
     }
     .main-btn:hover {
       font-size: clamp(1.1rem, 2.7vw, 1.5rem); 
@@ -673,7 +753,7 @@ export default {
        font-weight: 550;
     }
     .website-btn-content{
-      margin-right: 64px; 
+      /* margin-right: 50px; removed to allow full width */
     }
     .main-btn:active { transform: translateY(0); }
     .btn-icon {
@@ -734,7 +814,7 @@ export default {
     border-radius: 16px 16px 0 0;
     }
     .product-name {
-        font-weight: 700;
+        font-weight: 300;
         font-size: clamp(1rem, 2.2vw, 1.2rem);
         text-align: center;
         margin: 6px 6px 2px;
@@ -750,7 +830,7 @@ export default {
       }
     .product-price {
       
-      font-weight: 800;
+      font-weight: 600;
       text-align: center;
       font-size: clamp(1.05rem, 2.4vw, 1.3rem);
     }
@@ -792,7 +872,7 @@ export default {
 @media (max-width: 820px) {
   body { font-size: 16.5px; }
   .bogiki-linktree { padding: 10px 8px 20px; max-width: 100vw; gap: 12px; }
-  .main-btn { gap: 10px; border-radius: 18px; margin: 0 auto 8px; width: 90%;}
+  .main-btn { gap: 10px; border-radius: 18px; margin: 10px auto; width: 300px;height:55px;}
   .btn-icon { width: 32px; height: 32px; }
   .shop-now-btn {
     padding: 10px 22px;
@@ -821,14 +901,14 @@ export default {
     box-shadow: none;
 }
  .website-btn-content{
-      margin-right: 47px; 
+      /* margin-right: 40px; removed to allow full width */
     }
 
   .avatar-circle { width: 120px; height: 120px; }
   .avatar-img { width: 100%; height: 100%; }
   .brand { font-size: 1.5rem; }
   .section-title, .product-title { font-size: 1.1rem; margin: 12px 0 6px; }
-  .social-list { gap: 20px; }
+  .social-list { gap: 12px; flex-wrap: nowrap; overflow-x: auto; }
   .social-btn { width: 55px; height: 55px; }
   .social-btn img { width: 40px; height: 40px; }
   .product-list { grid-template-columns: 0.5fr 0.5fr; }

@@ -9,11 +9,33 @@ from django.shortcuts import get_object_or_404
 import json
 from rest_framework.decorators import api_view
 
-
+@api_view(['POST'])
+def change_link(request):
+    """
+    Thay đổi trạng thái của link
+    """
+    try:
+        loai = LinkProfile.objects.get(id=request.data.get('id'))
+        loai.tinh_trang = not bool(loai.tinh_trang)
+        loai.save()
+        return Response({
+            'status': True,
+            'message': f"Đã đổi tình trạng {loai.name} thành công"
+        }, status=status.HTTP_200_OK)
+    except LinkProfile.DoesNotExist:
+        return Response({
+            'status': False,
+            'message': 'Không tìm thấy link'
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({
+            'status': False,
+            'message': str(e)
+        }, status=status.HTTP_400_BAD_REQUEST)
 @api_view(['GET'])
 def get_list_links_data(request):
     """
-    Trả về danh sách tất cả loại sản phẩm
+    Trả về danh sách tất cả link
     """
     loai_list = LinkProfile.objects.all()
     data = []
@@ -30,19 +52,27 @@ def get_list_links_data(request):
             'id': loai.id,
             'name': loai.name,
             'anh_dai_dien': anh_url,
+            'loai': loai.loai,
+            'tinh_trang': loai.tinh_trang,
             'links': loai.links,
         })
     return Response({'data': data, 'status': 1})
 @api_view(['GET'])
 def get_list_links(request):
     """
-    Trả về dict:
+    Trả về danh sách link đang hoạt động (tinh_trang = 1)
+
+    - Giữ nguyên các khóa cũ: "link", "avatar"
+    - Bổ sung khóa tiếng Việt: "duong_dan", "anh_dai_dien"
+
+    Cấu trúc:
     {
-      "Facebook": {"link": "...", "avatar": "..."},
-      "Amazon": {"link": "...", "avatar": "..."}
+      "Facebook": {"link": "...", "duong_dan": "...", "avatar": "...", "anh_dai_dien": "...", "loai": ..., "tinh_trang": ...},
+      ...
     }
     """
-    profiles = LinkProfile.objects.all()
+    profiles = LinkProfile.objects.filter(tinh_trang=1)
+    print("Profiles:", profiles) 
     data = {}
 
     for profile in profiles:
@@ -72,13 +102,23 @@ def get_list_links(request):
         except Exception:
             avatar_url = ""
 
-        # Gán vào dict
+        # Gán vào dict, bổ sung khóa Việt hóa và giữ tương thích ngược
         data[profile.name] = {
             "link": link_value,
-            "avatar": avatar_url
+            "duong_dan": link_value,
+            "avatar": avatar_url,
+            "anh_dai_dien": avatar_url,
+            "loai": profile.loai,
+            "tinh_trang": profile.tinh_trang,
         }
 
-    return Response(data)
+    # Giữ nguyên hành vi cũ: trả trực tiếp dict
+    # Đồng thời bổ sung trường Việt hóa ở mức bao gói để dễ mở rộng sau này
+    return Response({
+        "trang_thai": True,
+        "du_lieu": data,
+        "data": data,
+    })
 
 from django.conf import settings
 @require_http_methods(["GET"])
@@ -112,10 +152,12 @@ def get_links_api(request):
                 except Exception:
                     avatar_url = ""
 
-            # Đưa về dict
+            # Đưa về dict, bổ sung loai và tinh_trang
             data[profile.name] = {
                 "link": link_value,
-                "avatar": avatar_url
+                "avatar": avatar_url,
+                "loai": profile.loai,
+                "tinh_trang": profile.tinh_trang
             }
 
         return JsonResponse({
@@ -128,12 +170,13 @@ def get_links_api(request):
             'error': str(e)
         }, status=500)
 
-
 @api_view(['POST'])
 def create_link(request):
     try:
         name = request.data.get('name')
         links = request.data.get('links', '')  # Mặc định là rỗng nếu không có
+        loai = request.data.get('loai', 0)  # Mặc định là 0 nếu không có
+        tinh_trang = request.data.get('tinh_trang', 0)  #
         anh_dai_dien = request.FILES.get('anh_dai_dien')  # Lấy file ảnh từ request
         if anh_dai_dien:
             # Kiểm tra kích thước file
@@ -149,7 +192,7 @@ def create_link(request):
                     'error': f'Định dạng file không được hỗ trợ. Chỉ chấp nhận: {", ".join(allowed_extensions)}'
                 }, status=400)
 
-        LinkProfile.objects.create(name=name,links=links,anh_dai_dien=anh_dai_dien)
+        LinkProfile.objects.create(name=name,links=links,anh_dai_dien=anh_dai_dien, loai=loai, tinh_trang=tinh_trang)
         return JsonResponse({'status': True, 'message': 'thêm link thành công.'})
     except Exception as e:
             return JsonResponse({'status': False, 'error': str(e)}, status=400)
@@ -168,6 +211,8 @@ def update_link(request, id):
         data = LinkProfile.objects.get(id=id)
         data.links = request.data.get('links')
         data.name = request.data.get('name', data.name)  # Nếu có cập nhật tên
+        data.loai = request.data.get('loai', data.loai)  # Nếu có cập nhật loại
+        data.tinh_trang = request.data.get('tinh_trang', data.tinh_trang)  # Nếu có cập nhật tình trạng
 
         # Xử lý cập nhật ảnh đại diện nếu có file mới
         anh_dai_dien = request.FILES.get('anh_dai_dien')
