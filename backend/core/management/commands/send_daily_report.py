@@ -5,6 +5,8 @@ import requests
 import json
 import logging
 from core.views.view_teams_report import get_daily_stats, create_teams_message
+from django.conf import settings
+from core.views.view_teams_report import adapt_payload_for_webhook
 
 logger = logging.getLogger(__name__)
 
@@ -22,10 +24,25 @@ class Command(BaseCommand):
             type=str,
             help='Thời gian gửi báo cáo (format: HH:MM)',
         )
+        parser.add_argument(
+            '--webhook-url',
+            type=str,
+            dest='webhook_url',
+            help='Ghi đè URL webhook (ưu tiên hơn biến môi trường)',
+        )
+        parser.add_argument(
+            '--type',
+            type=str,
+            dest='webhook_type',
+            choices=['incoming', 'flow'],
+            help='Kiểu webhook: incoming (Teams Incoming Webhook) hoặc flow (Power Automate)',
+        )
 
     def handle(self, *args, **options):
         test_mode = options['test']
         report_time = options.get('time')
+        override_webhook_url = (options.get('webhook_url') or '').strip()
+        override_webhook_type = (options.get('webhook_type') or '').strip().lower()
         
         self.stdout.write(
             self.style.SUCCESS(f'🚀 Bắt đầu gửi báo cáo thống kê...')
@@ -56,11 +73,27 @@ class Command(BaseCommand):
                 return
             
             # Gửi đến Teams
-            TEAMS_WEBHOOK_URL = "https://defaultc8a25e62e9734b2ead55aeea08f862.89.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/eafa71ada5c843709d4c3685c58cc8c3/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=o24fzuiefrQEh_NZLCv4KHoV-iWwWF9HbmqB-STtwu0"
-            
+            webhook_url = (override_webhook_url
+                           or getattr(settings, 'TEAMS_WEBHOOK_URL', '')).strip()
+            webhook_type = (override_webhook_type
+                            or getattr(settings, 'TEAMS_WEBHOOK_TYPE', '')).strip().lower()
+            if not webhook_type:
+                if 'webhook.office.com' in webhook_url or 'office.com/webhook' in webhook_url:
+                    webhook_type = 'incoming'
+                elif 'powerautomate' in webhook_url or 'flow.microsoft' in webhook_url or 'environment.api.powerplatform.com' in webhook_url:
+                    webhook_type = 'flow'
+                else:
+                    webhook_type = 'incoming'
+
+            if not webhook_url:
+                self.stdout.write(self.style.ERROR('❌ Chưa cấu hình TEAMS_WEBHOOK_URL và không truyền --webhook-url'))
+                return
+
+            payload = adapt_payload_for_webhook(message, webhook_type)
+
             response = requests.post(
-                TEAMS_WEBHOOK_URL,
-                json=message,
+                webhook_url,
+                json=payload,
                 headers={'Content-Type': 'application/json'},
                 timeout=30
             )

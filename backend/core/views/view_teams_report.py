@@ -10,11 +10,34 @@ from core.models.VisitCounter import VisitLog, VisitCounter
 from core.models.SanPham import SanPham, SanPhamView
 from .utils import get_visit_stats, get_country_stats
 import logging
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
-# Microsoft Teams Webhook URL
-TEAMS_WEBHOOK_URL = "https://defaultc8a25e62e9734b2ead55aeea08f862.89.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/eafa71ada5c843709d4c3685c58cc8c3/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=o24fzuiefrQEh_NZLCv4KHoV-iWwWF9HbmqB-STtwu0"
+def get_webhook_url() -> str:
+    return getattr(settings, 'TEAMS_WEBHOOK_URL', '')
+
+def detect_webhook_type(webhook_url: str) -> str:
+    # 'incoming' for Teams Incoming Webhook; 'flow' for Power Automate flow
+    if 'webhook.office.com' in webhook_url or 'office.com/webhook' in webhook_url:
+        return 'incoming'
+    if 'powerautomate' in webhook_url or 'flow.microsoft' in webhook_url or 'environment.api.powerplatform.com' in webhook_url:
+        return 'flow'
+    # fallback to explicit setting or default to 'incoming'
+    explicit = getattr(settings, 'TEAMS_WEBHOOK_TYPE', '').strip().lower()
+    return explicit or 'incoming'
+
+def adapt_payload_for_webhook(message: dict, webhook_type: str) -> dict:
+    # Incoming Webhook accepts MessageCard/Adaptive Card directly.
+    if webhook_type == 'incoming':
+        return message
+    # Power Automate manual trigger usually expects a custom schema.
+    # Wrap minimal fields so Flow can map them, while still passing full card if needed.
+    return {
+        'summary': message.get('summary', 'SaleBooks KDP Report'),
+        'text': f"📊 {message.get('summary', '')}",
+        'raw': message
+    }
 
 def get_daily_stats():
     """Lấy thống kê trong ngày"""
@@ -89,9 +112,10 @@ def create_teams_message(stats):
             "@context": "http://schema.org/extensions",
             "themeColor": "0076D7",
             "summary": f"Báo cáo thống kê ngày {stats.get('date', 'N/A')}",
+            "originator": "SaleBooks KDP System",
             "sections": [{
                 "activityTitle": f"📊 Báo cáo thống kê ngày {stats.get('date', 'N/A')}",
-                "activitySubtitle": "Tổng hợp lượt truy cập và sản phẩm hot",
+                "activitySubtitle": "Tổng hợp lượt truy cập và sản phẩm hot từ SaleBooks KDP",
                 "activityImage": "https://img.icons8.com/color/96/000000/analytics.png",
                 "facts": [
                     {
@@ -139,7 +163,7 @@ def create_teams_message(stats):
                 },
                 {
                     "name": "Nguồn dữ liệu",
-                    "value": "Hệ thống SaleBooks KDP"
+                    "value": "SaleBooks KDP - Hệ thống thống kê"
                 }
             ]
         })
@@ -187,11 +211,30 @@ def send_daily_report(request):
         logger.info(f"Đã tạo message: {message}")
         
         # Gửi đến Teams
-        logger.info(f"Đang gửi đến Teams webhook: {TEAMS_WEBHOOK_URL}")
+        webhook_url = get_webhook_url()
+        # Cho phép override qua body để test nếu chưa cấu hình env
+        try:
+            if not webhook_url and request.body:
+                body = json.loads(request.body)
+                webhook_url = body.get('webhook_url') or webhook_url
+        except Exception:
+            pass
+        webhook_type = detect_webhook_type(webhook_url)
+        if not webhook_url:
+            logger.error("TEAMS_WEBHOOK_URL rỗng - chưa cấu hình trong môi trường")
+            return JsonResponse({'status': 'error', 'message': 'Chưa cấu hình TEAMS_WEBHOOK_URL'}, status=500)
+
+        logger.info(f"Đang gửi đến Teams webhook: {webhook_url} (type={webhook_type})")
+        logger.info(f"Message payload: {json.dumps(message, ensure_ascii=False, indent=2)}")
+        payload = adapt_payload_for_webhook(message, webhook_type)
+
         response = requests.post(
-            TEAMS_WEBHOOK_URL,
-            json=message,
-            headers={'Content-Type': 'application/json'},
+            webhook_url,
+            json=payload,
+            headers={
+                'Content-Type': 'application/json',
+                'User-Agent': 'SaleBooks-KDP-Report/1.0'
+            },
             timeout=30
         )
         
@@ -204,11 +247,14 @@ def send_daily_report(request):
                 'status': 'success',
                 'message': 'Báo cáo đã được gửi thành công đến Microsoft Teams',
                 'data': {
-                    'date': stats.get('date', 'N/A'),
-                    'total_visits': stats.get('visit_stats', {}).get('total_visits', 0),
-                    'today_visits': stats.get('visit_stats', {}).get('today_visits', 0),
-                    'countries_count': len(stats.get('country_stats', [])),
-                    'products_count': len(stats.get('top_products', []))
+                    'stats': stats,
+                    'message_card': message,
+                    'webhook_url': webhook_url,
+                    'webhook_type': webhook_type,
+                    'provider_response': {
+                        'status_code': response.status_code,
+                        'text': response.text
+                    }
                 }
             })
         else:
@@ -216,7 +262,13 @@ def send_daily_report(request):
             return JsonResponse({
                 'status': 'error',
                 'message': f'Lỗi khi gửi báo cáo: {response.status_code}',
-                'error': response.text
+                'error': response.text,
+                'data': {
+                    'stats': stats,
+                    'message_card': message,
+                    'webhook_url': webhook_url,
+                    'webhook_type': webhook_type
+                }
             }, status=500)
             
     except requests.exceptions.RequestException as e:
@@ -251,7 +303,9 @@ def get_report_preview(request):
             'status': 'success',
             'data': {
                 'stats': stats,
-                'message': message
+                'message': message,
+                'webhook_url': get_webhook_url(),
+                'webhook_type': detect_webhook_type(get_webhook_url() or '')
             }
         })
         
@@ -283,6 +337,29 @@ def test_report(request):
             'message': str(e)
         }, status=500)
 
+@api_view(['GET'])
+def test_teams_message(request):
+    """API test để xem format message Teams"""
+    try:
+        stats = get_daily_stats()
+        message = create_teams_message(stats)
+        
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Message format for Teams',
+            'data': {
+                'stats': stats,
+                'teams_message': message,
+                'webhook_url': get_webhook_url(),
+                'webhook_type': detect_webhook_type(get_webhook_url() or '')
+            }
+        })
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        }, status=500)
+
 @api_view(['POST'])
 @csrf_exempt
 def send_custom_report(request):
@@ -302,9 +379,14 @@ def send_custom_report(request):
         message = create_teams_message(stats)
         
         # Gửi đến Teams
+        webhook_url = get_webhook_url()
+        webhook_type = detect_webhook_type(webhook_url)
+        if not webhook_url:
+            return JsonResponse({'status': 'error', 'message': 'Chưa cấu hình TEAMS_WEBHOOK_URL'}, status=500)
+        payload = adapt_payload_for_webhook(message, webhook_type)
         response = requests.post(
-            TEAMS_WEBHOOK_URL,
-            json=message,
+            webhook_url,
+            json=payload,
             headers={'Content-Type': 'application/json'},
             timeout=30
         )

@@ -15,15 +15,41 @@ pymysql.install_as_MySQLdb()
 from pathlib import Path
 import os
 from datetime import timedelta
-from dotenv import load_dotenv
-
+from dotenv import load_dotenv, dotenv_values
+import logging
+import dotenv
+import environ
+env = environ.Env()
+environ.Env.read_env()
+# Ensure .env values override any existing empty/misconfigured OS env vars
+dotenv.load_dotenv(override=True)
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 GEOIP_PATH = os.path.join(BASE_DIR, "geoip")
 
-# Load environment variables
-load_dotenv()
+# Load environment variables explicitly from backend/.env and project root .env
+logger = logging.getLogger(__name__)
+
+def _load_env_file(path: str) -> None:
+    try:
+        if os.path.exists(path):
+            # Allow values in this .env file to override existing env vars
+            load_dotenv(path, override=True)
+            logger.info(f"Loaded .env from: {path}")
+        else:
+            logger.debug(f".env not found at: {path}")
+    except Exception as e:
+        # Không làm hỏng quá trình khởi động nếu có lỗi khi đọc .env
+        logger.warning(f"Could not load .env at {path}: {e}")
+
+DOTENV_PATH = os.path.join(BASE_DIR, '.env')
+_load_env_file(DOTENV_PATH)
+
+# Also try project root (one level above backend) to be flexible with where .env is placed
+PROJECT_ROOT = os.path.dirname(BASE_DIR)
+ROOT_DOTENV_PATH = os.path.join(PROJECT_ROOT, '.env')
+_load_env_file(ROOT_DOTENV_PATH)
 
 # OpenAI Configuration
 # API key mới từ tài khoản OpenAI
@@ -191,3 +217,28 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'thanhphuocj3@gmail.com'
 EMAIL_HOST_PASSWORD = 'vylrgclcqhjrxzks'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+# Microsoft Teams / Power Automate webhook configuration
+# Use environment variables to avoid hardcoding secrets in code
+# Robust fallback: if env var is empty, read directly from .env
+_dotenv_values = {}
+def _normalize_env_keys(d: dict) -> dict:
+    try:
+        return {
+            (k.lstrip('\ufeff').strip() if isinstance(k, str) else k):
+            (v.strip() if isinstance(v, str) else v)
+            for k, v in (d or {}).items()
+        }
+    except Exception:
+        return d or {}
+try:
+    # Prefer backend .env; fallback to project root .env
+    _dotenv_values = _normalize_env_keys(dotenv_values(DOTENV_PATH))
+    if not _dotenv_values:
+        _dotenv_values = _normalize_env_keys(dotenv_values(ROOT_DOTENV_PATH))
+except Exception:
+    _dotenv_values = {}
+
+TEAMS_WEBHOOK_URL = os.getenv('TEAMS_WEBHOOK_URL') or _dotenv_values.get('TEAMS_WEBHOOK_URL', '')
+TEAMS_WEBHOOK_TYPE = (os.getenv('TEAMS_WEBHOOK_TYPE') or _dotenv_values.get('TEAMS_WEBHOOK_TYPE', '')).strip()
+

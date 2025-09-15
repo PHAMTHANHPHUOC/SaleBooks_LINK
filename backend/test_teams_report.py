@@ -58,6 +58,9 @@ def test_api_endpoints():
     # Test 3: Send report (test mode)
     print("3. Testing /api/teams/send-report/ (sending actual report)")
     try:
+        if not os.getenv('TEAMS_WEBHOOK_URL'):
+            print("   Skipped: TEAMS_WEBHOOK_URL not set in environment")
+            return
         response = requests.post(f"{base_url}/api/teams/send-report/")
         print(f"   Status: {response.status_code}")
         if response.status_code == 200:

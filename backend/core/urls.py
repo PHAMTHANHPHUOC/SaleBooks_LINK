@@ -71,6 +71,7 @@ path('api/teams/send-report/', view_teams_report.send_daily_report, name='send_d
 path('api/teams/preview-report/', view_teams_report.get_report_preview, name='preview_report'),
 path('api/teams/send-custom-report/', view_teams_report.send_custom_report, name='send_custom_report'),
 path('api/teams/test/', view_teams_report.test_report, name='test_report'),
+path('api/teams/test-message/', view_teams_report.test_teams_message, name='test_teams_message'),
 
     
 
