@@ -26,7 +26,7 @@
             <button class="btn btn-success" @click="updateBackground">Cập nhật màu nền</button>
           </div>
           <div class="col-md-2 text-end">
-           <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#ghichumodel">
+           <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#ghichumodel">
          Ghi chú
         </button>
           </div>

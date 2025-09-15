@@ -46,10 +46,8 @@
         @click="showImagePreview(getFullImageUrl(item.anh_dai_dien))"
       />
     {{ item.name }}<br>
-       <span class="sub-title" >{{ item.subtitle }}</span> <br>
-
-    
-    </span>
+      <span class="sub-title" >{{ item.subtitle }}</span> <br>
+        </span>
   </a>
 </div>
 
@@ -458,20 +456,29 @@ export default {
           };
         },
     getFullImageUrl(imagePath) {
-      if (!imagePath) return '';
-      
-      // Nếu đã là URL đầy đủ thì return luôn
-      if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-        return imagePath;
-      }
-      
-      // Nếu không bắt đầu bằng / thì thêm vào
-      if (!imagePath.startsWith('/')) {
-        imagePath = '/' + imagePath;
-      }
-      
-      return this.baseUrl + imagePath;
-    },
+  if (!imagePath) return '';
+  
+  // Nếu đã là URL đầy đủ thì return luôn
+  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+    return imagePath;
+  }
+
+  // Nếu đường dẫn không bắt đầu bằng /media thì thêm vào
+  if (!imagePath.startsWith('/media/')) {
+    imagePath = '/media/' + imagePath.replace(/^\/+/, '');
+  }
+
+  // Đảm bảo baseUrl là IP LAN, không phải localhost
+  let baseUrl = this.baseUrl;
+  if (baseUrl.includes('localhost') || baseUrl.includes('127.0.0.1')) {
+    baseUrl = 'http://192.168.1.28:8000'; // Đổi thành IP LAN của bạn
+  }
+
+  // Bỏ dấu / cuối nếu có
+  baseUrl = baseUrl.replace(/\/$/, '');
+
+  return baseUrl + imagePath;
+},
     showImagePreview(imageUrl) {
       this.previewImageUrl = imageUrl;
       // Sử dụng Bootstrap modal
@@ -487,7 +494,8 @@ export default {
       this.baseUrl = baseRequest.defaults?.baseURL || 
                     baseRequest.defaults?.url || 
                     baseRequest.config?.baseURL ||
-                    'http://localhost:8000'; // fallback
+                    'http://localhost:8000' ||
+                    'http://192.168.1.28:8000'; // fallback
       
       // Bỏ dấu / cuối nếu có
       this.baseUrl = this.baseUrl.replace(/\/$/, '');
@@ -533,6 +541,10 @@ export default {
   grid-column: 1 / -1;
   margin-top: 20px; /* Cố định 20px cho mobile */
 }
+.name-socal {
+      font-weight: normal; 
+      font-size: 16px;
+    }
       .card {
         min-height: 60px;
         border-radius: 4px;
@@ -660,7 +672,7 @@ export default {
       margin: 0;
     }
     .link-icon {
-      margin-top: -34px;
+      margin-top: -43px;
     }
 
     /* Section title */
@@ -676,6 +688,7 @@ export default {
     }
     .name-socal {
       font-weight: normal; 
+      font-size: 1.4rem;
     }
 
     /* Socials */
@@ -689,14 +702,13 @@ export default {
     }
     
   .social-btn {
-    background: var(--card);
+    /* background: var(--card); */
     border-radius: 50%;
     width: 70px;
     height: 70px;
     display: flex;
     align-items: center;
     justify-content: center;
-   
     transition: transform .18s, box-shadow .18s, outline-color .18s;
     outline: none;
     border: none;
@@ -738,17 +750,19 @@ export default {
   margin-bottom: -30px;
   letter-spacing: 0.01em;
 }
+
     /* Main CTAs */
     .main-btn {
       width: 500px;
       height: 90px;
       display: flex;
+      flex-direction: row;
       align-items: center;
       justify-content: center;
       gap: 14px;
       text-decoration: none;
       padding: clamp(0px, 3.2vw, 32px) clamp(10px, 3vw, 30px);
-      margin: 12px 0;
+      margin: 20px 0;
       background: #ffe6ec;
       color: var(--text);
       font-weight: 800;
@@ -890,7 +904,7 @@ export default {
 @media (max-width: 820px) {
   body { font-size: 16.5px; }
   .bogiki-linktree { padding: 10px 8px 20px; max-width: 100vw; gap: 12px; }
-  .main-btn { gap: 10px; border-radius: 18px; margin: 10px auto; width: 300px;height:55px;}
+  .main-btn { gap: 10px; border-radius: 18px; margin: 12px auto; width: 300px;height:55px;}
   .btn-icon { width: 32px; height: 32px; }
   .shop-now-btn {
     padding: 10px 22px;
@@ -902,6 +916,10 @@ export default {
    .h2-title{
       font-size:25px;
       font-weight: 550;
+    }
+    .name-socal {
+      font-weight: normal; 
+      font-size: 16px;
     }
   .shop-now-btn:hover {
     background: #2563eb;
@@ -919,7 +937,7 @@ export default {
     box-shadow: none;
 }
   .link-icon {
-      margin-top: -22px;
+      margin-top: -24px;
     }
 .sub-title {
   font-size: 0.75rem;

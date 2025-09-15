@@ -7,6 +7,23 @@
         <span class="visitor-flag">{{ getCountryFlag(currentVisitor.country) }}</span>
         <span class="visitor-text">Bạn đang truy cập từ: {{ currentVisitor.country_name || currentVisitor.country }}</span>
       </div>
+      <div class="header-actions">
+        <button 
+          @click="previewReport" 
+          class="btn-preview"
+          :disabled="loading"
+        >
+          👁️ Xem trước báo cáo
+        </button>
+        <button 
+          @click="sendReport" 
+          class="btn-send"
+          :disabled="loading || sendingReport"
+        >
+          <span v-if="sendingReport">📤 Đang gửi...</span>
+          <span v-else>📤 Gửi báo cáo Teams</span>
+        </button>
+      </div>
     </div>
 
     <!-- Loading State -->
@@ -197,7 +214,9 @@ export default {
       dailyChart: null,
       countryChart: null,
       refreshInterval: null,
-      mockMode: false
+      mockMode: false,
+      sendingReport: false,
+      reportPreview: null
     }
   },
   computed: {
@@ -564,6 +583,71 @@ export default {
         this.countryChart.destroy()
         this.countryChart = null
       }
+    },
+
+    async previewReport() {
+      try {
+        const response = await baseRequest.get('api/teams/preview-report/')
+        this.reportPreview = response.data
+        
+        // Hiển thị modal preview
+        this.showReportPreview()
+      } catch (error) {
+        console.error('Error previewing report:', error)
+        alert('Lỗi khi tạo preview báo cáo: ' + (error.response?.data?.message || error.message))
+      }
+    },
+
+    async sendReport() {
+      if (!confirm('Bạn có chắc chắn muốn gửi báo cáo thống kê đến Microsoft Teams?')) {
+        return
+      }
+
+      this.sendingReport = true
+      try {
+        const response = await baseRequest.post('api/teams/send-report/')
+        
+        if (response.data.status === 'success') {
+          alert('✅ Báo cáo đã được gửi thành công đến Microsoft Teams!')
+        } else {
+          alert('❌ Lỗi khi gửi báo cáo: ' + response.data.message)
+        }
+      } catch (error) {
+        console.error('Error sending report:', error)
+        alert('❌ Lỗi khi gửi báo cáo: ' + (error.response?.data?.message || error.message))
+      } finally {
+        this.sendingReport = false
+      }
+    },
+
+    showReportPreview() {
+      if (!this.reportPreview) return
+      
+      const stats = this.reportPreview.data.stats
+      const message = this.reportPreview.data.message
+      
+      let previewText = `📊 BÁO CÁO THỐNG KÊ NGÀY ${stats.date}\n\n`
+      previewText += `👥 Tổng lượt truy cập: ${stats.visit_stats.total_visits.toLocaleString()}\n`
+      previewText += `📅 Lượt truy cập hôm nay: ${stats.visit_stats.today_visits.toLocaleString()}\n`
+      previewText += `👤 Người dùng duy nhất: ${stats.visit_stats.unique_today.toLocaleString()}\n`
+      previewText += `🌍 Số quốc gia: ${stats.country_stats.length}\n\n`
+      
+      if (stats.country_stats.length > 0) {
+        previewText += `🌍 TOP QUỐC GIA:\n`
+        stats.country_stats.slice(0, 5).forEach((country, index) => {
+          previewText += `${index + 1}. ${this.getCountryFlag(country.country_code)} ${country.country_name}: ${country.visits} lượt\n`
+        })
+        previewText += `\n`
+      }
+      
+      if (stats.top_products.length > 0) {
+        previewText += `🏆 TOP SẢN PHẨM:\n`
+        stats.top_products.forEach((product, index) => {
+          previewText += `${index + 1}. ${product.ten}: ${product.so_luot} lượt xem\n`
+        })
+      }
+      
+      alert(previewText)
     }
   }
 }
@@ -606,6 +690,55 @@ body {
   -webkit-text-fill-color: transparent;
   background-clip: text;
   margin-bottom: 10px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.btn-preview, .btn-send {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-preview {
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: white;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-preview:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-send {
+  background: linear-gradient(45deg, #4ecdc4, #44a08d);
+  color: white;
+  box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
+}
+
+.btn-send:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4);
+}
+
+.btn-preview:disabled, .btn-send:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .stats-grid {

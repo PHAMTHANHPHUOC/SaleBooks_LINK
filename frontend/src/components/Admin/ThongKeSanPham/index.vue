@@ -4,6 +4,23 @@
     <div class="header">
       <h1>📊 Thống kê sản phẩm</h1>
       <p>Theo dõi hiệu suất và xu hướng sản phẩm</p>
+      <div class="header-actions">
+        <button 
+          @click="previewProductReport" 
+          class="btn-preview"
+          :disabled="loading"
+        >
+          👁️ Xem trước báo cáo
+        </button>
+        <button 
+          @click="sendProductReport" 
+          class="btn-send"
+          :disabled="loading || sendingReport"
+        >
+          <span v-if="sendingReport">📤 Đang gửi...</span>
+          <span v-else>📤 Gửi báo cáo Teams</span>
+        </button>
+      </div>
     </div>
 
     <!-- Filter Tabs -->
@@ -152,6 +169,7 @@ export default {
       activeTab: 'ngay',
       viewMode: 'grid',
       baseUrl: '',
+      sendingReport: false,
       tabs: [
         { key: 'ngay', label: 'Hôm nay', icon: '📅' },
         { key: 'tuan', label: 'Tuần này', icon: '🗓️' }, 
@@ -310,6 +328,66 @@ export default {
       this.baseUrl = this.baseUrl.replace(/\/$/, '');
       console.log('Base URL:', this.baseUrl); // Debug
     },
+
+    async previewProductReport() {
+      try {
+        const response = await baseRequest.get('api/teams/preview-report/')
+        this.showProductReportPreview(response.data)
+      } catch (error) {
+        console.error('Error previewing product report:', error)
+        alert('Lỗi khi tạo preview báo cáo: ' + (error.response?.data?.message || error.message))
+      }
+    },
+
+    async sendProductReport() {
+      if (!confirm('Bạn có chắc chắn muốn gửi báo cáo thống kê sản phẩm đến Microsoft Teams?')) {
+        return
+      }
+
+      this.sendingReport = true
+      try {
+        const response = await baseRequest.post('api/teams/send-report/')
+        
+        if (response.data.status === 'success') {
+          alert('✅ Báo cáo sản phẩm đã được gửi thành công đến Microsoft Teams!')
+        } else {
+          alert('❌ Lỗi khi gửi báo cáo: ' + response.data.message)
+        }
+      } catch (error) {
+        console.error('Error sending product report:', error)
+        alert('❌ Lỗi khi gửi báo cáo: ' + (error.response?.data?.message || error.message))
+      } finally {
+        this.sendingReport = false
+      }
+    },
+
+    showProductReportPreview(reportData) {
+      if (!reportData) return
+      
+      const stats = reportData.data.stats
+      
+      let previewText = `📊 BÁO CÁO THỐNG KÊ SẢN PHẨM NGÀY ${stats.date}\n\n`
+      previewText += `👥 Tổng lượt truy cập: ${stats.visit_stats.total_visits.toLocaleString()}\n`
+      previewText += `📅 Lượt truy cập hôm nay: ${stats.visit_stats.today_visits.toLocaleString()}\n`
+      previewText += `👤 Người dùng duy nhất: ${stats.visit_stats.unique_today.toLocaleString()}\n\n`
+      
+      if (stats.top_products.length > 0) {
+        previewText += `🏆 TOP SẢN PHẨM HOT HÔM NAY:\n`
+        stats.top_products.forEach((product, index) => {
+          previewText += `${index + 1}. ${product.ten}: ${product.so_luot} lượt xem\n`
+        })
+        previewText += `\n`
+      }
+      
+      if (stats.country_stats.length > 0) {
+        previewText += `🌍 TOP QUỐC GIA TRUY CẬP:\n`
+        stats.country_stats.slice(0, 5).forEach((country, index) => {
+          previewText += `${index + 1}. ${country.country_name}: ${country.visits} lượt\n`
+        })
+      }
+      
+      alert(previewText)
+    }
   },
   
   mounted() {
@@ -349,6 +427,55 @@ export default {
   font-size: 1.1rem;
   opacity: 0.9;
   margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.btn-preview, .btn-send {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-preview {
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: white;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-preview:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-send {
+  background: linear-gradient(45deg, #4ecdc4, #44a08d);
+  color: white;
+  box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
+}
+
+.btn-send:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4);
+}
+
+.btn-preview:disabled, .btn-send:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
 /* Tabs */

@@ -172,11 +172,19 @@ def get_visit_stats(page_name='homepage'):
         ).count()
         print(f"[DEBUG] Month visits query: {month_visits}")
         
+        # Unique visitors hôm nay (theo IP)
+        today = timezone.now().date()
+        unique_today = VisitLog.objects.filter(
+            page_visited=page_name,
+            visit_time__date=today
+        ).values('ip_address').distinct().count()
+        
         return {
             'total_visits': counter.total_visits,
             'today_visits': counter.today_visits,
             'week_visits': week_visits,
             'month_visits': month_visits,
+            'unique_today': unique_today,
             'last_update': counter.updated_at,
         }
     except VisitCounter.DoesNotExist:
@@ -185,6 +193,7 @@ def get_visit_stats(page_name='homepage'):
             'today_visits': 0,
             'week_visits': 0,
             'month_visits': 0,
+            'unique_today': 0,
             'last_update': None,
         }
 ## DO NOT redefine get_client_ip below; we use the robust version above.

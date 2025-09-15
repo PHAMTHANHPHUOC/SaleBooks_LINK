@@ -1,5 +1,5 @@
 from django.urls import path,re_path
-from .views import view_count,view_sanpham,view_admin,view_link,view_location,view_styles
+from .views import view_count,view_sanpham,view_admin,view_link,view_location,view_styles,view_teams_report
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -66,6 +66,11 @@ path('api/styles/delete/<int:id>/',view_styles.delete_styles,name='delete_styles
 path('api/styles/update/<int:id>/',view_styles.update_styles,name='update_styles'),
 path('api/styles/background/',view_styles.site_background,name='update_styles'),
 
+# Teams Report URLs
+path('api/teams/send-report/', view_teams_report.send_daily_report, name='send_daily_report'),
+path('api/teams/preview-report/', view_teams_report.get_report_preview, name='preview_report'),
+path('api/teams/send-custom-report/', view_teams_report.send_custom_report, name='send_custom_report'),
+path('api/teams/test/', view_teams_report.test_report, name='test_report'),
 
     
 
