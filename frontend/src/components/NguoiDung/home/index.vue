@@ -28,21 +28,7 @@
           />
         </a>
 </div>
-
-
-    <!-- Shop Now -->
-    <!-- <h2 class="h2-title" :style="getStyle('tieude')" >Shop now on</h2> -->
-    <!-- <a v-if="list_link.Website " :style="getStyle('button')" class="main-btn"  :href="list_link.Website.link" target="_blank" rel="noopener">
-      <span class="website-btn-content">
-         <img :src="getFullImageUrl(list_link.Website.avatar)"   class="btn-icon "   @error="handleImageError" @click="showImagePreview(getFullImageUrl(list_link.Website.avatar))"/>
-      WEBSITE
-      </span>
-    </a>
-    <a v-if="list_link.Amazon" :style="getStyle('button')" class="main-btn" :href="list_link.Amazon.link" target="_blank" rel="noopener">
-       <img :src="getFullImageUrl(list_link.Amazon.avatar)" class="btn-icon"   @error="handleImageError" @click="showImagePreview(getFullImageUrl(list_link.Amazon.avatar))"/>
-      Amazon Store 
-    </a> -->
-    <div class="button-list">
+    <div class="button-list ">
   <a
     v-for="item in Array_link.filter(link => link.loai === 1 && link.tinh_trang === 1)"
     :key="item.id"
@@ -60,6 +46,8 @@
         @click="showImagePreview(getFullImageUrl(item.anh_dai_dien))"
       />
     {{ item.name }}<br>
+       <span class="sub-title" >{{ item.subtitle }}</span> <br>
+
     
     </span>
   </a>
@@ -68,7 +56,7 @@
 
     <!-- Community -->
     <!-- <h2 class="h2-title" :style="getStyle('tieude')" >Connect with me</h2> -->
-   <div class="button-list">
+   <div class="button-list link-icon">
   <a
     v-for="item in Array_link.filter(link => link.loai === 2 && link.tinh_trang === 1)"
     :key="item.id"
@@ -78,8 +66,9 @@
     target="_blank"
     rel="noopener"
   >
-  <span class="website-btn-content name-socal">{{ item.name }}</span>
-  
+  <span class="website-btn-content name-socal">{{ item.name }}<br>
+  <span class="sub-title" >{{ item.subtitle }}</span> <br>
+  </span>
   </a>
 </div>
 
@@ -670,6 +659,9 @@ export default {
       letter-spacing: .2px;
       margin: 0;
     }
+    .link-icon {
+      margin-top: -34px;
+    }
 
     /* Section title */
     .section-title {
@@ -737,11 +729,19 @@ export default {
     object-fit: cover;
     box-shadow: none;
 }
-
+.sub-title {
+  display: block;
+  font-size: 1rem;
+  color: #444;
+  font-weight: 400;
+  margin-top: -8px;
+  margin-bottom: -30px;
+  letter-spacing: 0.01em;
+}
     /* Main CTAs */
     .main-btn {
       width: 500px;
-      height: 85px;
+      height: 90px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -787,7 +787,7 @@ export default {
         vertical-align: middle;
         margin-right: 12px;
         flex: 0 0 auto;
-        margin-right: 12px;
+        margin-right: -2px;
       }
       .main-btn span {
         flex: 1;
@@ -917,6 +917,17 @@ export default {
     outline: none;
     object-fit: cover;
     box-shadow: none;
+}
+  .link-icon {
+      margin-top: -22px;
+    }
+.sub-title {
+  font-size: 0.75rem;
+  color: #444;
+  font-weight: 400;
+  margin-top: -6px;
+  margin-bottom: -30px;
+  letter-spacing: 0.01em;
 }
  .avatar-footer {
   width: 20%;

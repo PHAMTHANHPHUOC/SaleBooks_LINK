@@ -443,7 +443,7 @@
 
             const formData = new FormData();
             formData.append("name", this.create_link.name);
-            formData.append("name", this.create_link.subtitle || ''); // Gửi subtitle nếu có
+            formData.append("subtitle", this.create_link.subtitle || ''); // Gửi subtitle nếu có
             formData.append("links", this.create_link.links);
             formData.append("loai", this.create_link.loai);
             if (this.create_link.anh_dai_dien) {
@@ -486,7 +486,7 @@
 
         const formData = new FormData();
         formData.append("name", this.edit_link.name);
-        formData.append("name", this.edit_link.subtitle || ''); // Gửi subtitle nếu có
+        formData.append("subtitle", this.edit_link.subtitle || ''); // Gửi subtitle nếu có
         formData.append("links", this.edit_link.links);
         formData.append("loai", this.edit_link.loai);
 
