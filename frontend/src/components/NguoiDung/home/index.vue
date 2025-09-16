@@ -688,7 +688,7 @@ export default {
     }
     .name-socal {
       font-weight: normal; 
-      font-size: 1.4rem;
+      font-size: 1.2rem;
     }
 
     /* Socials */
@@ -743,7 +743,7 @@ export default {
 }
 .sub-title {
   display: block;
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: #444;
   font-weight: 400;
   margin-top: -8px;

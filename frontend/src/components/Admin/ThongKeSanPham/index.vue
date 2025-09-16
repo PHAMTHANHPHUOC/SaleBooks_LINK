@@ -4,7 +4,17 @@
     <div class="header">
       <h1>📊 Thống kê sản phẩm</h1>
       <p>Theo dõi hiệu suất và xu hướng sản phẩm</p>
+      <div class="time-range-info" v-if="!loading">
+        <span class="time-range-badge">{{ getTimeRangeInfo() }}</span>
+      </div>
       <div class="header-actions">
+        <!-- <button 
+          @click="debugWeekStats" 
+          class="btn-debug"
+          :disabled="loading"
+        >
+          🔍 Debug tuần
+        </button> -->
         <button 
           @click="previewProductReport" 
           class="btn-preview"
@@ -41,14 +51,17 @@
       <div class="stat-box">
         <div class="stat-number">{{ topSanPham.length }}</div>
         <div class="stat-label">Sản phẩm</div>
+        <div class="stat-period">{{ getActiveTabLabel() }}</div>
       </div>
       <div class="stat-box">
         <div class="stat-number">{{ totalViews.toLocaleString() }}</div>
         <div class="stat-label">Tổng lượt xem</div>
+        <div class="stat-period">{{ getActiveTabLabel() }}</div>
       </div>
       <div class="stat-box">
         <div class="stat-number">{{ topProduct ? '🏆' : '-' }}</div>
         <div class="stat-label">{{ topProduct?.ten || 'Chưa có dữ liệu' }}</div>
+        <div class="stat-period">{{ getActiveTabLabel() }}</div>
       </div>
     </div>
 
@@ -66,7 +79,8 @@
 
     <!-- Empty -->
     <div v-else-if="topSanPham.length === 0" class="empty">
-      <p>📈 Chưa có dữ liệu trong khoảng thời gian này</p>
+      <p>📈 Chưa có dữ liệu {{ getActiveTabLabel() }}</p>
+      <p class="empty-subtitle">Dữ liệu sẽ được cập nhật khi có lượt xem sản phẩm</p>
     </div>
 
     <!-- Product List -->
@@ -259,6 +273,26 @@ export default {
       return tab ? tab.label.toLowerCase() : '';
     },
     
+    getTimeRangeInfo() {
+      const today = new Date();
+      switch(this.activeTab) {
+        case 'ngay':
+          return `Hôm nay (${today.toLocaleDateString('vi-VN')})`;
+        case 'tuan':
+          const startOfWeek = new Date(today);
+          startOfWeek.setDate(today.getDate() - today.getDay() + 1); // Thứ 2
+          const endOfWeek = new Date(startOfWeek);
+          endOfWeek.setDate(startOfWeek.getDate() + 6); // Chủ nhật
+          return `Tuần này (${startOfWeek.toLocaleDateString('vi-VN')} - ${endOfWeek.toLocaleDateString('vi-VN')})`;
+        case 'thang':
+          return `Tháng ${today.getMonth() + 1}/${today.getFullYear()}`;
+        case 'nam':
+          return `Năm ${today.getFullYear()}`;
+        default:
+          return '';
+      }
+    },
+    
     getProgressWidth(views) {
       if (this.topSanPham.length === 0) return 0;
       const maxViews = Math.max(...this.topSanPham.map(sp => sp.so_luot));
@@ -387,7 +421,36 @@ export default {
       }
       
       alert(previewText)
-    }
+    },
+
+    // async debugWeekStats() {
+    //   try {
+    //     const response = await baseRequest.get('debug/week-stats/')
+    //     const data = response.data
+        
+    //     let debugText = `🔍 DEBUG THỐNG KÊ TUẦN\n\n`
+    //     debugText += `📅 Hôm nay: ${data.today}\n`
+    //     debugText += `📊 Thứ trong tuần: ${data.weekday} (0=Thứ 2, 6=Chủ nhật)\n`
+    //     debugText += `📅 Tuần bắt đầu: ${data.week_start}\n`
+    //     debugText += `📅 Tuần kết thúc: ${data.week_end}\n\n`
+    //     debugText += `📈 Tổng lượt xem trong DB: ${data.total_views}\n`
+    //     debugText += `📈 Lượt xem trong tuần: ${data.week_views}\n\n`
+        
+    //     if (data.week_stats && data.week_stats.length > 0) {
+    //       debugText += `🏆 TOP SẢN PHẨM TRONG TUẦN:\n`
+    //       data.week_stats.forEach((product, index) => {
+    //         debugText += `${index + 1}. ID ${product.san_pham__id} (${product.san_pham__ten_san_pham}): ${product.so_luot} lượt xem\n`
+    //       })
+    //     } else {
+    //       debugText += `❌ Không có dữ liệu trong tuần này`
+    //     }
+        
+    //     alert(debugText)
+    //   } catch (error) {
+    //     console.error('Error debugging week stats:', error)
+    //     alert('❌ Lỗi khi debug: ' + (error.response?.data?.message || error.message))
+    //   }
+    // }
   },
   
   mounted() {
@@ -429,6 +492,20 @@ export default {
   margin: 0;
 }
 
+.time-range-info {
+  margin: 15px 0;
+}
+
+.time-range-badge {
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+}
+
 .header-actions {
   display: flex;
   gap: 15px;
@@ -437,7 +514,7 @@ export default {
   flex-wrap: wrap;
 }
 
-.btn-preview, .btn-send {
+.btn-preview, .btn-send, .btn-debug {
   padding: 12px 24px;
   border: none;
   border-radius: 25px;
@@ -472,7 +549,18 @@ export default {
   box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4);
 }
 
-.btn-preview:disabled, .btn-send:disabled {
+/* .btn-debug {
+  background: linear-gradient(45deg, #f59e0b, #d97706);
+  color: white;
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+}
+
+.btn-debug:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+} */
+
+.btn-preview:disabled, .btn-send:disabled, .btn-debug:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
@@ -539,6 +627,13 @@ export default {
   font-weight: 500;
 }
 
+.stat-period {
+  color: #9ca3af;
+  font-size: 0.8rem;
+  margin-top: 5px;
+  font-style: italic;
+}
+
 /* Loading, Error, Empty States */
 .loading, .error, .empty {
   background: white;
@@ -546,6 +641,13 @@ export default {
   border-radius: 15px;
   text-align: center;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.empty-subtitle {
+  color: #6b7280;
+  font-size: 0.9rem;
+  margin-top: 10px;
+  opacity: 0.8;
 }
 
 .spinner {

@@ -11,37 +11,55 @@ import logging
 from datetime import timedelta
 from django.db.models import Count
 from django.utils.timezone import now
+from datetime import datetime, time
+from django.utils.timezone import make_aware, get_current_timezone
 
 logger = logging.getLogger(__name__)
 from rest_framework.parsers import MultiPartParser, FormParser
 
 
+from django.utils.timezone import make_aware
+
 @require_GET
 def top_san_pham(request):
-    loai = request.GET.get("loai", "ngay")  # giá trị: "ngay", "thang", "nam"
-    print(f"Received loai parameter: {loai}")
+    loai = request.GET.get("loai", "ngay")
+    tz = get_current_timezone()
     today = now().date()
-    print(f"Today: {today}") 
 
     if loai == "ngay":
-        start = today
+        start = make_aware(datetime.combine(today, time.min), tz)
+        end = make_aware(datetime.combine(today + timedelta(days=1), time.min), tz)
     elif loai == "tuan":
-        # Lấy ngày đầu tuần (theo ISO: thứ 2)
-        start = today - timedelta(days=today.weekday())
+        start_date = today - timedelta(days=today.weekday())
+        end_date = start_date + timedelta(days=7)
+        start = make_aware(datetime.combine(start_date, time.min), tz)
+        end = make_aware(datetime.combine(end_date, time.min), tz)
     elif loai == "thang":
-        start = today.replace(day=1)
+        start_date = today.replace(day=1)
+        if today.month == 12:
+            end_date = today.replace(year=today.year + 1, month=1, day=1)
+        else:
+            end_date = today.replace(month=today.month + 1, day=1)
+        start = make_aware(datetime.combine(start_date, time.min), tz)
+        end = make_aware(datetime.combine(end_date, time.min), tz)
     elif loai == "nam":
-        start = today.replace(month=1, day=1)
+        start_date = today.replace(month=1, day=1)
+        end_date = today.replace(year=today.year + 1, month=1, day=1)
+        start = make_aware(datetime.combine(start_date, time.min), tz)
+        end = make_aware(datetime.combine(end_date, time.min), tz)
     else:
         return JsonResponse({"error": "Tham số 'loai' không hợp lệ"}, status=400)
-    print(f"Start date: {start}") 
+
     views = (
-        SanPhamView.objects.filter(created_at__date__gte=start)
+        SanPhamView.objects.filter(
+            created_at__gte=start,
+            created_at__lt=end
+        )
         .values("san_pham__id", "san_pham__ten_san_pham", "san_pham__anh_dai_dien")
         .annotate(so_luot=Count("id"))
         .order_by("-so_luot")[:10]
     )
-    print(f"Query count: {views.count()}") 
+
     data = [
         {
             "id": v["san_pham__id"],
@@ -51,9 +69,65 @@ def top_san_pham(request):
         }
         for v in views
     ]
-    print(f"Response data: {data}")
     return JsonResponse(data, safe=False)
 
+@require_GET
+def debug_week_stats(request):
+    """
+    Debug endpoint để kiểm tra thống kê tuần
+    """
+    from datetime import datetime, timedelta
+    
+    today = now().date()
+    print(f"=== DEBUG WEEK STATS ===")
+    print(f"Today: {today}")
+    print(f"Today weekday: {today.weekday()} (0=Monday, 6=Sunday)")
+    
+    # Logic tính tuần
+    start = today - timedelta(days=today.weekday())
+    end = start + timedelta(days=7)
+    
+    print(f"Week start: {start}")
+    print(f"Week end: {end}")
+    
+    # Tất cả dữ liệu
+    all_views = SanPhamView.objects.all().order_by('created_at')
+    print(f"Total views in DB: {all_views.count()}")
+    
+    # Dữ liệu trong tuần
+    week_views = SanPhamView.objects.filter(
+        created_at__date__gte=start,
+        created_at__date__lt=end
+    )
+    print(f"Views in current week: {week_views.count()}")
+    
+    # Chi tiết từng view
+    print("All views:")
+    for view in all_views:
+        in_week = start <= view.created_at.date() < end
+        print(f"  ID: {view.id}, Date: {view.created_at.date()}, Product: {view.san_pham_id}, In week: {in_week}")
+    
+    # Thống kê theo sản phẩm
+    week_stats = (
+        week_views
+        .values("san_pham__id", "san_pham__ten_san_pham")
+        .annotate(so_luot=Count("id"))
+        .order_by("-so_luot")
+    )
+    
+    print("Week stats by product:")
+    for stat in week_stats:
+        print(f"  Product {stat['san_pham__id']} ({stat['san_pham__ten_san_pham']}): {stat['so_luot']} views")
+    
+    return JsonResponse({
+        'today': str(today),
+        'weekday': today.weekday(),
+        'week_start': str(start),
+        'week_end': str(end),
+        'total_views': all_views.count(),
+        'week_views': week_views.count(),
+        'week_stats': list(week_stats)
+    })
 
 @api_view(['POST'])
 def tang_luot_xem(request, pk):

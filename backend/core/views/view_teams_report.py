@@ -11,7 +11,7 @@ from core.models.SanPham import SanPham, SanPhamView
 from .utils import get_visit_stats, get_country_stats
 import logging
 from django.conf import settings
-
+# Invoke-RestMethod -Method Post -Uri http://192.168.1.28:8000/api/teams/send-report/
 logger = logging.getLogger(__name__)
 
 def get_webhook_url() -> str:
@@ -195,6 +195,57 @@ def get_country_flag(country_code):
     }
     return flags.get(country_code, '🌐')
 
+def create_adaptive_card_payload(stats):
+    """Tạo payload kiểu Adaptive Card để dùng như phương án dự phòng.
+
+    Một số tenant đã vô hiệu hoá MessageCard (legacy). Khi đó, Incoming Webhook
+    có thể vẫn trả 200 nhưng không hiển thị gì trong kênh. Ta sẽ gửi lại dưới
+    dạng Adaptive Card tối giản.
+    """
+    try:
+        total_visits = stats.get('visit_stats', {}).get('total_visits', 0)
+        today_visits = stats.get('visit_stats', {}).get('today_visits', 0)
+        unique_today = stats.get('visit_stats', {}).get('unique_today', 0)
+        date_str = stats.get('date', 'N/A')
+
+        adaptive_card = {
+            "type": "AdaptiveCard",
+            "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+            "version": "1.5",
+            "body": [
+                {"type": "TextBlock", "text": f"Báo cáo thống kê ngày {date_str}", "weight": "Bolder", "size": "Large"},
+                {"type": "TextBlock", "text": "SaleBooks KDP", "isSubtle": True, "spacing": "None"},
+                {
+                    "type": "FactSet",
+                    "facts": [
+                        {"title": "Tổng lượt truy cập", "value": f"{total_visits:,}"},
+                        {"title": "Lượt truy cập hôm nay", "value": f"{today_visits:,}"},
+                        {"title": "Người dùng duy nhất hôm nay", "value": f"{unique_today:,}"},
+                        {"title": "Số quốc gia", "value": str(len(stats.get('country_stats', [])))}
+                    ]
+                },
+                {"type": "TextBlock", "text": datetime.now().strftime('%H:%M:%S %d/%m/%Y'), "spacing": "Medium", "isSubtle": True}
+            ]
+        }
+
+        # Webhook Incoming của Teams yêu cầu bao gói Adaptive Card trong message/attachments
+        return {
+            "type": "message",
+            "attachments": [
+                {
+                    "contentType": "application/vnd.microsoft.card.adaptive",
+                    "contentUrl": None,
+                    "content": adaptive_card
+                }
+            ]
+        }
+    except Exception as e:
+        logger.error(f"Error creating Adaptive Card payload: {str(e)}")
+        # Fallback về một tin nhắn text đơn giản
+        return {
+            "text": f"Báo cáo SaleBooks KDP {stats.get('date', 'N/A')} - Tổng: {stats.get('visit_stats', {}).get('total_visits', 0)}"
+        }
+
 @api_view(['POST'])
 @csrf_exempt
 def send_daily_report(request):
@@ -217,9 +268,14 @@ def send_daily_report(request):
             if not webhook_url and request.body:
                 body = json.loads(request.body)
                 webhook_url = body.get('webhook_url') or webhook_url
+                # Cho phép override kiểu webhook nếu cần
+                override_type = (body.get('webhook_type') or '').strip().lower() if isinstance(body, dict) else ''
+                if override_type in ('incoming', 'flow'):
+                    webhook_type = override_type
         except Exception:
             pass
-        webhook_type = detect_webhook_type(webhook_url)
+        # Nếu chưa được override, tự nhận diện
+        webhook_type = locals().get('webhook_type', None) or detect_webhook_type(webhook_url)
         if not webhook_url:
             logger.error("TEAMS_WEBHOOK_URL rỗng - chưa cấu hình trong môi trường")
             return JsonResponse({'status': 'error', 'message': 'Chưa cấu hình TEAMS_WEBHOOK_URL'}, status=500)
@@ -240,8 +296,35 @@ def send_daily_report(request):
         
         logger.info(f"Response status: {response.status_code}")
         logger.info(f"Response text: {response.text}")
-        
-        if response.status_code in [200, 202]:
+
+        # Với Incoming Webhook, đôi khi trả 200 nhưng text khác '1' => card không được hiển thị.
+        # Khi đó, thử gửi lại bằng Adaptive Card.
+        retried_with_adaptive = False
+        if (
+            webhook_type == 'incoming' and
+            response.status_code in [200, 202] and
+            (response.text or '').strip() != '1'
+        ):
+            try:
+                logger.warning("Webhook trả 200 nhưng không xác nhận '1'. Thử gửi lại bằng Adaptive Card...")
+                adaptive_payload = create_adaptive_card_payload(stats)
+                logger.info(f"Adaptive payload: {json.dumps(adaptive_payload, ensure_ascii=False)[:2000]}")
+                response = requests.post(
+                    webhook_url,
+                    json=adaptive_payload,
+                    headers={
+                        'Content-Type': 'application/json',
+                        'User-Agent': 'SaleBooks-KDP-Report/1.0'
+                    },
+                    timeout=30
+                )
+                retried_with_adaptive = True
+                logger.info(f"Adaptive retry status: {response.status_code}")
+                logger.info(f"Adaptive retry text: {response.text}")
+            except Exception as re:
+                logger.error(f"Lỗi khi retry Adaptive Card: {str(re)}")
+
+        if response.status_code in [200, 202] and ((response.text or '').strip() in ('1', '') or retried_with_adaptive):
             logger.info("Báo cáo đã được gửi thành công đến Microsoft Teams")
             return JsonResponse({
                 'status': 'success',
@@ -251,6 +334,7 @@ def send_daily_report(request):
                     'message_card': message,
                     'webhook_url': webhook_url,
                     'webhook_type': webhook_type,
+                    'used_adaptive_retry': retried_with_adaptive,
                     'provider_response': {
                         'status_code': response.status_code,
                         'text': response.text

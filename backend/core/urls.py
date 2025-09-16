@@ -36,6 +36,7 @@ path('products/type/delete/<int:id>/', view_sanpham.delete_loai_san_pham, name='
 path('products/type/change-status/', view_sanpham.change_loai_san_pham, name='change_loai_san_pham'),
 path("san-pham/<int:pk>/click/", view_sanpham.tang_luot_xem, name="tang_luot_xem"),
 path("san-pham/top/", view_sanpham.top_san_pham, name="top_san_pham"),
+path("debug/week-stats/", view_sanpham.debug_week_stats, name="debug_week_stats"),
 
 
 
