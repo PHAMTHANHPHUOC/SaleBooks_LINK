@@ -21,3 +21,6 @@ class LinkProfile(models.Model):
         if self.links and isinstance(self.links, dict):
             return {url: name for name, url in self.links.items()}
         return {}
+class LinkClickHistory(models.Model):
+    link = models.ForeignKey(LinkProfile, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)

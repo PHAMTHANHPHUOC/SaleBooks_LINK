@@ -1,14 +1,42 @@
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
-from core.models.LinkMangXaHoi import LinkProfile
+from core.models.LinkMangXaHoi import LinkProfile,LinkClickHistory
 from django.views.decorators.http import require_http_methods
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 import json
 from rest_framework.decorators import api_view
+@api_view(['POST'])
+def tang_luot_click(request, pk):
+    """
+    Tăng lượt click cho link mạng xã hội (giống sản phẩm)
+    """
+    try:
+        link = LinkProfile.objects.get(pk=pk)
+        LinkClickHistory.objects.create(link=link)
+        return Response({'status': True, 'message': 'Đã ghi nhận lượt click'})
+    except LinkProfile.DoesNotExist:
+        return Response({'status': False, 'message': 'Không tìm thấy link'}, status=404)
 
+@api_view(['GET'])
+def top_link(request):
+    """
+    Trả về top link mạng xã hội theo lượt click (giống sản phẩm)
+    """
+    from django.db.models import Count
+    stats = LinkClickHistory.objects.values('link__id', 'link__name', 'link__links').annotate(luot_click=Count('id')).order_by('-luot_click')[:10]
+    return Response({'status': True, 'data': list(stats)})
+@api_view(['GET'])
+def thong_ke_luot_click(request):
+    from django.db.models import Count
+    loai = request.GET.get('loai', 'ngay')
+    # ...lọc theo ngày/tuần/tháng/năm nếu cần...
+    stats = LinkClickHistory.objects.values('link__id', 'link__name', 'link__links') \
+        .annotate(luot_click=Count('id')) \
+        .order_by('-luot_click')
+    return Response({'status': True, 'data': list(stats)})
 @api_view(['POST'])
 def change_link(request):
     """

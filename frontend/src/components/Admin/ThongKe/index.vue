@@ -621,34 +621,43 @@ export default {
     },
 
     showReportPreview() {
-      if (!this.reportPreview) return
-      
-      const stats = this.reportPreview.data.stats
-      const message = this.reportPreview.data.message
-      
-      let previewText = `📊 BÁO CÁO THỐNG KÊ NGÀY ${stats.date}\n\n`
-      previewText += `👥 Tổng lượt truy cập: ${stats.visit_stats.total_visits.toLocaleString()}\n`
-      previewText += `📅 Lượt truy cập hôm nay: ${stats.visit_stats.today_visits.toLocaleString()}\n`
-      previewText += `👤 Người dùng duy nhất: ${stats.visit_stats.unique_today.toLocaleString()}\n`
-      previewText += `🌍 Số quốc gia: ${stats.country_stats.length}\n\n`
-      
-      if (stats.country_stats.length > 0) {
-        previewText += `🌍 TOP QUỐC GIA:\n`
-        stats.country_stats.slice(0, 5).forEach((country, index) => {
-          previewText += `${index + 1}. ${this.getCountryFlag(country.country_code)} ${country.country_name}: ${country.visits} lượt\n`
-        })
-        previewText += `\n`
-      }
-      
-      if (stats.top_products.length > 0) {
-        previewText += `🏆 TOP SẢN PHẨM:\n`
-        stats.top_products.forEach((product, index) => {
-          previewText += `${index + 1}. ${product.ten}: ${product.so_luot} lượt xem\n`
-        })
-      }
-      
-      alert(previewText)
-    }
+  if (!this.reportPreview) return
+
+  const stats = this.reportPreview.data.stats
+  const message = this.reportPreview.data.message
+
+  let previewText = `📊 BÁO CÁO THỐNG KÊ NGÀY ${stats.date}\n\n`
+  previewText += `👥 Tổng lượt truy cập: ${stats.visit_stats.total_visits.toLocaleString()}\n`
+  previewText += `📅 Lượt truy cập hôm nay: ${stats.visit_stats.today_visits.toLocaleString()}\n`
+  previewText += `👤 Người dùng duy nhất: ${stats.visit_stats.unique_today.toLocaleString()}\n`
+  previewText += `🌍 Số quốc gia: ${stats.country_stats.length}\n\n`
+
+  if (stats.country_stats.length > 0) {
+    previewText += `🌍 TOP QUỐC GIA:\n`
+    stats.country_stats.slice(0, 5).forEach((country, index) => {
+      previewText += `${index + 1}. ${this.getCountryFlag(country.country_code)} ${country.country_name}: ${country.visits} lượt\n`
+    })
+    previewText += `\n`
+  }
+
+  // Thêm mục top link mạng xã hội
+  if (stats.top_links && stats.top_links.length > 0) {
+    previewText += `🔗 TOP LINK MẠNG XÃ HỘI:\n`
+    stats.top_links.forEach((link, index) => {
+      previewText += `${index + 1}. ${link.name}: ${link.so_luot} lượt click\n`
+    })
+    previewText += `\n`
+  }
+
+  if (stats.top_products.length > 0) {
+    previewText += `🏆 TOP SẢN PHẨM:\n`
+    stats.top_products.forEach((product, index) => {
+      previewText += `${index + 1}. ${product.ten}: ${product.so_luot} lượt xem\n`
+    })
+  }
+
+  alert(previewText)
+}
   }
 }
 </script>

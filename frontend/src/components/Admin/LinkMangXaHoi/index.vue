@@ -230,7 +230,7 @@
                   <td class="align-middle link-column" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
                     {{ linkItem.links }}
                   </td>
-                  <td>
+                  <td style="width: 120px;" class="align-middle text-center">
                     <div v-if="linkItem.anh_dai_dien" class="image-container">
                       <img  :src="getFullImageUrl(linkItem.anh_dai_dien)" 
                         class="product-image img-thumbnail" 

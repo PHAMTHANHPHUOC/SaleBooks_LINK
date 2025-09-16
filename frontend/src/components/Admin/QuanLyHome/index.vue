@@ -76,6 +76,11 @@
                   <th>price</th>
                   <td>Giá Sản phẩm</td>
                 </tr>
+                <tr>
+                  <th>tinydaisy</th>
+                  <td>@tinydaisy.coloring</td>
+                </tr>
+                
               </tbody>
             </table>
           </div>

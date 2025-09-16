@@ -31,6 +31,11 @@ const routes = [
         beforeEnter: KiemTraAdmin,
     },
     {
+        path: '/admin/quan-ly-thong-ke-mang-xa-hoi', component: () => import('../components/Admin/ThongKeMangXaHoi/index.vue'), 
+        meta : {layout : 'client'},
+        beforeEnter: KiemTraAdmin,
+    },
+    {
         path: '/admin', component: () => import('../components/Admin/QuanLyHome/index.vue'), 
         meta : {layout : 'client'},
         beforeEnter: KiemTraAdmin,

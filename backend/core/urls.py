@@ -57,6 +57,9 @@ path('api/link/create/',view_link.create_link,name='create_link'),
 path('api/link/delete/<int:id>/',view_link.delete_link,name='delete_link'),
 path('api/link/update/<int:id>/',view_link.update_link,name='update_link'),
 path('api/link/change-status/', view_link.change_link, name='change_link'),
+path('api/links/<int:pk>/click/', view_link.tang_luot_click, name='tang_luot_click'),
+path('api/links/top/', view_link.top_link, name='top_link'),
+path('api/links/click-stats/', view_link.thong_ke_luot_click, name='thong_ke_luot_click'),
 
 
 

@@ -5,7 +5,7 @@
       <h1 class="avatar-circle">
         <img class="avatar-img" src="../../../assets/images/TINY.jpg" alt="Avatar" />
       </h1>
-      <!-- <h1 class="brand">Tiny Daisy</h1> -->
+      <h1 :style="getStyle('tinydaisy')" class="brand">@tinydaisy.coloring</h1>
     </div>
 
     <!-- Social Icons -->
@@ -19,6 +19,7 @@
           rel="noopener"
           class="social-btn"
           :aria-label="item.name"
+          @click="handleLinkClick(item.id)"
         >
           <img
             :src="getFullImageUrl(item.anh_dai_dien)"
@@ -37,6 +38,7 @@
     :href="item.links"
     target="_blank"
     rel="noopener"
+    @click="handleLinkClick(item.id)"
   >
     <span class="website-btn-content name-socal">
       <img
@@ -63,6 +65,7 @@
     :href="item.links"
     target="_blank"
     rel="noopener"
+    @click="handleLinkClick(item.id)"
   >
   <span class="website-btn-content name-socal">{{ item.name }}<br>
   <span class="sub-title" >{{ item.subtitle }}</span> <br>
@@ -98,7 +101,7 @@
   <footer class="footer">
     <div class="footer-inner">
       <img src="../../../assets/images/TINY.jpg" alt="Tiny Logo" class="avatar-footer" />
-      <h4 :style="getStyle('email')" v-if="list_link.Email" class="email-footer text-decoration-none fw-bold fs-5 text-darkz">{{ list_link.Email.link }}</h4>
+      <h4 :style="getStyle('email')"v-if="list_link.Email" class="email-footer text-decoration-none ">{{ list_link.Email.link }}</h4>
     </div>
   </footer>
 </template>
@@ -352,6 +355,13 @@ export default {
         this.productTypes = [];
       }
     },
+     async handleLinkClick(linkId) {
+    try {
+      await baseRequest.post(`api/links/${linkId}/click/`);
+    } catch (error) {
+      console.error("Lỗi khi ghi nhận click link:", error);
+    }
+  },
     
     async handleClick(productId) {
       try {
@@ -617,7 +627,7 @@ export default {
     .shop-now-btn {
       display: inline-block;
       padding: 16px 38px;
-      border: 3px solid #2563eb;
+      border: 3px solid #818080;
       border-radius: 40px;
       background: #fff;
       font-weight: 800;
@@ -665,9 +675,9 @@ export default {
       display: block;
     }
     .brand {
-      font-family: Georgia, "Times New Roman", serif;
-      font-weight: 800;
-      font-size: clamp(2rem, 4vw, 3.2rem);
+      /* font-family: Georgia, "Times New Roman", serif; */
+      font-weight: 600;
+      font-size: clamp(2rem, 4vw, 1.5rem);
       letter-spacing: .2px;
       margin: 0;
     }
@@ -725,10 +735,11 @@ export default {
   display: block;
 }
 .email-footer {
-  font-size: 0.5rem;
+  font-size: 1.0rem;
   margin: 0;
   text-align: center;
 }
+
     .social-btn:hover { transform: translateY(-3px) scale(1.04);  }
     .social-btn:focus-visible { outline: 4px solid var(--ring); }
     .social-btn img.icon-connect {
@@ -783,8 +794,8 @@ export default {
       transition: transform .18s ease, box-shadow .18s ease, background .18s ease, color .18s ease;
     }
     .h2-title{
-      font-size:40px;
-       font-weight: 550;
+      font-size:30px;
+      font-weight: 700;
     }
     
     .main-btn:active { transform: translateY(0); }
@@ -814,7 +825,7 @@ export default {
     
     .h3-title {
       text-align: center;
-      font-weight: 800;
+      /* font-weight: bolder; */
     }
     .product-list {
       display: grid;
@@ -908,7 +919,7 @@ export default {
   .btn-icon { width: 32px; height: 32px; }
   .shop-now-btn {
     padding: 10px 22px;
-    border: 2px solid #2563eb;
+    border: 2px solid #d0d8e9;
     border-radius: 28px;
     font-size: 1rem;
     box-shadow: 0 1px 6px rgba(37,99,235,0.07);
@@ -922,7 +933,7 @@ export default {
       font-size: 16px;
     }
   .shop-now-btn:hover {
-    background: #2563eb;
+    background: #f8f8f8;
     color: #fff;
     box-shadow: 0 4px 16px rgba(37,99,235,0.13);
   }

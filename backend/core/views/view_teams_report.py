@@ -10,6 +10,8 @@ from core.models.VisitCounter import VisitLog, VisitCounter
 from core.models.SanPham import SanPham, SanPhamView
 from .utils import get_visit_stats, get_country_stats
 import logging
+from core.models.LinkMangXaHoi import LinkProfile, LinkClickHistory
+
 from django.conf import settings
 # Invoke-RestMethod -Method Post -Uri http://192.168.1.28:8000/api/teams/send-report/
 logger = logging.getLogger(__name__)
@@ -58,8 +60,22 @@ def get_daily_stats():
             SanPhamView.objects.filter(created_at__date=today)
             .values("san_pham__id", "san_pham__ten_san_pham", "san_pham__anh_dai_dien")
             .annotate(so_luot=Count("id"))
-            .order_by("-so_luot")[:5]
+            .order_by("-so_luot")
         )
+        today_links = (
+            LinkClickHistory.objects.filter(created_at__date=today)
+            .values("link__id", "link__name", "link__links")
+            .annotate(so_luot=Count("id"))
+            .order_by("-so_luot")
+        )
+        top_links = [
+            {
+                "name": v["link__name"],
+                "url": v["link__links"],
+                "so_luot": v["so_luot"]
+            }
+            for v in today_links
+        ]
         
         top_products = [
             {
@@ -74,6 +90,7 @@ def get_daily_stats():
             'visit_stats': visit_stats,
             'country_stats': today_countries,
             'top_products': top_products,
+            'top_links': top_links,
             'date': today.strftime('%d/%m/%Y')
         }
     except Exception as e:
@@ -87,12 +104,20 @@ def get_daily_stats():
             },
             'country_stats': [],
             'top_products': [],
+              'top_links': [],
             'date': datetime.now().date().strftime('%d/%m/%Y')
         }
 
 def create_teams_message(stats):
     """Tạo message cho Microsoft Teams"""
     try:
+         # Tạo danh sách top link mạng xã hội
+        link_list = ""
+        if stats.get('top_links'):
+            for i, link in enumerate(stats['top_links'], 1):
+                # Chỉ lấy tên, không lấy url
+                link_list += f"{i}. {link.get('name', 'Unknown')}: {link.get('so_luot', 0)} lượt click\n"
+# ...existing code...        
         # Tạo danh sách top quốc gia
         country_list = ""
         if stats.get('country_stats'):
@@ -111,7 +136,7 @@ def create_teams_message(stats):
             "@type": "MessageCard",
             "@context": "http://schema.org/extensions",
             "themeColor": "0076D7",
-            "summary": f"Báo cáo thống kê ngày {stats.get('date', 'N/A')}",
+            "summary": f" NGÀY {stats.get('date', 'N/A')}",
             "originator": "SaleBooks KDP System",
             "sections": [{
                 "activityTitle": f"📊 Báo cáo thống kê ngày {stats.get('date', 'N/A')}",
@@ -144,6 +169,11 @@ def create_teams_message(stats):
             message["sections"].append({
                 "activityTitle": "🌍 Top quốc gia truy cập hôm nay",
                 "text": country_list or "Chưa có dữ liệu"
+        })
+        if stats.get('top_links'):
+            message["sections"].append({
+                "activityTitle": "🔗 Top link mạng xã hội được click hôm nay",
+                "text": link_list or "Chưa có dữ liệu"
             })
         
         # Thêm section top sản phẩm nếu có
