@@ -45,7 +45,7 @@
 
                         <div class="mb-2">
                             <label>Loại Sản Phẩm</label>
-                            <select v-model="create_san_pham.loai_san_pham" class="form-control mt-2">
+                            <select multiple v-model="create_san_pham.loai_san_pham" class="form-control mt-2">
                                 <template v-for="(v, k) in loaisanpham" :key="k">
                                     <option v-bind:value="v.id">{{ v.ten_loai }}</option>
                                 </template>

@@ -6,6 +6,7 @@ from rest_framework import serializers
 class LoaiSanPham(models.Model):
     ten_loai = models.CharField(max_length=100, unique=True)  # Tên loại sản phẩm
     tinh_trang = models.IntegerField(default=0)
+    layout = models.IntegerField(default=0)
     link_danh_muc = models.URLField(blank=True, null=True)  
     
     # Mô tả loại sản phẩm (tuỳ chọn)
@@ -30,6 +31,12 @@ class SanPham(models.Model):
         blank=True,
         related_name='san_phams'    # Có thể dùng: loai_san_pham.san_phams.all()
     )
+    # loai_san_pham = models.ManyToManyField(
+    #     LoaiSanPham,
+    #     blank=True,
+    #     related_name='san_phams'
+    # )
+
 
     def __str__(self):
         return self.ten_san_pham

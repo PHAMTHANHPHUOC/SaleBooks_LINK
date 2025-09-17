@@ -15,21 +15,6 @@
         >
           🔍 Debug tuần
         </button> -->
-        <button 
-          @click="previewProductReport" 
-          class="btn-preview"
-          :disabled="loading"
-        >
-          👁️ Xem trước báo cáo
-        </button>
-        <button 
-          @click="sendProductReport" 
-          class="btn-send"
-          :disabled="loading || sendingReport"
-        >
-          <span v-if="sendingReport">📤 Đang gửi...</span>
-          <span v-else>📤 Gửi báo cáo Teams</span>
-        </button>
       </div>
     </div>
 
@@ -361,38 +346,6 @@ export default {
       // Bỏ dấu / cuối nếu có
       this.baseUrl = this.baseUrl.replace(/\/$/, '');
       console.log('Base URL:', this.baseUrl); // Debug
-    },
-
-    async previewProductReport() {
-      try {
-        const response = await baseRequest.get('api/teams/preview-report/')
-        this.showProductReportPreview(response.data)
-      } catch (error) {
-        console.error('Error previewing product report:', error)
-        alert('Lỗi khi tạo preview báo cáo: ' + (error.response?.data?.message || error.message))
-      }
-    },
-
-    async sendProductReport() {
-      if (!confirm('Bạn có chắc chắn muốn gửi báo cáo thống kê sản phẩm đến Microsoft Teams?')) {
-        return
-      }
-
-      this.sendingReport = true
-      try {
-        const response = await baseRequest.post('api/teams/send-report/')
-        
-        if (response.data.status === 'success') {
-          alert('✅ Báo cáo sản phẩm đã được gửi thành công đến Microsoft Teams!')
-        } else {
-          alert('❌ Lỗi khi gửi báo cáo: ' + response.data.message)
-        }
-      } catch (error) {
-        console.error('Error sending product report:', error)
-        alert('❌ Lỗi khi gửi báo cáo: ' + (error.response?.data?.message || error.message))
-      } finally {
-        this.sendingReport = false
-      }
     },
 
     showProductReportPreview(reportData) {

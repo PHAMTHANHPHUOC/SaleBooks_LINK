@@ -28,12 +28,18 @@ def top_link(request):
     from django.db.models import Count
     stats = LinkClickHistory.objects.values('link__id', 'link__name', 'link__links').annotate(luot_click=Count('id')).order_by('-luot_click')[:10]
     return Response({'status': True, 'data': list(stats)})
+from datetime import datetime
+
 @api_view(['GET'])
 def thong_ke_luot_click(request):
     from django.db.models import Count
     loai = request.GET.get('loai', 'ngay')
-    # ...lọc theo ngày/tuần/tháng/năm nếu cần...
-    stats = LinkClickHistory.objects.values('link__id', 'link__name', 'link__links') \
+    today = datetime.now().date()
+    queryset = LinkClickHistory.objects.all()
+    if loai == 'ngay':
+        queryset = queryset.filter(created_at__date=today)
+    # Có thể bổ sung lọc tuần/tháng/năm ở đây
+    stats = queryset.values('link__id', 'link__name', 'link__links') \
         .annotate(luot_click=Count('id')) \
         .order_by('-luot_click')
     return Response({'status': True, 'data': list(stats)})

@@ -30,7 +30,6 @@ GEOIP_PATH = os.path.join(BASE_DIR, "geoip")
 
 # Load environment variables explicitly from backend/.env and project root .env
 logger = logging.getLogger(__name__)
-
 def _load_env_file(path: str) -> None:
     try:
         if os.path.exists(path):
@@ -84,6 +83,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'corsheaders',
     'core',
+    'django_crontab',
 ]
 
 SIMPLE_JWT = {
@@ -242,3 +242,7 @@ except Exception:
 TEAMS_WEBHOOK_URL = os.getenv('TEAMS_WEBHOOK_URL') or _dotenv_values.get('TEAMS_WEBHOOK_URL', '')
 TEAMS_WEBHOOK_TYPE = (os.getenv('TEAMS_WEBHOOK_TYPE') or _dotenv_values.get('TEAMS_WEBHOOK_TYPE', '')).strip()
 
+
+# CRONJOBS = [
+#     ('25 9 * * *', 'views.cron.call_api'),
+# ]
