@@ -200,6 +200,15 @@
                   <option value="1">Hiển Thị</option>
                   <option value="0">Tạm Dừng</option>
                 </select>
+                <label class="form-lable mt-2"> Layout Hiển Thị</label>
+                  <select
+                    v-model="edit_loai_san_pham.layout"
+                    class="form-control"
+                  >
+                    <option value="0">Simple</option>
+                    <option value="1">Scroll bar</option>
+                    <option value="2">Collapse icon</option>
+                  </select>
               </div>
               <div class="modal-footer">
                 <button

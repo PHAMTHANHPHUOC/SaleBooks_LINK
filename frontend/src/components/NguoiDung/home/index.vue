@@ -1,7 +1,7 @@
 <template>
 <div class="bogiki-linktree">
     <!-- Avatar & Name -->
-    <div class="profile">
+    <div class="profile ">
       <h1 class="avatar-circle">
         <img class="avatar-img" src="../../../assets/images/TINY.jpg" alt="Avatar" />
       </h1>
@@ -73,9 +73,42 @@
   </a>
 </div>
 
-
+    <div v-for="type in productTypes.filter(link => link.layout === 2)" :key="type.id" class="product-section">
+  <h3 :style="getStyle('loai-san-pham')" class="h3-title">{{ type.ten_loai }}</h3>
+  <div class="product-list-btn">
+    <a
+      v-for="product in type.products"
+      :key="product.id"
+      :href="product.duong_dan_ngoai"
+      @click="handleClick(product.id)"
+      target="_blank"
+      class="btn-layout2"
+    >
+      <img
+        :src="getFullImageUrl(product.anh_dai_dien)"
+        class="btn-layout2-img"
+        @error="handleImageError"
+        @click.stop="showImagePreview(getFullImageUrl(product.anh_dai_dien))"
+      />
+      <span class="btn-layout2-content">
+        <span :style="getStyle('collapse-title')" class="btn-layout2-title">{{ product.ten_san_pham }}</span><br>
+        <span :style="getStyle('collapse-sub')" class="btn-layout2-sub">{{ product.gia_mac_dinh }}</span>
+      </span>
+    </a>
+  </div>
+  <!-- <div class="shop-now-wrapper" :style="{ marginTop: '20px' }">
+    <a
+      v-if="type.link_danh_muc"
+      target="_blank"
+      rel="noopener"
+      :href="type.link_danh_muc"
+      :style="getStyle('button-shop-now')"
+      class="shop-now-btn"
+    >SHOP NOW</a>
+  </div> -->
+</div>
     <!-- Product Section: For từng loại sản phẩm -->
-    <div v-for="type in productTypes" :key="type.id" class="product-section">
+    <div  v-for="type in productTypes.filter(link => link.layout === 0)" :key="type.id" class="product-section">
       <h3 :style="getStyle('loai-san-pham')" class="h3-title ">{{ type.ten_loai }}</h3>
       <div class="product-list ">
         <a v-for="product in type.products" :key="product.id" :href="product.duong_dan_ngoai"  @click="handleClick(product.id)" target="_blank" class="product-link">
@@ -86,7 +119,7 @@
                  @click="showImagePreview(getFullImageUrl(product.anh_dai_dien))" />
             <div class="card-body">
               <h4 :style="getStyle('san-pham')" class="product-name">{{ product.ten_san_pham }}</h4>
-              <h4 :style="getStyle('price')" class="product-price">${{ product.gia_mac_dinh }}</h4>
+              <h4 :style="getStyle('price')" class="product-price">{{ product.gia_mac_dinh }}</h4>
             </div>
           </div>
         </a>
@@ -96,6 +129,29 @@
         <a v-if="type.link_danh_muc" target="_blank" rel="noopener" :href="type.link_danh_muc" :style="getStyle('button-shop-now')" class="shop-now-btn">SHOP NOW</a>
       </h4>
     </div>
+    <div v-for="type in productTypes.filter(link => link.layout === 1)" :key="type.id" class="product-section">
+  <h3 :style="getStyle('loai-san-pham')" class="h3-title ">{{ type.ten_loai }}</h3>
+  <div class="product-list horizontal-scroll">
+    <a v-for="product in type.products" :key="product.id" :href="product.duong_dan_ngoai" @click="handleClick(product.id)" target="_blank" class="product-link">
+      <div class="card">
+        <img :src="getFullImageUrl(product.anh_dai_dien)" 
+             class="card-img-top" 
+             @error="handleImageError"
+             @click="showImagePreview(getFullImageUrl(product.anh_dai_dien))" />
+        <div class="card-body">
+          <h4 :style="getStyle('san-pham')" class="product-name">{{ product.ten_san_pham }}</h4>
+          <h4 :style="getStyle('price')" class="product-price">{{ product.gia_mac_dinh }}</h4>
+        </div>
+      </div>
+    </a>
+  </div>
+
+    </div>
+   
+
+
+
+    
   </div>
   
   <footer class="footer">
@@ -147,11 +203,14 @@ export default {
     }
   },
   async mounted() {
+    console.log("layout",this.productTypes);
+
     this.initializeBaseUrl();
     this.loadlink();
     this.loadAllProductTypes();
     this.loadBackground();
     this.loadlink_Array();
+    
     await this.loadStyle();
     // this.loadFonts();
   try {
@@ -909,9 +968,111 @@ export default {
       font-size: 1rem;
       text-align: center;
     }
+    .product-list.horizontal-scroll {
+  display: flex !important;
+  flex-direction: row;
+  gap: 30px;
+  overflow-x: auto;
+  padding-bottom: 12px;
+  scrollbar-width: thin;
+  scrollbar-color: #e75480 #faf9f6;
+}
+.product-list.horizontal-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+.product-list.horizontal-scroll::-webkit-scrollbar-thumb {
+  background: #e75480;
+  border-radius: 8px;
+}
+.product-list.horizontal-scroll::-webkit-scrollbar-track {
+  background: #faf9f6;
+  border-radius: 8px;
+}
+.product-list.horizontal-scroll .product-link {
+  min-width: 240px;
+  max-width: 260px;
+  flex: 0 0 auto;
+}
+.product-list.horizontal-scroll .card {
+  width: 105%;
+}
     
     /* Animations */
        /* Responsive: all mobile under 820px */
+
+.product-list-btn {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  width: 100%;
+  align-items: center;
+}
+.btn-layout2 {
+  display: flex;
+  align-items: center;
+  background: #f7ccd6;
+  border-radius: 40px;
+  padding: 18px 32px;
+  width: 100%;
+  max-width: 520px;
+  text-decoration: none;
+  color: #222;
+  box-shadow: 0 2px 12px rgba(37,99,235,0.07);
+  transition: background .18s, box-shadow .18s;
+  font-weight: 600;
+}
+.btn-layout2:hover {
+  font-size: clamp(1.1rem, 2.7vw, 1.1rem); 
+  background: #f7ccd6;
+  color: #725858ff;
+  transform: translateY(-2px) scale(1.06); /* tăng scale để to ra hơn */
+  box-shadow: var(--shadow-hover);
+  /* border: 2.5px solid #fac2c2; */
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease, color .18s ease;
+}
+.btn-layout2-img {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 18px;
+  background: #fff;
+  border: 2px solid #fff;
+}
+.btn-layout2-content {
+  /* display: flex; */
+  flex-direction: column;
+  justify-content: center;
+}
+.btn-layout2-title {
+  font-size: 1.25rem;
+  font-weight: normal;
+}
+.btn-layout2-sub {
+  font-size: 0.9rem;
+  /* color: #fff; */
+  font-weight: normal;
+  opacity: 0.85;
+}
+@media (max-width: 600px) {
+  .btn-layout2 {
+    padding: 12px 10px;
+    font-size: 1rem;
+    border-radius: 28px;
+    max-width: 98vw;
+  }
+  .btn-layout2-img {
+    width: 48px;
+    height: 48px;
+    margin-right: 12px;
+  }
+  .btn-layout2-title {
+    font-size: 1.05rem;
+  }
+  .btn-layout2-sub {
+    font-size: 0.85rem;
+  }
+}
 @media (max-width: 820px) {
   body { font-size: 16.5px; }
   .bogiki-linktree { padding: 10px 8px 20px; max-width: 100vw; gap: 12px; }
@@ -932,11 +1093,36 @@ export default {
       font-weight: normal; 
       font-size: 16px;
     }
+    .product-list.horizontal-scroll .card {
+      width: 80%;
+    }
+    .product-list.horizontal-scroll {
+      gap: 0;
+    }
+
+    .btn-layout2 {
+    padding: 12px 10px;
+    font-size: 1rem;
+    border-radius: 28px;
+    max-width: 98vw;
+  }
+  .btn-layout2-img {
+    width: 48px;
+    height: 48px;
+    margin-right: 12px;
+  }
+  .btn-layout2-title {
+    font-size: 1.05rem;
+  }
+  .btn-layout2-sub {
+    font-size: 0.85rem;
+  }
   .shop-now-btn:hover {
     background: #f8f8f8;
     color: #fff;
     box-shadow: 0 4px 16px rgba(37,99,235,0.13);
   }
+  
   .social-btn img.icon-connect {
     width: 45px;
     height: 45px;
@@ -987,6 +1173,7 @@ export default {
   .product-name  { font-size: 1rem; margin: 4px 0 2px;   }
   
   .product-price { font-size: 1.05rem; }
+  
 }
 
 @keyframes floatIn {

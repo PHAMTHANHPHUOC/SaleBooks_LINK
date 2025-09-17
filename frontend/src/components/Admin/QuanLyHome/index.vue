@@ -80,6 +80,14 @@
                   <th>tinydaisy</th>
                   <td>@tinydaisy.coloring</td>
                 </tr>
+                <tr>
+                  <th>collapse-title</th>
+                  <td>Tên của collapse icon</td>
+                </tr>
+                <tr>
+                  <th>collapse-sub</th>
+                  <td>giá trị bên dưới của collapse icon</td>
+                </tr>
                 
               </tbody>
             </table>

@@ -183,7 +183,7 @@
                         <td>{{ k+1 }}</td>
                         <td>{{ v.ten_san_pham }}</td>
                         <td>{{ v.duong_dan_ngoai }}</td>
-                        <td>${{ v.gia_mac_dinh }}</td>
+                        <td>{{ v.gia_mac_dinh }}</td>
                         <td>
                             <div v-if="v.anh_dai_dien" class="image-container">
                                 <img :src="getFullImageUrl(v.anh_dai_dien)" 
