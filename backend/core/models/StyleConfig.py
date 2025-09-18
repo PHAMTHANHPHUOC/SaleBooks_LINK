@@ -3,7 +3,8 @@ from django.db import models
 class StyleConfig(models.Model):
     tag = models.CharField(max_length=50, blank=True, unique=True)
     font_family = models.CharField(max_length=200, blank=True, null=True, help_text="Font family CSS")
-    font_size = models.CharField(max_length=20, blank=True, null=True, help_text="Font size (px, em, rem)")
+    font_weight = models.CharField(max_length=20, blank=True, null=True, help_text="Font weight (px, em, rem)")
+    background = models.CharField(max_length=20, blank=True, null=True, help_text="Màu nền chung (hex)")
     color = models.CharField(max_length=20, blank=True, null=True, help_text="Màu chữ (hex)")
     updated_at = models.DateTimeField(auto_now=True)
 

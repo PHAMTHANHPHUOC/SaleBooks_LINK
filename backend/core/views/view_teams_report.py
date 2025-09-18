@@ -433,46 +433,7 @@ def get_report_preview(request):
             'error': str(e)
         }, status=500)
 
-@api_view(['GET'])
-def test_report(request):
-    """API test đơn giản để kiểm tra"""
-    try:
-        return JsonResponse({
-            'status': 'success',
-            'message': 'API hoạt động bình thường',
-            'data': {
-                'timestamp': datetime.now().isoformat(),
-                'test': True
-            }
-        })
-    except Exception as e:
-        return JsonResponse({
-            'status': 'error',
-            'message': str(e)
-        }, status=500)
 
-@api_view(['GET'])
-def test_teams_message(request):
-    """API test để xem format message Teams"""
-    try:
-        stats = get_daily_stats()
-        message = create_teams_message(stats)
-        
-        return JsonResponse({
-            'status': 'success',
-            'message': 'Message format for Teams',
-            'data': {
-                'stats': stats,
-                'teams_message': message,
-                'webhook_url': get_webhook_url(),
-                'webhook_type': detect_webhook_type(get_webhook_url() or '')
-            }
-        })
-    except Exception as e:
-        return JsonResponse({
-            'status': 'error',
-            'message': str(e)
-        }, status=500)
 
 @api_view(['POST'])
 @csrf_exempt

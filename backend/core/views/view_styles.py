@@ -11,7 +11,8 @@ def get_list_styles(request):
             'id': style.id,
             'tag': style.tag,
             'font_family': style.font_family,
-            'font_size': style.font_size,
+            'font_weight': style.font_weight,
+            'background': style.background,
             'color': style.color,
         })
     return Response(data)
@@ -21,8 +22,9 @@ def get_data_styles(request):
     for style in styles:
         data[style.tag] = {
             "font_family": style.font_family,
-            "font_size": style.font_size,
+            "font_weight": style.font_weight,
             "color": style.color,
+            "background": style.background,
             # Không lấy background ở đây!
         }
     # Nếu muốn trả về background, lấy từ SiteConfig
@@ -34,13 +36,15 @@ def create_styles(request):
     try:
         tag = request.data.get('tag')
         font_family = request.data.get('font_family', '')  
-        font_size = request.data.get('font_size', '')  
+        font_weight = request.data.get('font_weight', '')  
         color = request.data.get('color', '')
+        background = request.data.get('background', '')
         StyleConfig.objects.create(
             tag=tag,
             font_family=font_family,
-            font_size=font_size,
+            font_weight=font_weight,
             color=color,
+            background = background,
         )
         return Response({'status': True, 'message': 'Thêm style thành công.'})
     except Exception as e:
@@ -52,7 +56,8 @@ def update_styles(request, id):
         data = StyleConfig.objects.get(id=id)
         data.tag = request.data.get('tag', data.tag)
         data.font_family = request.data.get('font_family', data.font_family)
-        data.font_size = request.data.get('font_size', data.font_size)
+        data.font_weight = request.data.get('font_weight', data.font_weight)
+        data.background = request.data.get('background', data.background)
         data.color = request.data.get('color', data.color)
         data.save()
         return Response({'status': True, 'message': 'Đã cập nhật style thành công!'})

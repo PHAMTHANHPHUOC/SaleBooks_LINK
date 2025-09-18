@@ -116,6 +116,8 @@
               <th>Font Family (Google Fonts)</th>
               <!-- <th>Font Size</th> -->
               <th>Color</th>
+              <th>Độ dày của chữ</th>
+              <th>background</th>
               <th class="text-center">Hành động</th>
             </tr>
           </thead>
@@ -123,9 +125,12 @@
             <tr v-for="item in list_style" :key="item.id">
               <td>{{ item.tag }}</td>
               <td>{{ item.font_family }}</td>
-              <!-- <td>{{ item.font_size }}</td> -->
               <td>
                 <span :style="{color: item.color}">{{ item.color }}</span>
+              </td>
+              <td>{{ item.font_weight }}</td>
+              <td>
+                <span :style="{color: item.background}">{{ item.background }}</span>
               </td>
               <td class="text-center">
                 <button class="btn btn-info me-2" @click="setEditSanPham(item)" data-bs-toggle="modal" data-bs-target="#editStyleModal">Sửa</button>
@@ -147,6 +152,8 @@
             <input v-model="create_san_pham.font_family" class="form-control mb-2" placeholder="Font Family (ví dụ: Roboto)">
             <!-- <input v-model="create_san_pham.font_size" class="form-control mb-2" placeholder="Font Size (ví dụ: 18px)"> -->
             <input v-model="create_san_pham.color" class="form-control mb-2" placeholder="Color (ví dụ: #333)">
+            <input v-model="create_san_pham.font_weight" class="form-control mb-2" placeholder="nhập từ 100 đến 1000">
+            <input v-model="create_san_pham.background" class="form-control mb-2" placeholder="có thể bỏ trống nếu không cần">
             <small class="text-muted">Font Family có thể nhập bất kỳ, nếu là Google Fonts sẽ tự động tải.</small>
           </div>
           <div class="modal-footer">
@@ -169,6 +176,10 @@
             <input v-model="edit_san_pham.font_size" class="form-control mb-2" placeholder="Font Size"> -->
             <label for="">Color</label>
             <input v-model="edit_san_pham.color" class="form-control mb-2" placeholder="Color">
+            <label for="">font_weight</label>
+            <input v-model="edit_san_pham.font_weight" class="form-control mb-2" placeholder="nhập từ 100 - > 1000">
+            <label for="">background</label>
+            <input v-model="edit_san_pham.background" class="form-control mb-2" placeholder="mã màu">
           </div>
           <div class="modal-footer">
             <button class="btn btn-success" @click="update_style">Cập nhật</button>

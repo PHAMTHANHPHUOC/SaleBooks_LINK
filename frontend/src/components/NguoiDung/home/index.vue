@@ -5,11 +5,12 @@
       <h1 class="avatar-circle">
         <img class="avatar-img" src="../../../assets/images/TINY.jpg" alt="Avatar" />
       </h1>
-      <h1 :style="getStyle('tinydaisy')" class="brand">@tinydaisy.coloring</h1>
-    </div>
+      <div class="containerh1-h2">
+        <h1 :style="getStyle('tinydaisy')" class="brand">@tinydaisy.coloring</h1>
+      <h2 class="h2-title"  :style="getStyle('tieude')"  >Relaxing Coloring Books </h2>
+      </div>
 
-    <!-- Social Icons -->
-    <h2 class="h2-title"  :style="getStyle('tieude')"  >Relaxing Coloring Books </h2>
+    </div>
     <div class="social-list">
         <a
           v-for="item in Array_link.filter(link => link.loai === 0 && link.tinh_trang === 1)"
@@ -29,6 +30,10 @@
           />
         </a>
 </div>
+
+
+    <!-- Social Icons -->
+    
     <div class="button-list ">
   <a
     v-for="item in Array_link.filter(link => link.loai === 1 && link.tinh_trang === 1)"
@@ -145,13 +150,7 @@
       </div>
     </a>
   </div>
-
     </div>
-   
-
-
-
-    
   </div>
   
   <footer class="footer">
@@ -203,8 +202,6 @@ export default {
     }
   },
   async mounted() {
-    console.log("layout",this.productTypes);
-
     this.initializeBaseUrl();
     this.loadlink();
     this.loadAllProductTypes();
@@ -519,9 +516,9 @@ export default {
           const style = this.list_style[tag] || {};
           return {
             fontFamily: style.font_family || undefined,
-            fontSize: style.font_size || undefined,
-            color: style.color || undefined,
-            background: style.background || undefined,
+            fontWeight: style.font_weight || undefined,
+            color:      style.color       || undefined,
+            background: style.background  || undefined,
           };
         },
     getFullImageUrl(imagePath) {
@@ -686,7 +683,7 @@ export default {
     .shop-now-btn {
       display: inline-block;
       padding: 16px 38px;
-      border: 3px solid #818080;
+      border: 1px solid #818080;
       border-radius: 40px;
       background: #fff;
       font-weight: 800;
@@ -698,10 +695,12 @@ export default {
       text-align: center;
     }
     .shop-now-btn:hover {
-      background: #eb25b0ff;
-      border: 3px solid #eb25b0ff;
-      color: #fff;
-      box-shadow: 0 6px 24px rgba(37,99,235,0.13);
+      /* background: #eb25b0ff;
+      border: 3px solid #eb25b0ff; */
+      /* color: #fff; */
+      box-shadow: 0 6px 24px rgba(255, 255, 255, 0.13);
+       transform: translateY(-2px) scale(1.06); /* tăng scale để to ra hơn */
+      box-shadow: var(--shadow-hover);
     }
     .product-link {
       text-decoration: none;   /* bỏ gạch chân */
@@ -722,6 +721,7 @@ export default {
       justify-content: center;
       /* box-shadow: 0 4px 20px rgba(0,0,0,0.08); */
       margin: 0 auto var(--gap);
+      margin-bottom: -8px;
       overflow: hidden;
     }
     .avatar-img {
@@ -765,7 +765,7 @@ export default {
       width: 100%;
       display: flex;
       justify-content: center;
-      gap: clamp(8px, 1.5vw, 15px);
+      gap: clamp(8px, 1.5vw, 10px);
       flex-wrap: nowrap;
       overflow-x: auto;
     }
@@ -1085,10 +1085,7 @@ export default {
     font-size: 1rem;
     box-shadow: 0 1px 6px rgba(37,99,235,0.07);
   }
-   .h2-title{
-      font-size:25px;
-      font-weight: 550;
-    }
+   
     .name-socal {
       font-weight: normal; 
       font-size: 16px;
@@ -1158,13 +1155,31 @@ export default {
   margin: 0;
   text-align: center;
 }
+.h2-title{
+      font-size:18px;
+      font-weight: 550;
+      margin-top: 5px;
+    }
+div.profile {
+  display: flex;
+  justify-content: flex-start; 
+  margin-right: 50px;
+  
+}
+.containerh1-h2 {
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+  margin-right: 22px;
+}
   .avatar-circle { width: 120px; height: 120px; }
-  .avatar-img { width: 70%; height: 70%; }
-  .brand { font-size: 1.5rem; }
+  .avatar-img { width: 75%; height: 75%; }
+  .brand { font-size: 1.5rem; margin-top: 5px;}
   .section-title, .product-title { font-size: 1.1rem; margin: 12px 0 6px; }
-  .social-list { gap: 12px; flex-wrap: nowrap; overflow-x: auto; }
-  .social-btn { width: 55px; height: 55px; }
-  .social-btn img { width: 40px; height: 40px; }
+  .social-list { gap: 2px; flex-wrap: nowrap; overflow-x: auto; margin-top: -10px;display: flex; margin-left: 10px;
+  justify-content: flex-start; }
+  .social-btn { width: 41px; height: 41px; }
+  .social-btn img { width: 41px; height: 41px; }
   .product-list { grid-template-columns: 0.5fr 0.5fr; }
   .card { width: 100%;
   overflow: hidden;
@@ -1173,6 +1188,9 @@ export default {
   .product-name  { font-size: 1rem; margin: 4px 0 2px;   }
   
   .product-price { font-size: 1.05rem; }
+
+
+  
   
 }
 
