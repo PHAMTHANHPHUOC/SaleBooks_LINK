@@ -45,11 +45,18 @@
 
                         <div class="mb-2">
                             <label>Loại Sản Phẩm</label>
-                            <select multiple v-model="create_san_pham.loai_san_pham" class="form-control mt-2">
-                                <template v-for="(v, k) in loaisanpham" :key="k">
-                                    <option v-bind:value="v.id">{{ v.ten_loai }}</option>
-                                </template>
-                            </select>
+                           <div v-for="(v, k) in loaisanpham" :key="k" class="form-check">
+                            <input
+                              type="checkbox"
+                              class="form-check-input"
+                              :id="'loai-' + v.id"
+                              :value="v.id"
+                              v-model="edit_san_pham.loai_san_pham"
+                            />
+                            <label class="form-check-label" :for="'loai-' + v.id">
+                              {{ v.ten_loai }}
+                            </label>
+                          </div>
                     </div>
                     </div>
                     <div class="modal-footer">
@@ -105,11 +112,18 @@
                           </select>
                         <div class="mb-2">
                             <label>Loại Sản Phẩm</label>
-                            <select v-model="edit_san_pham.loai_san_pham" class="form-control mt-2">
-                                <template v-for="(v, k) in loaisanpham" :key="k">
-                                    <option v-bind:value="v.id">{{ v.ten_loai }}</option>
-                                </template>
-                            </select>
+                           <div v-for="(v, k) in loaisanpham" :key="k" class="form-check">
+                            <input
+                              type="checkbox"
+                              class="form-check-input"
+                              :id="'loai-' + v.id"
+                              :value="v.id"
+                              v-model="edit_san_pham.loai_san_pham"
+                            />
+                            <label class="form-check-label" :for="'loai-' + v.id">
+                              {{ v.ten_loai }}
+                            </label>
+                          </div>
                     </div>
                     </div>
                     <div class="modal-footer">
@@ -196,7 +210,12 @@
                                 <small class="text-muted">Chưa có ảnh</small>
                             </div>
                         </td>
-                        <td>{{ getLoaiSanPhamName(v.loai_san_pham) }}</td>
+                      <td>
+                        <span v-if="v.loai_san_pham && v.loai_san_pham.length">
+                          {{ v.loai_san_pham.map(id => getLoaiSanPhamName(id)).join('  |  ') }}
+                        </span>
+                        <span v-else>N/A</span>
+                      </td>
                         <td class="align-middle text-nowrap text-center">
                           <template v-if="v.tinh_trang == 1">
                             <button v-on:click="changeStatus(v)" class="btn btn-success w-100">Hiển Thị</button>

@@ -82,6 +82,7 @@
   <h3 :style="getStyle('loai-san-pham')" class="h3-title">{{ type.ten_loai }}</h3>
   <div class="product-list-btn">
     <a
+      :style="getStyle('background-layout-icon')"
       v-for="product in type.products"
       :key="product.id"
       :href="product.duong_dan_ngoai"

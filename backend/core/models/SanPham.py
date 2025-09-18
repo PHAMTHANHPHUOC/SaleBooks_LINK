@@ -24,19 +24,18 @@ class SanPham(models.Model):
     anh_dai_dien = models.ImageField(upload_to='avatars/', blank=True, null=True)
     
     # Thêm ForeignKey tới LoaiSanPham
-    loai_san_pham = models.ForeignKey(
-        LoaiSanPham,
-        on_delete=models.SET_NULL,   # Nếu loại bị xóa, sản phẩm vẫn giữ nhưng loai_san_pham = NULL
-        null=True,
-        blank=True,
-        related_name='san_phams'    # Có thể dùng: loai_san_pham.san_phams.all()
-    )
-    # loai_san_pham = models.ManyToManyField(
+    # loai_san_pham = models.ForeignKey(
     #     LoaiSanPham,
+    #     on_delete=models.SET_NULL,   # Nếu loại bị xóa, sản phẩm vẫn giữ nhưng loai_san_pham = NULL
+    #     null=True,
     #     blank=True,
-    #     related_name='san_phams'
+    #     related_name='san_phams'    # Có thể dùng: loai_san_pham.san_phams.all()
     # )
-
+    loai_san_pham = models.ManyToManyField(
+        LoaiSanPham,
+        blank=True,
+        related_name='san_phams'
+    )
 
     def __str__(self):
         return self.ten_san_pham

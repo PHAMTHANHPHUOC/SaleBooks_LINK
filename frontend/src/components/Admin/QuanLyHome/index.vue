@@ -88,6 +88,10 @@
                   <th>collapse-sub</th>
                   <td>giá trị bên dưới của collapse icon</td>
                 </tr>
+                <tr>
+                  <th>background-layout-icon</th>
+                  <td>background layout Collapse icon</td>
+                </tr>
                 
               </tbody>
             </table>

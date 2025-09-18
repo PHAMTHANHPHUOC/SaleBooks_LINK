@@ -259,12 +259,19 @@ def update_san_pham(request, id):
         loai_san_pham_id = request.data.get('loai_san_pham')
         if loai_san_pham_id:
             try:
-                loai_san_pham = LoaiSanPham.objects.get(id=loai_san_pham_id)
-                data.loai_san_pham = loai_san_pham
-            except LoaiSanPham.DoesNotExist:
+                loai_san_phams = LoaiSanPham.objects.filter(id__in=loai_san_pham_id)
+                if not loai_san_phams.exists():
+                    return Response({
+                        'status': False,
+                        'error': 'Không tìm thấy loại sản phẩm hợp lệ'
+                    }, status=status.HTTP_400_BAD_REQUEST)
+                
+                # Gán lại toàn bộ M2M
+                data.loai_san_pham.set(loai_san_phams)
+            except Exception as e:
                 return Response({
                     'status': False,
-                    'error': 'Loại sản phẩm không tồn tại'
+                    'error': str(e)
                 }, status=status.HTTP_400_BAD_REQUEST)
         
         # Xử lý file upload - QUAN TRỌNG: Lấy từ request.FILES
@@ -415,10 +422,10 @@ def product_data(request):
 @api_view(['GET'])
 def product_type(request, id):
     """
-    Trả về dữ liệu sản phẩm theo loại
+    Trả về dữ liệu sản phẩm theo loại (ManyToMany)
     """
     try:
-        san_phams = SanPham.objects.filter(loai_san_pham_id=id, tinh_trang=1)
+        san_phams = SanPham.objects.filter(loai_san_pham=id, tinh_trang=1)
         serializer = SanPhamSerializer(san_phams, many=True)
         return Response({
             'status': True,
