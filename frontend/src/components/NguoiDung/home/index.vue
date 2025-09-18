@@ -1177,8 +1177,8 @@ div.profile {
   .avatar-img { width: 75%; height: 75%; }
   .brand { font-size: 1.5rem; margin-top: 5px;}
   .section-title, .product-title { font-size: 1.1rem; margin: 12px 0 6px; }
-  .social-list { gap: 2px; flex-wrap: nowrap; overflow-x: auto; margin-top: -10px;display: flex; margin-left: 10px;
-  justify-content: flex-start; }
+  .social-list { gap: 2px; flex-wrap: nowrap; overflow-x: auto; margin-top: -10px;display: flex;
+  justify-content: center; }
   .social-btn { width: 41px; height: 41px; }
   .social-btn img { width: 41px; height: 41px; }
   .product-list { grid-template-columns: 0.5fr 0.5fr; }

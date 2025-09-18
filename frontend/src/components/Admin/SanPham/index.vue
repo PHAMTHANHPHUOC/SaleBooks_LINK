@@ -43,21 +43,23 @@
                             <option value="0">Tạm Dừng</option>
                           </select>
 
-                        <div class="mb-2">
+                          <div class="mb-2">
                             <label>Loại Sản Phẩm</label>
-                           <div v-for="(v, k) in loaisanpham" :key="k" class="form-check">
-                            <input
-                              type="checkbox"
-                              class="form-check-input"
-                              :id="'loai-' + v.id"
-                              :value="v.id"
-                              v-model="edit_san_pham.loai_san_pham"
-                            />
-                            <label class="form-check-label" :for="'loai-' + v.id">
-                              {{ v.ten_loai }}
-                            </label>
+                            <div v-for="(v, k) in loaisanpham" :key="k" class="form-check">
+                              <input
+                                type="checkbox"
+                                class="form-check-input"
+                                :id="'loai-' + v.id"
+                                :value="v.id"
+                                v-model="create_san_pham.loai_san_pham"
+                              />
+                              <label class="form-check-label" :for="'loai-' + v.id">
+                                {{ v.ten_loai }}
+                              </label>
+                            </div>
                           </div>
-                    </div>
+
+
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
@@ -268,7 +270,20 @@ export default {
       debug_mode: true, // Bật debug mode để kiểm tra
       api_response: null,
       previewImageUrl: '', // Thêm để preview ảnh
-      baseUrl: '' // Thêm base URL
+      baseUrl: '' ,// Thêm base URL,
+      create_san_pham: {
+      ten_san_pham: "",
+      duong_dan_ngoai: "",
+      gia_mac_dinh: "",
+      tinh_trang: 1,
+      loai_san_pham: [],   // QUAN TRỌNG: phải là array, không được null/""/false
+      anh_dai_dien: null,
+    },
+    edit_san_pham: {
+      id: null,
+      ten_san_pham: "",
+      loai_san_pham: [],   // tương tự
+    }
     };
   },
   mounted() {
@@ -428,7 +443,9 @@ export default {
   formData.append('duong_dan_ngoai', this.create_san_pham.duong_dan_ngoai || '');
   formData.append('gia_mac_dinh', this.create_san_pham.gia_mac_dinh || '0');
   formData.append('tinh_trang', this.create_san_pham.tinh_trang || '0');
-  formData.append('loai_san_pham', this.create_san_pham.loai_san_pham || '');
+  this.create_san_pham.loai_san_pham.forEach(id => {
+  formData.append("loai_san_pham", id);
+});
   
   // Thêm file nếu có
   if (this.create_san_pham.anh_dai_dien) {
@@ -449,6 +466,12 @@ export default {
         // Reset file input
         document.querySelector('input[type="file"]').value = '';
         this.loadSanPham();
+        this.create_san_pham = {
+            ten_san_pham: "",
+            gia_mac_dinh: "",
+            loai_san_pham: [],   // reset về mảng rỗng
+            anh_dai_dien: null,
+          };
       } else {
         toaster.error(res.data.message);
       }

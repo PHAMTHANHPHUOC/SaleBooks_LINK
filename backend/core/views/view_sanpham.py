@@ -166,58 +166,108 @@ def change_san_pham(request):
             'message': str(e)
         }, status=status.HTTP_400_BAD_REQUEST)
 @api_view(['POST'])
-@parser_classes([MultiPartParser, FormParser])  # QUAN TRỌNG: Thêm parser cho file upload
+@parser_classes([MultiPartParser, FormParser])
 def create_san_pham(request):
     try:
         ten_san_pham = request.data.get('ten_san_pham')
         duong_dan_ngoai = request.data.get('duong_dan_ngoai')
         gia_mac_dinh = request.data.get('gia_mac_dinh')
-        
-        # THAY ĐỔI CHÍNH: Lấy file từ request.FILES thay vì request.data
-        anh_dai_dien = request.FILES.get('anh_dai_dien')  # File object, không phải string
-        
+        anh_dai_dien = request.FILES.get('anh_dai_dien')
         tinh_trang = request.data.get('tinh_trang', 0)
-        loai_san_pham_id = request.data.get('loai_san_pham')
-        loai_san_pham = LoaiSanPham.objects.get(id=loai_san_pham_id) if loai_san_pham_id else None        
-        
-        # Validate file nếu cần
+
+        # ================== XỬ LÝ LOẠI SẢN PHẨM ==================
+        loai_san_pham_ids = []
+
+        # Trường hợp frontend gửi dạng list (append nhiều lần)
+        if hasattr(request.data, "getlist"):
+            loai_san_pham_raw = request.data.getlist("loai_san_pham")
+        else:
+            loai_san_pham_raw = request.data.get("loai_san_pham", "")
+
+        # Nếu là chuỗi "1,2,3" → tách thành list
+        if isinstance(loai_san_pham_raw, str):
+            loai_san_pham_raw = [x.strip() for x in loai_san_pham_raw.split(",") if x.strip()]
+
+        # Convert sang int
+        for item in loai_san_pham_raw:
+            try:
+                loai_san_pham_ids.append(int(item))
+            except (ValueError, TypeError):
+                return JsonResponse({
+                    'status': False,
+                    'error': f'ID loại sản phẩm không hợp lệ: {item}'
+                }, status=400)
+
+        # Validate tồn tại trong DB
+        if loai_san_pham_ids:
+            existing_ids = set(
+                LoaiSanPham.objects.filter(id__in=loai_san_pham_ids).values_list('id', flat=True)
+            )
+            invalid_ids = set(loai_san_pham_ids) - existing_ids
+            if invalid_ids:
+                return JsonResponse({
+                    'status': False,
+                    'error': f'Không tìm thấy loại sản phẩm với ID: {list(invalid_ids)}'
+                }, status=400)
+
+        # ================== VALIDATE INPUT ==================
+        if not ten_san_pham:
+            return JsonResponse({'status': False, 'error': 'Tên sản phẩm là bắt buộc'}, status=400)
+
+        if not gia_mac_dinh:
+            return JsonResponse({'status': False, 'error': 'Giá mặc định là bắt buộc'}, status=400)
+
+        # Validate file upload
         if anh_dai_dien:
-            # Kiểm tra kích thước file
-            if anh_dai_dien.size > 5 * 1024 * 1024:  # 5MB
+            if anh_dai_dien.size > 5 * 1024 * 1024:
                 return JsonResponse({'status': False, 'error': 'File quá lớn (>5MB)'}, status=400)
-            
-            # Kiểm tra định dạng file
+
             allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp']
             file_extension = anh_dai_dien.name.split('.')[-1].lower()
             if file_extension not in allowed_extensions:
                 return JsonResponse({
-                    'status': False, 
+                    'status': False,
                     'error': f'Định dạng file không được hỗ trợ. Chỉ chấp nhận: {", ".join(allowed_extensions)}'
                 }, status=400)
-        
+
+        # ================== TẠO SẢN PHẨM ==================
         san_pham = SanPham.objects.create(
             ten_san_pham=ten_san_pham,
             duong_dan_ngoai=duong_dan_ngoai,
             gia_mac_dinh=gia_mac_dinh,
-            anh_dai_dien=anh_dai_dien,  # File object - Django tự động lưu
-            tinh_trang=tinh_trang,
-            loai_san_pham=loai_san_pham
+            anh_dai_dien=anh_dai_dien,
+            tinh_trang=tinh_trang
         )
-        
-        # Trả về thông tin bao gồm URL của ảnh đã upload
+
+        # Gán nhiều loại sản phẩm
+        if loai_san_pham_ids:
+            san_pham.loai_san_pham.set(loai_san_pham_ids)
+
+        # ================== RESPONSE ==================
         response_data = {
-            'status': True, 
+            'status': True,
             'message': 'Thêm sản phẩm thành công.',
             'data': {
                 'id': san_pham.id,
                 'ten_san_pham': san_pham.ten_san_pham,
-                'anh_dai_dien_url': san_pham.anh_dai_dien.url if san_pham.anh_dai_dien else None
+                'anh_dai_dien_url': san_pham.anh_dai_dien.url if san_pham.anh_dai_dien else None,
+                'loai_san_pham': list(san_pham.loai_san_pham.values('id', 'ten_loai'))
             }
         }
         return JsonResponse(response_data)
-        
+
     except Exception as e:
-        return JsonResponse({'status': False, 'error': str(e)}, status=400)
+        import traceback
+        print("=== ERROR DEBUG ===")
+        print(f"Error: {str(e)}")
+        print(f"Request data: {dict(request.data)}")
+        print(f"Traceback: {traceback.format_exc()}")
+
+        return JsonResponse({
+            'status': False,
+            'error': f'Lỗi server: {str(e)}'
+        }, status=500)
+
 @api_view(['POST'])
 def delete_san_pham(request, id):
     try:
