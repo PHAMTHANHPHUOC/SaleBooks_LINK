@@ -78,7 +78,7 @@
   </a>
 </div>
 
-    <div v-for="type in productTypes.filter(link => link.layout === 2)" :key="type.id" class="product-section">
+    <div v-for="type in productTypes.filter(link => link.layout === 2)" :key="type.id" class="product-section ">
   <h3 :style="getStyle('loai-san-pham')" class="h3-title">{{ type.ten_loai }}</h3>
   <div class="product-list-btn">
     <a
@@ -96,7 +96,7 @@
         @error="handleImageError"
         @click.stop="showImagePreview(getFullImageUrl(product.anh_dai_dien))"
       />
-      <span class="btn-layout2-content">
+      <span  class="btn-layout2-content">
         <span :style="getStyle('collapse-title')" class="btn-layout2-title">{{ product.ten_san_pham }}</span><br>
         <span :style="getStyle('collapse-sub')" class="btn-layout2-sub">{{ product.gia_mac_dinh }}</span>
       </span>
@@ -123,7 +123,7 @@
                  class="card-img-top" 
                  @error="handleImageError"
                  @click="showImagePreview(getFullImageUrl(product.anh_dai_dien))" />
-            <div class="card-body">
+            <div :style="getStyle('card-body-style')" class="card-body">
               <h4 :style="getStyle('san-pham')" class="product-name">{{ product.ten_san_pham }}</h4>
               <h4 :style="getStyle('price')" class="product-price">{{ product.gia_mac_dinh }}</h4>
             </div>
@@ -135,7 +135,7 @@
         <a v-if="type.link_danh_muc" target="_blank" rel="noopener" :href="type.link_danh_muc" :style="getStyle('button-shop-now')" class="shop-now-btn">SHOP NOW</a>
       </h4>
     </div>
-    <div v-for="type in productTypes.filter(link => link.layout === 1)" :key="type.id" class="product-section">
+    <div v-for="type in productTypes.filter(link => link.layout === 1)" :key="type.id" class="product-section produc-layout-01">
   <h3 :style="getStyle('loai-san-pham')" class="h3-title ">{{ type.ten_loai }}</h3>
   <div class="product-list horizontal-scroll">
     <a v-for="product in type.products" :key="product.id" :href="product.duong_dan_ngoai" @click="handleClick(product.id)" target="_blank" class="product-link">
@@ -144,13 +144,18 @@
              class="card-img-top" 
              @error="handleImageError"
              @click="showImagePreview(getFullImageUrl(product.anh_dai_dien))" />
-        <div class="card-body">
+        <div :style="getStyle('card-body-style')" class="card-body">
           <h4 :style="getStyle('san-pham')" class="product-name">{{ product.ten_san_pham }}</h4>
           <h4 :style="getStyle('price')" class="product-price">{{ product.gia_mac_dinh }}</h4>
         </div>
       </div>
+      
     </a>
+   
   </div>
+   <h4  class="shop-now-wrapper">
+        <a v-if="type.link_danh_muc" target="_blank" rel="noopener" :href="type.link_danh_muc" :style="getStyle('button-shop-now')" class="shop-now-btn btn-layout-01">SHOP NOW</a>
+      </h4>
     </div>
   </div>
   
@@ -590,6 +595,7 @@ export default {
         border-radius: 12px;
         font-size: 0.9rem;
       }
+    
       .avatar-circle { width: 50px; height: 50px; }
       .avatar-img { width: 100%; height: 100%; }
       .brand { font-size: 0.9rem; }
@@ -684,13 +690,12 @@ export default {
     .shop-now-btn {
       display: inline-block;
       padding: 16px 38px;
-      border: 1px solid #818080;
       border-radius: 40px;
       background: #fff;
       font-weight: 800;
       font-size: 1.18rem;
       letter-spacing: .04em;
-      text-decoration: none;
+      text-decoration: underline;
       transition: background .18s, color .18s, box-shadow .18s;
       box-shadow: 0 2px 12px rgba(37,99,235,0.07);
       text-align: center;
@@ -969,10 +974,21 @@ export default {
       font-size: 1rem;
       text-align: center;
     }
+    .btn-layout-01 {
+       position: relative;
+      top: -140px;
+    }
+    .card-body {
+      width: 100%;
+      border-bottom: 100%;
+      background: #eee8e8;
+      border-radius: 0 0 30px 30px
+    }
     .product-list.horizontal-scroll {
   display: flex !important;
   flex-direction: row;
   gap: 30px;
+  height: 470px;
   overflow-x: auto;
   padding-bottom: 12px;
   scrollbar-width: thin;
@@ -1083,18 +1099,29 @@ export default {
     padding: 10px 22px;
     border: 2px solid #d0d8e9;
     border-radius: 28px;
+    text-decoration: underline;
     font-size: 1rem;
     box-shadow: 0 1px 6px rgba(37,99,235,0.07);
   }
+  .product-list.horizontal-scroll .product-link {
+    width:190px;
+    
+  }
+ 
    
     .name-socal {
       font-weight: normal; 
       font-size: 16px;
     }
     .product-list.horizontal-scroll .card {
-      width: 80%;
+      width: 208px;
+    }
+    .btn-layout-01 {
+      position: relative;
+      top: -110px;
     }
     .product-list.horizontal-scroll {
+      height: 370px;
       gap: 0;
     }
 
@@ -1167,6 +1194,7 @@ div.profile {
   margin-right: 50px;
   
 }
+
 .containerh1-h2 {
   display: flex;
   flex-direction: column;

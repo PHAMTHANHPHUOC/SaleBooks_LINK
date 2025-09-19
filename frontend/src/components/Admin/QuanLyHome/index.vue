@@ -92,6 +92,10 @@
                   <th>background-layout-icon</th>
                   <td>background layout Collapse icon</td>
                 </tr>
+                <tr>
+                  <th>card-body-style</th>
+                  <td>Là ô bên dưới sản phẩm</td>
+                </tr>
                 
               </tbody>
             </table>
