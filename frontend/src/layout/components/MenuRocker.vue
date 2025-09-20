@@ -24,6 +24,14 @@
           </router-link>
         </li>
         <li class="nav-item">
+          <router-link to="/admin/edit-giao-dien">
+            <a class="nav-link" href="/admin/edit-giao-dien">
+              <div class="parent-icon"><i class="fa-solid fa-bars-progress"></i></div>
+              <div class="menu-title">Edit Giao Diện</div>
+            </a>
+          </router-link>
+        </li>
+        <li class="nav-item">
           <router-link to="/admin/loai-san-pham">
             <a class="nav-link" href="/admin/loai-san-pham">
               <div class="parent-icon"><i class="fa-brands fa-product-hunt"></i></div>

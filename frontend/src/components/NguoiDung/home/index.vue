@@ -132,7 +132,7 @@
       </div>
       <!-- Enhanced calcMargin for multiple devices -->
       <h4 :style="{ marginTop: calcMargin(type.products.length) + 'px' }" class="shop-now-wrapper">
-        <a v-if="type.link_danh_muc" target="_blank" rel="noopener" :href="type.link_danh_muc" :style="getStyle('button-shop-now')" class="shop-now-btn">SHOP NOW</a>
+        <a v-if="type.link_danh_muc" target="_blank" rel="noopener" :href="type.link_danh_muc" :style="getStyle('button-shop-now')" class="shop-now-btn">VIEW MORE</a>
       </h4>
     </div>
     <div v-for="type in productTypes.filter(link => link.layout === 1)" :key="type.id" class="product-section produc-layout-01">
@@ -177,7 +177,7 @@
     </button>
   </div>
    <h4  class="shop-now-wrapper">
-        <a v-if="type.link_danh_muc" target="_blank" rel="noopener" :href="type.link_danh_muc" :style="getStyle('button-shop-now')" class="shop-now-btn btn-layout-01">SHOP NOW</a>
+        <a v-if="type.link_danh_muc" target="_blank" rel="noopener" :href="type.link_danh_muc" :style="getStyle('button-shop-now')" class="shop-now-btn btn-layout-01">VIEW MORE</a>
       </h4>
     </div>
   </div>

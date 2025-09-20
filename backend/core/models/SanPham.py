@@ -25,6 +25,7 @@ class SanPham(models.Model):
 
     loai_san_pham = models.ManyToManyField(
         LoaiSanPham,
+        through="SanPhamLoai",
         blank=True,
         related_name='san_phams'
     )
@@ -42,3 +43,14 @@ class SanPhamView(models.Model):
 
     def __str__(self):
         return f"{self.san_pham.ten_san_pham} - {self.created_at.strftime('%Y-%m-%d %H:%M:%S')}"
+class SanPhamLoai(models.Model):
+    san_pham = models.ForeignKey("SanPham", on_delete=models.CASCADE)
+    loai = models.ForeignKey("LoaiSanPham", on_delete=models.CASCADE)
+    order = models.IntegerField(default=0)  # <--- quan trọng: vị trí trong loại
+
+    class Meta:
+        unique_together = ("san_pham", "loai")  # tránh trùng lặp
+        ordering = ["order"]
+
+    def __str__(self):
+        return f"{self.san_pham.ten_san_pham} trong {self.loai.ten_loai} (order={self.order})"
