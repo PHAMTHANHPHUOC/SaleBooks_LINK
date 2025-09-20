@@ -22,15 +22,7 @@ class SanPham(models.Model):
     gia_mac_dinh = models.CharField(max_length=50)
     tinh_trang = models.IntegerField(default=0)
     anh_dai_dien = models.ImageField(upload_to='avatars/', blank=True, null=True)
-    
-    # Thêm ForeignKey tới LoaiSanPham
-    # loai_san_pham = models.ForeignKey(
-    #     LoaiSanPham,
-    #     on_delete=models.SET_NULL,   # Nếu loại bị xóa, sản phẩm vẫn giữ nhưng loai_san_pham = NULL
-    #     null=True,
-    #     blank=True,
-    #     related_name='san_phams'    # Có thể dùng: loai_san_pham.san_phams.all()
-    # )
+
     loai_san_pham = models.ManyToManyField(
         LoaiSanPham,
         blank=True,

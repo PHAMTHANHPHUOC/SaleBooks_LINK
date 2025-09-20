@@ -136,22 +136,45 @@
       </h4>
     </div>
     <div v-for="type in productTypes.filter(link => link.layout === 1)" :key="type.id" class="product-section produc-layout-01">
-  <h3 :style="getStyle('loai-san-pham')" class="h3-title ">{{ type.ten_loai }}</h3>
-  <div class="product-list horizontal-scroll">
-    <a v-for="product in type.products" :key="product.id" :href="product.duong_dan_ngoai" @click="handleClick(product.id)" target="_blank" class="product-link">
-      <div class="card">
-        <img :src="getFullImageUrl(product.anh_dai_dien)" 
-             class="card-img-top" 
-             @error="handleImageError"
-             @click="showImagePreview(getFullImageUrl(product.anh_dai_dien))" />
-        <div :style="getStyle('card-body-style')" class="card-body">
-          <h4 :style="getStyle('san-pham')" class="product-name">{{ product.ten_san_pham }}</h4>
-          <h4 :style="getStyle('price')" class="product-price">{{ product.gia_mac_dinh }}</h4>
-        </div>
-      </div>
-      
-    </a>
-   
+      <h3 :style="getStyle('loai-san-pham')" class="h3-title ">{{ type.ten_loai }}</h3>
+      <!-- THÊM: Container wrapper -->
+    <div class="horizontal-scroll-container">
+    <!-- THÊM: Left button -->
+    <button 
+      class="scroll-nav-btn scroll-nav-left" 
+      @click="scrollLeft(type.id)"
+      :disabled="scrollPositions[type.id] <= 0"
+    >
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+      <div
+       :ref="`scroll-${type.id}`"
+      class="product-list horizontal-scroll"
+      @scroll="updateScrollPosition(type.id, $event)">
+        <a v-for="product in type.products" :key="product.id" :href="product.duong_dan_ngoai" @click="handleClick(product.id)" target="_blank" class="product-link">
+          <div class="card">
+            <img :src="getFullImageUrl(product.anh_dai_dien)" 
+                class="card-img-top" 
+                @error="handleImageError"
+                @click="showImagePreview(getFullImageUrl(product.anh_dai_dien))" />
+            <div :style="getStyle('card-body-style')" class="card-body">
+              <h4 :style="getStyle('san-pham')" class="product-name">{{ product.ten_san_pham }}</h4>
+              <h4 :style="getStyle('price')" class="product-price">{{ product.gia_mac_dinh }}</h4>
+            </div>
+          </div>
+        </a>
+  </div>
+  <button 
+      class="scroll-nav-btn scroll-nav-right" 
+      @click="scrollRight(type.id)"
+      :disabled="scrollPositions[type.id] >= maxScrollPositions[type.id]"
+    >
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
   </div>
    <h4  class="shop-now-wrapper">
         <a v-if="type.link_danh_muc" target="_blank" rel="noopener" :href="type.link_danh_muc" :style="getStyle('button-shop-now')" class="shop-now-btn btn-layout-01">SHOP NOW</a>
@@ -183,6 +206,8 @@ export default {
       Array_link : [],
       api_response: null,
       loading: false,
+      scrollPositions: {},      
+      maxScrollPositions: {},
 
     };
   },
@@ -213,7 +238,7 @@ export default {
     this.loadAllProductTypes();
     this.loadBackground();
     this.loadlink_Array();
-    
+    this.initializeScrollPositions(); 
     await this.loadStyle();
     // this.loadFonts();
   try {
@@ -235,6 +260,39 @@ export default {
     }
   },
   methods: {
+    scrollLeft(typeId) {
+    const container = this.$refs[`scroll-${typeId}`][0];
+    if (container) {
+      container.scrollBy({ left: -250, behavior: 'smooth' });
+    }
+  },
+
+  scrollRight(typeId) {
+    const container = this.$refs[`scroll-${typeId}`][0];
+    if (container) {
+      container.scrollBy({ left: 250, behavior: 'smooth' });
+    }
+  },
+
+  updateScrollPosition(typeId, event) {
+    const container = event.target;
+    this.scrollPositions[typeId] = container.scrollLeft;
+    this.maxScrollPositions[typeId] = container.scrollWidth - container.clientWidth;
+  },
+  initializeScrollPositions() {
+    this.$nextTick(() => {
+      this.productTypes.forEach(type => {
+        if (type.layout === 1) {
+          const container = this.$refs[`scroll-${type.id}`]?.[0];
+          if (container) {
+            this.scrollPositions[type.id] = 0;
+            this.maxScrollPositions[type.id] = container.scrollWidth - container.clientWidth;
+          }
+        }
+      });
+    });
+  },
+    
     handleResize() {
       this.windowWidth = window.innerWidth;
       this.windowHeight = window.innerHeight;
@@ -765,6 +823,65 @@ export default {
       font-weight: normal; 
       font-size: 1.2rem;
     }
+    .horizontal-scroll-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Navigation buttons */
+.scroll-nav-btn {
+  position: absolute;
+  top: 30%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid #e75480;
+  background: rgba(255, 255, 255, 0.95);
+  color: #e75480;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+  backdrop-filter: blur(8px);
+}
+
+.scroll-nav-btn:hover:not(:disabled) {
+  background: #e75480;
+  color: white;
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 6px 20px rgba(231, 84, 128, 0.3);
+}
+
+.scroll-nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.scroll-nav-left {
+  left: 0px;
+  width: 40px;
+  height: 40px;
+  
+}
+
+.scroll-nav-right {
+  right: 0px;
+  width: 40px;
+  height: 40px;
+}
+
+/* Điều chỉnh product-list để có space cho buttons */
+.horizontal-scroll-container .product-list.horizontal-scroll {
+  flex: 1;
+  margin: 0 12px;
+}
 
     /* Socials */
     .social-list {
@@ -898,12 +1015,7 @@ export default {
       gap: clamp(16px, 3.2vw, 28px);
     
     }
-    .shop-now-wrapper {
-  grid-column: 1 / -1;
-  display: flex;
-  justify-content: center;
-  margin-top: 16px; /* chỉ cần ít thôi */
-}
+
 
     .card {
       background: var(--card);
@@ -949,7 +1061,7 @@ export default {
       display: flex;
       justify-content: center;
       grid-column: 1 / -1;
-      margin-top: 50px;
+      margin-top: -60px;
     }
 
     /* Footer */
@@ -976,7 +1088,7 @@ export default {
     }
     .btn-layout-01 {
        position: relative;
-      top: -140px;
+      top: -25px;
     }
     .card-body {
       width: 100%;
@@ -985,17 +1097,17 @@ export default {
       border-radius: 0 0 30px 30px
     }
     .product-list.horizontal-scroll {
-  display: flex !important;
-  flex-direction: row;
-  gap: 30px;
-  height: 470px;
-  overflow-x: auto;
-  padding-bottom: 12px;
-  scrollbar-width: thin;
-  scrollbar-color: #e75480 #faf9f6;
-}
+      display: flex !important;
+      flex-direction: row;
+      gap: 80px;
+      height: 530px;
+      overflow-x: auto;
+      padding-bottom: 12px;
+      scrollbar-width: thick;
+      scrollbar-color: #e75480 #faf9f6;
+    }
 .product-list.horizontal-scroll::-webkit-scrollbar {
-  height: 8px;
+  height: 24px;
 }
 .product-list.horizontal-scroll::-webkit-scrollbar-thumb {
   background: #e75480;
@@ -1011,7 +1123,7 @@ export default {
   flex: 0 0 auto;
 }
 .product-list.horizontal-scroll .card {
-  width: 105%;
+  width: 310px;
 }
     
     /* Animations */
@@ -1024,6 +1136,9 @@ export default {
   width: 100%;
   align-items: center;
 }
+.h3-title {
+      margin-top: 30px;
+     }
 .btn-layout2 {
   display: flex;
   align-items: center;
@@ -1078,6 +1193,9 @@ export default {
     border-radius: 28px;
     max-width: 98vw;
   }
+  .card-body {
+      height: 80px;
+    }
   .btn-layout2-img {
     width: 48px;
     height: 48px;
@@ -1092,7 +1210,7 @@ export default {
 }
 @media (max-width: 820px) {
   body { font-size: 16.5px; }
-  .bogiki-linktree { padding: 10px 8px 20px; max-width: 100vw; gap: 12px; }
+  .bogiki-linktree { padding: 20px 5px 20px; max-width: 100vw; gap: 12px; }
   .main-btn { gap: 10px; border-radius: 18px; margin: 12px auto; width: 300px;height:55px;}
   .btn-icon { width: 32px; height: 32px; }
   .shop-now-btn {
@@ -1103,26 +1221,61 @@ export default {
     font-size: 1rem;
     box-shadow: 0 1px 6px rgba(37,99,235,0.07);
   }
+ 
+  
   .product-list.horizontal-scroll .product-link {
     width:190px;
+    margin: 0 !important;   /* bỏ margin */
+    padding: 0 !important;  /* bỏ padding nếu có */
     
   }
- 
-   
+  .scroll-nav-btn {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .scroll-nav-left {
+    left: 0;
+  }
+  
+  .scroll-nav-right {
+    right: 0;
+  }
+  
+  .horizontal-scroll-container .product-list.horizontal-scroll {
+    margin: 0 8px;
+  }
     .name-socal {
       font-weight: normal; 
       font-size: 16px;
     }
     .product-list.horizontal-scroll .card {
       width: 208px;
+
+      /* margin: 0 !important; */
+      /* margin-right: -15px; */
     }
+    .product-list.horizontal-scroll .product-link:not(:first-child) {
+      transform: translateX(-17px);
+    }
+     .h3-title {
+      margin-top: 20px;
+     }
+     .shop-now-wrapper {
+      margin-top: -40px;
+    }
+
     .btn-layout-01 {
       position: relative;
-      top: -110px;
+      top: -20px;
     }
     .product-list.horizontal-scroll {
-      height: 370px;
+      height: 390px;
       gap: 0;
+      
+    }
+    .product-list.horizontal-scroll .card-content {
+      padding: 0px; /* hoặc 0 nếu muốn sát hẳn */
     }
 
     .btn-layout2 {
@@ -1158,6 +1311,7 @@ export default {
     object-fit: cover;
     box-shadow: none;
 }
+
   .link-icon {
       margin-top: -24px;
     }
