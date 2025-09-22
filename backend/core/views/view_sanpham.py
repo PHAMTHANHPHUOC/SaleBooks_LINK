@@ -1,5 +1,5 @@
 
-from core.models.SanPham import SanPham,LoaiSanPham,SanPhamView
+from core.models.SanPham import SanPham,LoaiSanPham,SanPhamView,SanPhamLoai
 from django.shortcuts import get_object_or_404
 from core.serializers import SanPhamSerializer
 from rest_framework.response import Response
@@ -19,6 +19,18 @@ from rest_framework.parsers import MultiPartParser, FormParser
 
 
 from django.utils.timezone import make_aware
+@api_view(["POST"])
+def update_product_order(request):
+    try:
+        loai_id = request.data.get("loai_id")
+        product_ids = request.data.get("product_ids", [])
+
+        for index, sp_id in enumerate(product_ids):
+            SanPhamLoai.objects.filter(loai_id=loai_id, san_pham_id=sp_id).update(order=index)
+
+        return Response({"status": True, "message": "Cập nhật thứ tự thành công"})
+    except Exception as e:
+        return Response({"status": False, "message": str(e)}, status=500)
 
 @require_GET
 def top_san_pham(request):
@@ -71,63 +83,7 @@ def top_san_pham(request):
     ]
     return JsonResponse(data, safe=False)
 
-@require_GET
-def debug_week_stats(request):
-    """
-    Debug endpoint để kiểm tra thống kê tuần
-    """
-    from datetime import datetime, timedelta
-    
-    today = now().date()
-    print(f"=== DEBUG WEEK STATS ===")
-    print(f"Today: {today}")
-    print(f"Today weekday: {today.weekday()} (0=Monday, 6=Sunday)")
-    
-    # Logic tính tuần
-    start = today - timedelta(days=today.weekday())
-    end = start + timedelta(days=7)
-    
-    print(f"Week start: {start}")
-    print(f"Week end: {end}")
-    
-    # Tất cả dữ liệu
-    all_views = SanPhamView.objects.all().order_by('created_at')
-    print(f"Total views in DB: {all_views.count()}")
-    
-    # Dữ liệu trong tuần
-    week_views = SanPhamView.objects.filter(
-        created_at__date__gte=start,
-        created_at__date__lt=end
-    )
-    print(f"Views in current week: {week_views.count()}")
-    
-    # Chi tiết từng view
-    print("All views:")
-    for view in all_views:
-        in_week = start <= view.created_at.date() < end
-        print(f"  ID: {view.id}, Date: {view.created_at.date()}, Product: {view.san_pham_id}, In week: {in_week}")
-    
-    # Thống kê theo sản phẩm
-    week_stats = (
-        week_views
-        .values("san_pham__id", "san_pham__ten_san_pham")
-        .annotate(so_luot=Count("id"))
-        .order_by("-so_luot")
-    )
-    
-    print("Week stats by product:")
-    for stat in week_stats:
-        print(f"  Product {stat['san_pham__id']} ({stat['san_pham__ten_san_pham']}): {stat['so_luot']} views")
-    
-    return JsonResponse({
-        'today': str(today),
-        'weekday': today.weekday(),
-        'week_start': str(start),
-        'week_end': str(end),
-        'total_views': all_views.count(),
-        'week_views': week_views.count(),
-        'week_stats': list(week_stats)
-    })
+
 
 @api_view(['POST'])
 def tang_luot_xem(request, pk):
@@ -241,7 +197,12 @@ def create_san_pham(request):
 
         # Gán nhiều loại sản phẩm
         if loai_san_pham_ids:
-            san_pham.loai_san_pham.set(loai_san_pham_ids)
+            for idx, loai_id in enumerate(loai_san_pham_ids):
+                SanPhamLoai.objects.create(
+                    san_pham=san_pham,
+                    loai_id=loai_id,
+                    order=idx  # đặt thứ tự hiển thị, bạn muốn mặc định sao cũng được
+                )
 
         # ================== RESPONSE ==================
         response_data = {
@@ -306,23 +267,44 @@ def update_san_pham(request, id):
             data.tinh_trang = int(tinh_trang)
             
         # Xử lý loại sản phẩm (foreign key)
-        loai_san_pham_id = request.data.get('loai_san_pham')
-        if loai_san_pham_id:
+        # loai_san_pham_id = request.data.get('loai_san_pham')
+        
+        # Xử lý loại sản phẩm - tương thích với cả FormData và JSON
+        loai_san_pham_raw = request.data.get("loai_san_pham", [])
+        
+        # Nếu là chuỗi "1,2,3" → tách thành list
+        if isinstance(loai_san_pham_raw, str):
+            loai_san_pham_raw = [x.strip() for x in loai_san_pham_raw.split(",") if x.strip()]
+        
+        # Convert sang int và validate
+        loai_san_pham_id = []
+        for item in loai_san_pham_raw:
             try:
-                loai_san_phams = LoaiSanPham.objects.filter(id__in=loai_san_pham_id)
-                if not loai_san_phams.exists():
-                    return Response({
-                        'status': False,
-                        'error': 'Không tìm thấy loại sản phẩm hợp lệ'
-                    }, status=status.HTTP_400_BAD_REQUEST)
-                
-                # Gán lại toàn bộ M2M
-                data.loai_san_pham.set(loai_san_phams)
-            except Exception as e:
+                loai_san_pham_id.append(int(item))
+            except (ValueError, TypeError):
                 return Response({
                     'status': False,
-                    'error': str(e)
+                    'error': f'ID loại sản phẩm không hợp lệ: {item}'
                 }, status=status.HTTP_400_BAD_REQUEST)
+        
+        if loai_san_pham_id:
+            # Xoá toàn bộ quan hệ cũ
+            SanPhamLoai.objects.filter(san_pham=data).delete()
+
+            # Thêm lại quan hệ mới + order
+            for idx, loai_id in enumerate(loai_san_pham_id):
+                # Kiểm tra loại sản phẩm có tồn tại không
+                if not LoaiSanPham.objects.filter(id=loai_id).exists():
+                    return Response({
+                        'status': False,
+                        'error': f'Không tìm thấy loại sản phẩm ID={loai_id}'
+                    }, status=status.HTTP_400_BAD_REQUEST)
+
+                SanPhamLoai.objects.create(
+                    san_pham=data,
+                    loai_id=loai_id,
+                    order=idx
+                )
         
         # Xử lý file upload - QUAN TRỌNG: Lấy từ request.FILES
         anh_dai_dien = request.FILES.get('anh_dai_dien')
@@ -472,10 +454,25 @@ def product_data(request):
 @api_view(['GET'])
 def product_type(request, id):
     """
-    Trả về dữ liệu sản phẩm theo loại (ManyToMany)
+    Trả về dữ liệu sản phẩm theo loại (ManyToMany) với thứ tự đúng
     """
     try:
-        san_phams = SanPham.objects.filter(loai_san_pham=id, tinh_trang=1)
+        # Lấy sản phẩm theo thứ tự từ bảng SanPhamLoai
+        san_pham_loai_relations = SanPhamLoai.objects.filter(
+            loai_id=id,
+            san_pham__tinh_trang=1
+        ).select_related('san_pham').order_by('order')
+        
+        # Lấy danh sách sản phẩm theo thứ tự
+        san_phams = [relation.san_pham for relation in san_pham_loai_relations]
+        
+        # Nếu không có sản phẩm nào, trả về danh sách rỗng
+        if not san_phams:
+            return Response({
+                'status': True,
+                'data': []
+            })
+        
         serializer = SanPhamSerializer(san_phams, many=True)
         return Response({
             'status': True,

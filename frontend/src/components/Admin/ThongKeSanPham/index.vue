@@ -376,34 +376,7 @@ export default {
       alert(previewText)
     },
 
-    // async debugWeekStats() {
-    //   try {
-    //     const response = await baseRequest.get('debug/week-stats/')
-    //     const data = response.data
-        
-    //     let debugText = `🔍 DEBUG THỐNG KÊ TUẦN\n\n`
-    //     debugText += `📅 Hôm nay: ${data.today}\n`
-    //     debugText += `📊 Thứ trong tuần: ${data.weekday} (0=Thứ 2, 6=Chủ nhật)\n`
-    //     debugText += `📅 Tuần bắt đầu: ${data.week_start}\n`
-    //     debugText += `📅 Tuần kết thúc: ${data.week_end}\n\n`
-    //     debugText += `📈 Tổng lượt xem trong DB: ${data.total_views}\n`
-    //     debugText += `📈 Lượt xem trong tuần: ${data.week_views}\n\n`
-        
-    //     if (data.week_stats && data.week_stats.length > 0) {
-    //       debugText += `🏆 TOP SẢN PHẨM TRONG TUẦN:\n`
-    //       data.week_stats.forEach((product, index) => {
-    //         debugText += `${index + 1}. ID ${product.san_pham__id} (${product.san_pham__ten_san_pham}): ${product.so_luot} lượt xem\n`
-    //       })
-    //     } else {
-    //       debugText += `❌ Không có dữ liệu trong tuần này`
-    //     }
-        
-    //     alert(debugText)
-    //   } catch (error) {
-    //     console.error('Error debugging week stats:', error)
-    //     alert('❌ Lỗi khi debug: ' + (error.response?.data?.message || error.message))
-    //   }
-    // }
+    
   },
   
   mounted() {

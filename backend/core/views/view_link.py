@@ -1,3 +1,4 @@
+from itertools import count
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
@@ -7,7 +8,10 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 import json
+from django.utils.timezone import make_aware, get_current_timezone
+from django.utils.timezone import now
 from rest_framework.decorators import api_view
+from datetime import datetime, time, timedelta
 @api_view(['POST'])
 def tang_luot_click(request, pk):
     """
@@ -22,22 +26,86 @@ def tang_luot_click(request, pk):
 
 @api_view(['GET'])
 def top_link(request):
-    """
-    Trả về top link mạng xã hội theo lượt click (giống sản phẩm)
-    """
-    from django.db.models import Count
-    stats = LinkClickHistory.objects.values('link__id', 'link__name', 'link__links').annotate(luot_click=Count('id')).order_by('-luot_click')[:10]
-    return Response({'status': True, 'data': list(stats)})
-from datetime import datetime
+    loai = request.GET.get("loai", "ngay")
+    tz = get_current_timezone()
+    today = now().date()
+
+    if loai == "ngay":
+        start = make_aware(datetime.combine(today, time.min), tz)
+        end = make_aware(datetime.combine(today + timedelta(days=1), time.min), tz)
+    elif loai == "tuan":
+        start_date = today - timedelta(days=today.weekday())
+        end_date = start_date + timedelta(days=7)
+        start = make_aware(datetime.combine(start_date, time.min), tz)
+        end = make_aware(datetime.combine(end_date, time.min), tz)
+    elif loai == "thang":
+        start_date = today.replace(day=1)
+        if today.month == 12:
+            end_date = today.replace(year=today.year + 1, month=1, day=1)
+        else:
+            end_date = today.replace(month=today.month + 1, day=1)
+        start = make_aware(datetime.combine(start_date, time.min), tz)
+        end = make_aware(datetime.combine(end_date, time.min), tz)
+    elif loai == "nam":
+        start_date = today.replace(month=1, day=1)
+        end_date = today.replace(year=today.year + 1, month=1, day=1)
+        start = make_aware(datetime.combine(start_date, time.min), tz)
+        end = make_aware(datetime.combine(end_date, time.min), tz)
+    else:
+        return JsonResponse({"error": "Tham số 'loai' không hợp lệ"}, status=400)
+    views = (
+        LinkClickHistory.objects.filter(
+            created_at__gte=start,
+            created_at__lt=end
+        )
+        .values('link__id', 'link__name', 'link__links')
+        .annotate(so_luot=count("id"))
+        .order_by("-so_luot")[:10]
+    )
+    data = [
+        {
+            "id": v["link__id"],
+            "name": v["link__name"],
+            "links": v["link__links"],
+            "so_luot": v["so_luot"]
+        }
+        for v in views
+    ]
+    return JsonResponse(data, safe=False)
+    
+    
+#     from django.db.models import Count
+#     stats = LinkClickHistory.objects.values('link__id', 'link__name', 'link__links').annotate(luot_click=Count('id')).order_by('-luot_click')[:10]
+#     return Response({'status': True, 'data': list(stats)})
+# from datetime import datetime
 
 @api_view(['GET'])
 def thong_ke_luot_click(request):
     from django.db.models import Count
     loai = request.GET.get('loai', 'ngay')
     today = datetime.now().date()
+    current_year = today.year
+    current_month = today.month
+    current_week = today.isocalendar()[1]
     queryset = LinkClickHistory.objects.all()
     if loai == 'ngay':
         queryset = queryset.filter(created_at__date=today)
+    if loai == 'tuan':
+        queryset = queryset.filter(
+        created_at__week=current_week,
+        created_at__year=current_year
+    )
+
+    if loai == 'thang':
+        queryset = queryset.filter(
+        created_at__month=current_month,
+        created_at__year=current_year
+        )
+
+    if loai == 'nam':
+        queryset = queryset.filter(
+        created_at__year=current_year
+        )
     # Có thể bổ sung lọc tuần/tháng/năm ở đây
     stats = queryset.values('link__id', 'link__name', 'link__links') \
         .annotate(luot_click=Count('id')) \

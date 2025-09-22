@@ -102,16 +102,6 @@
       </span>
     </a>
   </div>
-  <!-- <div class="shop-now-wrapper" :style="{ marginTop: '20px' }">
-    <a
-      v-if="type.link_danh_muc"
-      target="_blank"
-      rel="noopener"
-      :href="type.link_danh_muc"
-      :style="getStyle('button-shop-now')"
-      class="shop-now-btn"
-    >SHOP NOW</a>
-  </div> -->
 </div>
     <!-- Product Section: For từng loại sản phẩm -->
     <div  v-for="type in productTypes.filter(link => link.layout === 0)" :key="type.id" class="product-section">
@@ -260,7 +250,7 @@ export default {
     }
   },
   methods: {
-    scrollLeft(typeId) {
+  scrollLeft(typeId) {
     const container = this.$refs[`scroll-${typeId}`][0];
     if (container) {
       container.scrollBy({ left: -250, behavior: 'smooth' });
@@ -293,141 +283,141 @@ export default {
     });
   },
     
-    handleResize() {
-      this.windowWidth = window.innerWidth;
-      this.windowHeight = window.innerHeight;
-      this.$forceUpdate();
-    },
+  handleResize() {
+    this.windowWidth = window.innerWidth;
+    this.windowHeight = window.innerHeight;
+    this.$forceUpdate();
+  },
    
     // Enhanced calcMargin for multiple devices
-    calcMargin(cardCount) {
-      const deviceType = this.deviceType;
-      const width = this.windowWidth;
-     
-     switch (deviceType) {
-  case 'small-phone': // iPhone SE (375px)
-    if (cardCount <= 2) return -110;
-    if (cardCount <= 4) return 160;
-    if (cardCount <= 6) return 440;
-    if (cardCount <= 8) return 700;
-    if (cardCount <= 10) return 980;
-    if (cardCount <= 12) return 1250;
-    if (cardCount <= 14) return 1520;
-    if (cardCount <= 16) return 1790;
-    if (cardCount <= 18) return 2060;
-    if (cardCount <= 20) return 2330;
-  case 'pro-phone': // iPhone 12pro (390px)
-    if (cardCount <= 2) return -110;
-    if (cardCount <= 4) return 180;
-    if (cardCount <= 6) return 450;
-    if (cardCount <= 8) return 730;
-    if (cardCount <= 10) return 1000;
-    if (cardCount <= 12) return 1280 ;
-    if (cardCount <= 14) return 1560;
-    if (cardCount <= 16) return 1835;
-    if (cardCount <= 18) return 2120;
-    if (cardCount <= 20) return 2400;
+  calcMargin(cardCount) {
+    const deviceType = this.deviceType;
+    const width = this.windowWidth;
+    
+    switch (deviceType) {
+case 'small-phone': // iPhone SE (375px)
+  if (cardCount <= 2) return -110;
+  if (cardCount <= 4) return 160;
+  if (cardCount <= 6) return 440;
+  if (cardCount <= 8) return 700;
+  if (cardCount <= 10) return 980;
+  if (cardCount <= 12) return 1250;
+  if (cardCount <= 14) return 1520;
+  if (cardCount <= 16) return 1790;
+  if (cardCount <= 18) return 2060;
+  if (cardCount <= 20) return 2330;
+case 'pro-phone': // iPhone 12pro (390px)
+  if (cardCount <= 2) return -110;
+  if (cardCount <= 4) return 180;
+  if (cardCount <= 6) return 450;
+  if (cardCount <= 8) return 730;
+  if (cardCount <= 10) return 1000;
+  if (cardCount <= 12) return 1280 ;
+  if (cardCount <= 14) return 1560;
+  if (cardCount <= 16) return 1835;
+  if (cardCount <= 18) return 2120;
+  if (cardCount <= 20) return 2400;
 
-  case 'medium-phone': // iPhone XR, 12/13/14 (414px)
-    if (cardCount <= 2) return -90;
-    if (cardCount <= 4) return 200;
-    if (cardCount <= 6) return 480;
-    if (cardCount <= 8) return 770;
-    if (cardCount <= 10) return 1070;
-    if (cardCount <= 12) return 1350;
-    if (cardCount <= 14) return 1640;
-    if (cardCount <= 16) return 1920;
-    if (cardCount <= 18) return 2210;
-    if (cardCount <= 20) return 2500;
+case 'medium-phone': // iPhone XR, 12/13/14 (414px)
+  if (cardCount <= 2) return -90;
+  if (cardCount <= 4) return 200;
+  if (cardCount <= 6) return 480;
+  if (cardCount <= 8) return 770;
+  if (cardCount <= 10) return 1070;
+  if (cardCount <= 12) return 1350;
+  if (cardCount <= 14) return 1640;
+  if (cardCount <= 16) return 1920;
+  if (cardCount <= 18) return 2210;
+  if (cardCount <= 20) return 2500;
 
-  case 'large-phone': // iPhone 14 Pro Max, Pixel 7 (428-480px)
-    if (cardCount <= 2) return -88;
-    if (cardCount <= 4) return 220;
-    if (cardCount <= 6) return 520;
-    if (cardCount <= 8) return 820;
-    if (cardCount <= 10) return 1120;
-    if (cardCount <= 12) return 1420;
-    if (cardCount <= 14) return 1720;
-    if (cardCount <= 16) return 2020;
-    if (cardCount <= 18) return 2320;
-    if (cardCount <= 20) return 2620;
+case 'large-phone': // iPhone 14 Pro Max, Pixel 7 (428-480px)
+  if (cardCount <= 2) return -88;
+  if (cardCount <= 4) return 220;
+  if (cardCount <= 6) return 520;
+  if (cardCount <= 8) return 820;
+  if (cardCount <= 10) return 1120;
+  if (cardCount <= 12) return 1420;
+  if (cardCount <= 14) return 1720;
+  if (cardCount <= 16) return 2020;
+  if (cardCount <= 18) return 2320;
+  if (cardCount <= 20) return 2620;
 
-  case 'tablet-portrait': // iPad portrait (768px)
-    if (cardCount <= 2) return 90;
-    if (cardCount <= 4) return 590;
-    if (cardCount <= 6) return 1080;
-    if (cardCount <= 8) return 1560;
-    if (cardCount <= 10) return 2070;
-    if (cardCount <= 12) return 2550;
-    if (cardCount <= 14) return 3040;
-    if (cardCount <= 16) return 3530;
-    if (cardCount <= 18) return 4020;
-    if (cardCount <= 20) return 4510;
+case 'tablet-portrait': // iPad portrait (768px)
+  if (cardCount <= 2) return 90;
+  if (cardCount <= 4) return 590;
+  if (cardCount <= 6) return 1080;
+  if (cardCount <= 8) return 1560;
+  if (cardCount <= 10) return 2070;
+  if (cardCount <= 12) return 2550;
+  if (cardCount <= 14) return 3040;
+  if (cardCount <= 16) return 3530;
+  if (cardCount <= 18) return 4020;
+  if (cardCount <= 20) return 4510;
 
-  case 'tablet-landscape': // iPad landscape (820px)
-    if (cardCount <= 2) return 110;
-    if (cardCount <= 4) return 630;
-    if (cardCount <= 6) return 1160;
-    if (cardCount <= 8) return 1670;
-    if (cardCount <= 10) return 2170;
-    if (cardCount <= 12) return 2680;
-    if (cardCount <= 14) return 3190;
-    if (cardCount <= 16) return 3700;
-    if (cardCount <= 18) return 4210;
-    if (cardCount <= 20) return 4720;
+case 'tablet-landscape': // iPad landscape (820px)
+  if (cardCount <= 2) return 110;
+  if (cardCount <= 4) return 630;
+  if (cardCount <= 6) return 1160;
+  if (cardCount <= 8) return 1670;
+  if (cardCount <= 10) return 2170;
+  if (cardCount <= 12) return 2680;
+  if (cardCount <= 14) return 3190;
+  if (cardCount <= 16) return 3700;
+  if (cardCount <= 18) return 4210;
+  if (cardCount <= 20) return 4720;
 
-  case 'small-tablet': // iPad Air (1024px)
-    if (cardCount <= 3) return 90;
-    if (cardCount <= 6) return 1070;
-    if (cardCount <= 9) return 1550;
-    if (cardCount <= 12) return 2050;
-    if (cardCount <= 15) return 2530;
-    if (cardCount <= 18) return 3010;
-    if (cardCount <= 21) return 3490;
+case 'small-tablet': // iPad Air (1024px)
+  if (cardCount <= 3) return 90;
+  if (cardCount <= 6) return 1070;
+  if (cardCount <= 9) return 1550;
+  if (cardCount <= 12) return 2050;
+  if (cardCount <= 15) return 2530;
+  if (cardCount <= 18) return 3010;
+  if (cardCount <= 21) return 3490;
 
-  default: // Desktop (1920px+)
-    if (cardCount <= 2) return 90;     // 1–2 card
-    if (cardCount <= 4) return 555;    // 3–4 card
-    if (cardCount <= 6) return 1050;   // 5–6 card
-    if (cardCount <= 8) return 1530;   // 7–8 card
-    if (cardCount <= 10) return 2010;  // 9–10 card
-    if (cardCount <= 12) return 2490;  // 11–12 card
-    if (cardCount <= 14) return 2980;  // 13–14 card
-    if (cardCount <= 16) return 3460;  // 15–16 card
-    if (cardCount <= 18) return 3950;  // 17–18 card
-    if (cardCount <= 20) return 4440;  // 19–20 card
+default: // Desktop (1920px+)
+  if (cardCount <= 2) return 90;     // 1–2 card
+  if (cardCount <= 4) return 555;    // 3–4 card
+  if (cardCount <= 6) return 1050;   // 5–6 card
+  if (cardCount <= 8) return 1530;   // 7–8 card
+  if (cardCount <= 10) return 2010;  // 9–10 card
+  if (cardCount <= 12) return 2490;  // 11–12 card
+  if (cardCount <= 14) return 2980;  // 13–14 card
+  if (cardCount <= 16) return 3460;  // 15–16 card
+  if (cardCount <= 18) return 3950;  // 17–18 card
+  if (cardCount <= 20) return 4440;  // 19–20 card
 }
-     
-      
-    },
+    
+    
+  },
 
     // Alternative method: calcMargin with aspect ratio consideration
-    calcMarginWithAspectRatio(cardCount) {
-      const width = this.windowWidth;
-      const height = this.windowHeight;
-      const aspectRatio = width / height;
-      const isPortrait = aspectRatio < 1;
-      const isSquareish = aspectRatio >= 1 && aspectRatio <= 1.3;
-      const isWide = aspectRatio > 1.3;
+  calcMarginWithAspectRatio(cardCount) {
+    const width = this.windowWidth;
+    const height = this.windowHeight;
+    const aspectRatio = width / height;
+    const isPortrait = aspectRatio < 1;
+    const isSquareish = aspectRatio >= 1 && aspectRatio <= 1.3;
+    const isWide = aspectRatio > 1.3;
 
-      // Base margin calculation
-      let baseMargin;
-      if (width <= 375) baseMargin = 80;
-      else if (width <= 414) baseMargin = 90;
-      else if (width <= 480) baseMargin = 100;
-      else if (width <= 768) baseMargin = 140;
-      else if (width <= 1024) baseMargin = 170;
-      else baseMargin = 200;
+    // Base margin calculation
+    let baseMargin;
+    if (width <= 375) baseMargin = 80;
+    else if (width <= 414) baseMargin = 90;
+    else if (width <= 480) baseMargin = 100;
+    else if (width <= 768) baseMargin = 140;
+    else if (width <= 1024) baseMargin = 170;
+    else baseMargin = 200;
 
-      // Adjust based on aspect ratio
-      let aspectMultiplier = 1;
-      if (isPortrait) aspectMultiplier = 0.9;  // Tighter spacing for portrait
-      else if (isWide) aspectMultiplier = 1.2; // More spacing for wide screens
+    // Adjust based on aspect ratio
+    let aspectMultiplier = 1;
+    if (isPortrait) aspectMultiplier = 0.9;  // Tighter spacing for portrait
+    else if (isWide) aspectMultiplier = 1.2; // More spacing for wide screens
 
-      const rows = Math.ceil(cardCount / 2);
-      return Math.round(baseMargin * aspectMultiplier * (rows - 0.5));
-    },
-    async loadBackground() {
+    const rows = Math.ceil(cardCount / 2);
+    return Math.round(baseMargin * aspectMultiplier * (rows - 0.5));
+  },
+  async loadBackground() {
     try {
       const res = await baseRequest.get("api/styles/background/");
       document.body.style.background = res.data.background || "#fffef3";
@@ -437,155 +427,155 @@ export default {
   },
 
     // Method with device pixel ratio consideration
-    calcMarginWithDPR(cardCount) {
-      const width = this.windowWidth;
-      const dpr = window.devicePixelRatio || 1;
-      
-      // Adjust for high-DPI displays
-      let dpiMultiplier = 1;
-      if (dpr >= 3) dpiMultiplier = 0.85;      // iPhone retina
-      else if (dpr >= 2) dpiMultiplier = 0.9; // Most modern phones
-      
-      // Base calculation
-      let margin;
-      if (width <= 414) {
-        margin = Math.ceil(cardCount / 2) * 95 * dpiMultiplier;
-      } else if (width <= 768) {
-        margin = Math.ceil(cardCount / 2) * 140 * dpiMultiplier;
-      } else {
-        margin = Math.ceil(cardCount / 4) * 170 * dpiMultiplier;
-      }
-      
-      return Math.round(margin);
-    },
-
-    async loadAllProductTypes() {
-      try {
-        const resType = await baseRequest.get('products/type/list/');
-        const types = resType.data.filter(type => type.tinh_trang == 1);
-        const promises = types.map(async (type) => {
-          const resProduct = await baseRequest.get(`products/type/${type.id}/`);
-          return {
-            ...type,
-            products: resProduct.data.status ? resProduct.data.data : []
-          };
-        });
-        this.productTypes = await Promise.all(promises);
-      } catch (err) {
-        this.productTypes = [];
-      }
-    },
-     async handleLinkClick(linkId) {
-    try {
-      await baseRequest.post(`api/links/${linkId}/click/`);
-    } catch (error) {
-      console.error("Lỗi khi ghi nhận click link:", error);
-    }
-  },
+calcMarginWithDPR(cardCount) {
+    const width = this.windowWidth;
+    const dpr = window.devicePixelRatio || 1;
     
-    async handleClick(productId) {
-      try {
-        const res = await baseRequest.post(`san-pham/${productId}/click/`);
-        console.log(res.data);
-      } catch (error) {
-        console.error("Lỗi khi gửi click:", error);
-      }
-    },
-    loadlink_Array() {
-            this.loading = true;
-            baseRequest
-              .get("api/links/list/data/")
-              .then((res) => {
-                console.log("API Response:", res.data); 
-                this.api_response = JSON.stringify(res.data);
-                
-                // Kiểm tra cấu trúc response
-                if (res.data && res.data.data) {
-                  this.Array_link = res.data.data;
-                } else if (Array.isArray(res.data)) {
-                  // Trường hợp API trả về trực tiếp array
-                  this.Array_link = res.data;
-                } else {
-                  console.error("Unexpected response structure:", res.data);
-                  this.Array_link = [];
-                }
-                
-                if (res.data.status === 0) {
-                  toaster.error(res.data.message);
-                }
-              })
-              .catch((error) => {
-                console.error("API Error:", error);
-                this.Array_link = [];
-                if (toaster) {
-                  toaster.error("Lỗi khi tải dữ liệu: " + error.message);
-                }
-              })
-              .finally(() => {
-                this.loading = false;
-              });
-          },
-    loadlink() {
-      baseRequest
-        .get("api/links/list/")
-        .then((res) => {
-           console.log('Links:', res.data); 
-          if (res.data && res.data.data) {
-            this.list_link = res.data.data;
-          } else if (Array.isArray(res.data)) {
-            this.list_link = res.data;
-          } else {
-            this.list_link = {};
-          }
-          console.log('list_link:', this.list_link);
-        })
-        .catch(() => {
-          this.list_link = {};
-          console.error('Error loading links:', err);
-        });
-    },
-     async loadStyle() {
-    baseRequest
-      .get("api/styles/list/data/")
-      .then((res) => {
-        if (res.data && res.data.data) {
-          this.list_style = res.data.data;
-        } else if (Array.isArray(res.data)) {
-          this.list_style = res.data;
-        } else {
-          this.list_style = {};
-        }
-        // Tự động tải font nếu có
-        Object.values(this.list_style).forEach(style => {
-          if (style.font_family) this.loadFont(style.font_family);
-        });
-      })
-      .catch(() => {
-        this.list_style = {};
-      });
+    // Adjust for high-DPI displays
+    let dpiMultiplier = 1;
+    if (dpr >= 3) dpiMultiplier = 0.85;      // iPhone retina
+    else if (dpr >= 2) dpiMultiplier = 0.9; // Most modern phones
+    
+    // Base calculation
+    let margin;
+    if (width <= 414) {
+      margin = Math.ceil(cardCount / 2) * 95 * dpiMultiplier;
+    } else if (width <= 768) {
+      margin = Math.ceil(cardCount / 2) * 140 * dpiMultiplier;
+    } else {
+      margin = Math.ceil(cardCount / 4) * 170 * dpiMultiplier;
+    }
+    
+    return Math.round(margin);
   },
-      loadFont(fontFamily) {
-  if (!fontFamily) return;
-  // Google Fonts
-  const googleFontUrl = `https://fonts.googleapis.com/css?family=${fontFamily.replace(/ /g, '+')}:400,700&display=swap`;
-  // Kiểm tra đã tải chưa
-  if (!document.querySelector(`link[href="${googleFontUrl}"]`)) {
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = googleFontUrl;
-    document.head.appendChild(link);
+
+async loadAllProductTypes() {
+  try {
+    const resType = await baseRequest.get('products/type/list/');
+    const types = resType.data.filter(type => type.tinh_trang == 1);
+    const promises = types.map(async (type) => {
+      const resProduct = await baseRequest.get(`products/type/${type.id}/`);
+      return {
+        ...type,
+        products: resProduct.data.status ? resProduct.data.data : []
+      };
+    });
+    this.productTypes = await Promise.all(promises);
+  } catch (err) {
+    this.productTypes = [];
   }
 },
-        getStyle(tag) {
-          const style = this.list_style[tag] || {};
-          return {
-            fontFamily: style.font_family || undefined,
-            fontWeight: style.font_weight || undefined,
-            color:      style.color       || undefined,
-            background: style.background  || undefined,
-          };
-        },
-    getFullImageUrl(imagePath) {
+  async handleLinkClick(linkId) {
+try {
+  await baseRequest.post(`api/links/${linkId}/click/`);
+} catch (error) {
+  console.error("Lỗi khi ghi nhận click link:", error);
+}
+},
+    
+async handleClick(productId) {
+  try {
+    const res = await baseRequest.post(`san-pham/${productId}/click/`);
+    console.log(res.data);
+  } catch (error) {
+    console.error("Lỗi khi gửi click:", error);
+  }
+},
+loadlink_Array() {
+      this.loading = true;
+      baseRequest
+        .get("api/links/list/data/")
+        .then((res) => {
+          console.log("API Response:", res.data); 
+          this.api_response = JSON.stringify(res.data);
+          
+          // Kiểm tra cấu trúc response
+          if (res.data && res.data.data) {
+            this.Array_link = res.data.data;
+          } else if (Array.isArray(res.data)) {
+            // Trường hợp API trả về trực tiếp array
+            this.Array_link = res.data;
+          } else {
+            console.error("Unexpected response structure:", res.data);
+            this.Array_link = [];
+          }
+          
+          if (res.data.status === 0) {
+            toaster.error(res.data.message);
+          }
+        })
+        .catch((error) => {
+          console.error("API Error:", error);
+          this.Array_link = [];
+          if (toaster) {
+            toaster.error("Lỗi khi tải dữ liệu: " + error.message);
+          }
+        })
+        .finally(() => {
+          this.loading = false;
+        });
+    },
+loadlink() {
+  baseRequest
+    .get("api/links/list/")
+    .then((res) => {
+        console.log('Links:', res.data); 
+      if (res.data && res.data.data) {
+        this.list_link = res.data.data;
+      } else if (Array.isArray(res.data)) {
+        this.list_link = res.data;
+      } else {
+        this.list_link = {};
+      }
+      console.log('list_link:', this.list_link);
+    })
+    .catch(() => {
+      this.list_link = {};
+      console.error('Error loading links:', err);
+    });
+},
+async loadStyle() {
+baseRequest
+  .get("api/styles/list/data/")
+  .then((res) => {
+    if (res.data && res.data.data) {
+      this.list_style = res.data.data;
+    } else if (Array.isArray(res.data)) {
+      this.list_style = res.data;
+    } else {
+      this.list_style = {};
+    }
+    // Tự động tải font nếu có
+    Object.values(this.list_style).forEach(style => {
+      if (style.font_family) this.loadFont(style.font_family);
+    });
+  })
+  .catch(() => {
+    this.list_style = {};
+  });
+},
+  loadFont(fontFamily) {
+if (!fontFamily) return;
+// Google Fonts
+const googleFontUrl = `https://fonts.googleapis.com/css?family=${fontFamily.replace(/ /g, '+')}:400,700&display=swap`;
+// Kiểm tra đã tải chưa
+if (!document.querySelector(`link[href="${googleFontUrl}"]`)) {
+const link = document.createElement('link');
+link.rel = 'stylesheet';
+link.href = googleFontUrl;
+document.head.appendChild(link);
+}
+},
+getStyle(tag) {
+  const style = this.list_style[tag] || {};
+  return {
+    fontFamily: style.font_family || undefined,
+    fontWeight: style.font_weight || undefined,
+    color:      style.color       || undefined,
+    background: style.background  || undefined,
+  };
+},
+getFullImageUrl(imagePath) {
   if (!imagePath) return '';
   
   // Nếu đã là URL đầy đủ thì return luôn
@@ -609,17 +599,17 @@ export default {
 
   return baseUrl + imagePath;
 },
-    showImagePreview(imageUrl) {
+showImagePreview(imageUrl) {
       this.previewImageUrl = imageUrl;
       // Sử dụng Bootstrap modal
       const modal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
       modal.show();
     },
-    handleImageError(event) {
+handleImageError(event) {
       event.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0zMCAyMEMyNi42ODYzIDIwIDI0IDIyLjY4NjMgMjQgMjZDMjQgMjkuMzEzNyAyNi42ODYzIDMyIDMwIDMyQzMzLjMxMzcgMzIgMzYgMjkuMzEzNyAzNiAyNkMzNiAyMi42ODYzIDMzLjMxMzcgMjAgMzAgMjBaIiBmaWxsPSIjOUNBM0FGIi8+CjxwYXRoIGQ9Ik0xNiA0MEw0NCA0MEw0MCAzNkwzNiAzMkwyOCAzNkwyMCAzMkwxNiAzNloiIGZpbGw9IiM5Q0EzQUYiLz4KPC9zdmc+';
       event.target.alt = 'Không thể tải ảnh';
     },
-     initializeBaseUrl() {
+initializeBaseUrl() {
       // Lấy baseURL từ baseRequest
       this.baseUrl = baseRequest.defaults?.baseURL || 
                     baseRequest.defaults?.url || 
