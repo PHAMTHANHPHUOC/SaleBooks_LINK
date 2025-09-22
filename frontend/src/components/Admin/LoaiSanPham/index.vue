@@ -84,8 +84,8 @@
                     </template>
                   </td>
                   <td class="text-center align-middle text-nowrap">
-                    <button class="btn btn-info me-2" data-bs-toggle="modal" v-on:click="Object.assign(edit_loai_san_pham, v)" data-bs-target="#editModal">Cập Nhật</button>
-                    <button class="btn btn-danger" data-bs-toggle="modal" v-on:click="Object.assign(delete_loai_san_pham, v)" data-bs-target="#deleteModal">Xóa Bỏ</button>
+                    <button class="btn btn-info me-2" data-bs-toggle="modal" @click="prepareEdit(v)" data-bs-target="#editModal">Cập Nhật</button>
+                    <button class="btn btn-danger" data-bs-toggle="modal" @click="prepareDelete(v)" data-bs-target="#deleteModal">Xóa Bỏ</button>
                   </td>
                 </tr>
               </tbody>
@@ -374,6 +374,17 @@ export default {
             toaster.error("Có lỗi xảy ra khi xóa");
           }
         });
+    },
+    
+    prepareEdit(loaiSanPhamItem) {
+      this.edit_loai_san_pham = { ...loaiSanPhamItem };
+    },
+    
+    prepareDelete(loaiSanPhamItem) {
+      this.delete_loai_san_pham = { 
+        id: loaiSanPhamItem.id, 
+        ten_loai: loaiSanPhamItem.ten_loai 
+      };
     },
     
     changeStatus(value) {

@@ -540,10 +540,6 @@ deleteLink() {
   });
 },
 
-prepareEdit(linkItem) {
-  this.edit_link = { ...linkItem };
-},
-
 prepareDelete(linkItem) {
   this.delete_link = { 
     id: linkItem.id, 

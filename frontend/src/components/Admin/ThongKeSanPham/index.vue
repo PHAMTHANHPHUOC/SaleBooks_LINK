@@ -210,48 +210,37 @@ export default {
       this.loadTop(tabKey);
     },
     
-    async loadTop(loai) {
-      console.log('loadTop called with:', loai);
-      
-      if (!loai) {
-        console.error('loai is undefined!');
-        return;
-      }
-      
-      // Reset dữ liệu trước khi load
-      this.topSanPham = [];
-      this.loading = true;
-      this.error = null;
-      this.activeTab = loai;
-      
-      try {
-        console.log('Loading data for:', loai);
-        
-        // Thử 2 cách gọi API
-        let res;
-        try {
-          // Cách 1: với params object
-          res = await baseRequest.get(`san-pham/top/`, {
-            params: { loai: loai }
-          });
-        } catch (e) {
-          console.log('Cách 1 thất bại, thử cách 2');
-          // Cách 2: trực tiếp trong URL
-          res = await baseRequest.get(`san-pham/top/?loai=${loai}`);
-        }
-        
-        console.log('Full response:', res);
-        console.log('Response data:', res.data);
-        
-        this.topSanPham = res.data || [];
-      } catch (error) {
-        this.error = "Không thể tải dữ liệu. Vui lòng thử lại.";
-        console.error("Lỗi khi load top sản phẩm:", error);
-        console.error("Error details:", error.response);
-      } finally {
-        this.loading = false;
-      }
-    },
+   async loadTop(loai) {
+  console.log('loadTop called with:', loai);
+
+  if (!loai) {
+    console.error('loai is undefined!');
+    return;
+  }
+
+  this.topSanPham = [];
+  this.loading = true;
+  this.error = null;
+  this.activeTab = loai;
+
+  try {
+    console.log('Loading data for:', loai);
+
+    // Luôn gọi API với query string để chắc chắn
+    const res = await baseRequest.get(`san-pham/top/?loai=${loai}`);
+
+    console.log('Full response:', res);
+    console.log('Response data:', res.data);
+
+    this.topSanPham = res.data || [];
+  } catch (error) {
+    this.error = "Không thể tải dữ liệu. Vui lòng thử lại.";
+    console.error("Lỗi khi load top sản phẩm:", error);
+    console.error("Error details:", error.response);
+  } finally {
+    this.loading = false;
+  }
+},
     
     getActiveTabLabel() {
       const tab = this.tabs.find(t => t.key === this.activeTab);
@@ -380,10 +369,11 @@ export default {
   },
   
   mounted() {
+    console.log('[mounted] activeTab:', this.activeTab);
     this.initializeBaseUrl();
     console.log('Component mounted');
     console.log('Tabs data:', this.tabs);
-    this.loadTop("ngay");
+    this.loadTop(this.activeTab);
   }
 };
 </script>

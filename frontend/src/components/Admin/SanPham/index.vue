@@ -227,8 +227,8 @@
                           </template>
                         </td>
                          <td class="text-center align-middle text-nowrap">
-                            <button class="btn btn-info me-2" data-bs-toggle="modal" v-on:click="Object.assign(edit_san_pham, v)" data-bs-target="#editModal">Cập Nhật</button>
-                            <button class="btn btn-danger" data-bs-toggle="modal" v-on:click="Object.assign(delete_san_pham, v)" data-bs-target="#deleteModal">Xóa Bỏ</button>
+                            <button class="btn btn-info me-2" data-bs-toggle="modal" @click="prepareEdit(v)" data-bs-target="#editModal">Cập Nhật</button>
+                            <button class="btn btn-danger" data-bs-toggle="modal" @click="prepareDelete(v)" data-bs-target="#deleteModal">Xóa Bỏ</button>
                         </td>
                     </tr>
                 </tbody>
@@ -261,8 +261,19 @@ import baseRequest from '../../../../src/core/baseRequest';
 export default {
   data() {
     return {
-      create_san_pham: {},
-      edit_san_pham: {},
+      create_san_pham: {
+        ten_san_pham: "",
+        duong_dan_ngoai: "",
+        gia_mac_dinh: "",
+        tinh_trang: 1,
+        loai_san_pham: [],   // QUAN TRỌNG: phải là array, không được null/""/false
+        anh_dai_dien: null,
+      },
+      edit_san_pham: {
+        id: null,
+        ten_san_pham: "",
+        loai_san_pham: [],   // tương tự
+      },
       delete_san_pham: {},
       list_san_pham: [],
       loaisanpham: [], // Thêm mảng loại sản phẩm
@@ -270,20 +281,7 @@ export default {
       debug_mode: true, // Bật debug mode để kiểm tra
       api_response: null,
       previewImageUrl: '', // Thêm để preview ảnh
-      baseUrl: '' ,// Thêm base URL,
-      create_san_pham: {
-      ten_san_pham: "",
-      duong_dan_ngoai: "",
-      gia_mac_dinh: "",
-      tinh_trang: 1,
-      loai_san_pham: [],   // QUAN TRỌNG: phải là array, không được null/""/false
-      anh_dai_dien: null,
-    },
-    edit_san_pham: {
-      id: null,
-      ten_san_pham: "",
-      loai_san_pham: [],   // tương tự
-    }
+      baseUrl: '' // Thêm base URL
     };
   },
   mounted() {
@@ -559,7 +557,18 @@ export default {
         toaster.error("Có lỗi xảy ra khi cập nhật: " + (res.message || 'Unknown error'));
       }
     });
-},
+    },
+    
+    prepareEdit(sanPhamItem) {
+      this.edit_san_pham = { ...sanPhamItem, new_image: null };
+    },
+    
+    prepareDelete(sanPhamItem) {
+      this.delete_san_pham = { 
+        id: sanPhamItem.id, 
+        ten_san_pham: sanPhamItem.ten_san_pham 
+      };
+    },
     
     xoaLoaiSanPham() {
       baseRequest

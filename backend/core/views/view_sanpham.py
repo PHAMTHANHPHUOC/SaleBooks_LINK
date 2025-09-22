@@ -32,45 +32,52 @@ def update_product_order(request):
     except Exception as e:
         return Response({"status": False, "message": str(e)}, status=500)
 
+from django.utils.timezone import now, make_aware
+from datetime import datetime, time, timedelta
+
 @require_GET
 def top_san_pham(request):
     loai = request.GET.get("loai", "ngay")
-    tz = get_current_timezone()
     today = now().date()
+    tz = get_current_timezone()
 
     if loai == "ngay":
-        start = make_aware(datetime.combine(today, time.min), tz)
-        end = make_aware(datetime.combine(today + timedelta(days=1), time.min), tz)
+        start = make_aware(datetime.combine(today, time.min), timezone=tz)
+        end = make_aware(datetime.combine(today, time.max), timezone=tz)
     elif loai == "tuan":
         start_date = today - timedelta(days=today.weekday())
-        end_date = start_date + timedelta(days=7)
-        start = make_aware(datetime.combine(start_date, time.min), tz)
-        end = make_aware(datetime.combine(end_date, time.min), tz)
+        end_date = start_date + timedelta(days=6)
+        start = make_aware(datetime.combine(start_date, time.min), timezone=tz)
+        end = make_aware(datetime.combine(end_date, time.max), timezone=tz)
     elif loai == "thang":
         start_date = today.replace(day=1)
         if today.month == 12:
-            end_date = today.replace(year=today.year + 1, month=1, day=1)
+            end_date = today.replace(year=today.year + 1, month=1, day=1) - timedelta(days=1)
         else:
-            end_date = today.replace(month=today.month + 1, day=1)
-        start = make_aware(datetime.combine(start_date, time.min), tz)
-        end = make_aware(datetime.combine(end_date, time.min), tz)
+            end_date = today.replace(month=today.month + 1, day=1) - timedelta(days=1)
+        start = make_aware(datetime.combine(start_date, time.min), timezone=tz)
+        end = make_aware(datetime.combine(end_date, time.max), timezone=tz)
     elif loai == "nam":
         start_date = today.replace(month=1, day=1)
-        end_date = today.replace(year=today.year + 1, month=1, day=1)
-        start = make_aware(datetime.combine(start_date, time.min), tz)
-        end = make_aware(datetime.combine(end_date, time.min), tz)
+        end_date = today.replace(month=12, day=31)
+        start = make_aware(datetime.combine(start_date, time.min), timezone=tz)
+        end = make_aware(datetime.combine(end_date, time.max), timezone=tz)
     else:
         return JsonResponse({"error": "Tham số 'loai' không hợp lệ"}, status=400)
+
+    print(f"[DEBUG] loai={loai}, start={start}, end={end}")
 
     views = (
         SanPhamView.objects.filter(
             created_at__gte=start,
-            created_at__lt=end
+            created_at__lte=end
         )
         .values("san_pham__id", "san_pham__ten_san_pham", "san_pham__anh_dai_dien")
         .annotate(so_luot=Count("id"))
         .order_by("-so_luot")[:10]
     )
+
+    print(f"[DEBUG] Views count: {views.count()}")
 
     data = [
         {
