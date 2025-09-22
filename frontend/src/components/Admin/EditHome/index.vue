@@ -120,9 +120,7 @@ export default {
       const products = resProduct.data.status ? resProduct.data.data : [];
       
       // Debug: Log giá của sản phẩm để kiểm tra
-      products.forEach(product => {
-        console.log(`Product: ${product.ten_san_pham}, Price: ${product.gia_mac_dinh} (type: ${typeof product.gia_mac_dinh})`);
-      });
+    
       
       return {
         ...type,
@@ -157,7 +155,6 @@ export default {
       });
 
         if (response.data.status) {
-          console.log("Đã cập nhật thứ tự thành công:", product_ids);
           // Refresh dữ liệu để đảm bảo đồng bộ
           await this.refreshProductData(type.id);
           // Có thể thêm thông báo thành công ở đây
@@ -225,11 +222,6 @@ export default {
     
   
     
-    // Các method hỗ trợ cho horizontal scroll
-    handleClick(productId) {
-      // Track click event
-      console.log('Product clicked:', productId);
-    },
     
     calcMargin(productCount) {
       // Calculate margin based on product count for responsive design

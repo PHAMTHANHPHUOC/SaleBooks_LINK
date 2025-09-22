@@ -63,7 +63,6 @@ export default {
         .post('api/admin/login/', this.khach_hang)
         .then((res) => {
           if (res.data.status == 1) {
-            console.log(res.data.chia_khoa);
             toaster.success(res.data.message);
             localStorage.setItem('chia_khoa', res.data.chia_khoa);
             localStorage.setItem('ten_kh', res.data.ten_kh);

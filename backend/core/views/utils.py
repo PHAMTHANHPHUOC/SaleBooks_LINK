@@ -150,7 +150,7 @@ def get_visit_stats(page_name='homepage'):
     """Lấy thống kê visit"""
     try:
         counter = VisitCounter.objects.get(page_name=page_name)
-        print(f"[DEBUG] Found counter: {counter.page_name} - Total: {counter.total_visits}")
+        
         
         # Force refresh từ DB
         counter.refresh_from_db()
