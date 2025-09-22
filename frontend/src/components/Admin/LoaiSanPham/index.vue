@@ -263,7 +263,6 @@ export default {
       baseRequest
         .get("products/type/list/")
         .then((res) => {
-          console.log("API Response:", res.data); 
           this.api_response = JSON.stringify(res.data);
           
           // Kiểm tra cấu trúc response

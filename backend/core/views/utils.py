@@ -162,7 +162,6 @@ def get_visit_stats(page_name='homepage'):
             page_visited=page_name,
             visit_time__date__gte=week_start
         ).count()
-        print(f"[DEBUG] Week visits query: {week_visits}")
         
         # Thống kê tháng này
         month_start = timezone.now().replace(day=1).date()
@@ -170,7 +169,6 @@ def get_visit_stats(page_name='homepage'):
             page_visited=page_name,
             visit_time__date__gte=month_start
         ).count()
-        print(f"[DEBUG] Month visits query: {month_visits}")
         
         # Unique visitors hôm nay (theo IP)
         today = timezone.now().date()

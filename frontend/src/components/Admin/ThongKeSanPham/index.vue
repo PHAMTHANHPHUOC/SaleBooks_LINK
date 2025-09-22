@@ -191,14 +191,12 @@ export default {
   methods: {
     
     handleTabClick(tabKey) {
-      console.log('Tab clicked:', tabKey);
       
       // Nếu tabKey undefined, lấy từ event
       if (!tabKey) {
         const event = arguments[0];
         if (event && event.target) {
           tabKey = event.target.getAttribute('data-key');
-          console.log('Got key from data-key:', tabKey);
         }
       }
       
@@ -211,7 +209,6 @@ export default {
     },
     
    async loadTop(loai) {
-  console.log('loadTop called with:', loai);
 
   if (!loai) {
     console.error('loai is undefined!');
@@ -224,13 +221,10 @@ export default {
   this.activeTab = loai;
 
   try {
-    console.log('Loading data for:', loai);
 
     // Luôn gọi API với query string để chắc chắn
     const res = await baseRequest.get(`san-pham/top/?loai=${loai}`);
 
-    console.log('Full response:', res);
-    console.log('Response data:', res.data);
 
     this.topSanPham = res.data || [];
   } catch (error) {
@@ -284,7 +278,6 @@ export default {
     },
     getFullImageUrl(imagePath) {
   if (!imagePath) {
-    console.log('No image path provided');
     return this.getSimpleDefaultImage();
   }
   
@@ -312,7 +305,6 @@ export default {
   }
   
   const fullUrl = this.baseUrl + processedPath;
-  console.log('Full image URL:', fullUrl);
   return fullUrl;
 },
     showImagePreview(imageUrl) {
@@ -334,7 +326,6 @@ export default {
       
       // Bỏ dấu / cuối nếu có
       this.baseUrl = this.baseUrl.replace(/\/$/, '');
-      console.log('Base URL:', this.baseUrl); // Debug
     },
 
     showProductReportPreview(reportData) {
@@ -369,10 +360,7 @@ export default {
   },
   
   mounted() {
-    console.log('[mounted] activeTab:', this.activeTab);
     this.initializeBaseUrl();
-    console.log('Component mounted');
-    console.log('Tabs data:', this.tabs);
     this.loadTop(this.activeTab);
   }
 };

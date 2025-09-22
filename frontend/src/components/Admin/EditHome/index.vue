@@ -266,7 +266,6 @@ export default {
           this.productTypes[typeIndex].products = updatedProducts;
         }
         
-        console.log("Đã refresh dữ liệu sản phẩm cho loại:", typeId);
       } catch (error) {
         console.error("Lỗi khi refresh dữ liệu sản phẩm:", error);
       }
@@ -308,21 +307,7 @@ export default {
       return `${formattedPrice} `;
     },
     
-    testApiData() {
-      console.log('=== API DATA TEST ===');
-      console.log('Product Types:', this.productTypes);
-      this.productTypes.forEach(type => {
-        console.log(`Type: ${type.ten_loai}`);
-        type.products.forEach(product => {
-          const originalPrice = product.gia_mac_dinh;
-          const formattedPrice = this.formatPrice(originalPrice);
-          console.log(`  - ${product.ten_san_pham}:`);
-          console.log(`    Original: "${originalPrice}" (${typeof originalPrice})`);
-          console.log(`    Formatted: "${formattedPrice}"`);
-        });
-      });
-      console.log('=== END TEST ===');
-    }
+    
   }
 };
 </script>

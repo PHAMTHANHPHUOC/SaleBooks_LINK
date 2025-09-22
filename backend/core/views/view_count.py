@@ -127,7 +127,6 @@ def track_visit(request):
         # Ưu tiên IP từ payload (được client xác định qua dịch vụ geo) nếu có
         ip_address = data.get('ip') or get_client_ip(request)
         user_agent = request.META.get('HTTP_USER_AGENT', '')
-        print("Received tracking data:", data)
 
         # Tạo VisitLog mới với thông tin từ frontend
         visit_log = VisitLog.objects.create(

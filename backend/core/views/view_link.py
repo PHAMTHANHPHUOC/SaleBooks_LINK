@@ -175,7 +175,6 @@ def get_list_links(request):
     }
     """
     profiles = LinkProfile.objects.filter(tinh_trang=1)
-    print("Profiles:", profiles) 
     data = {}
 
     for profile in profiles:

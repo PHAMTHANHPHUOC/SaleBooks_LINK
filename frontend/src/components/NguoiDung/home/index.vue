@@ -476,7 +476,6 @@ try {
 async handleClick(productId) {
   try {
     const res = await baseRequest.post(`san-pham/${productId}/click/`);
-    console.log(res.data);
   } catch (error) {
     console.error("Lỗi khi gửi click:", error);
   }
@@ -486,7 +485,6 @@ loadlink_Array() {
       baseRequest
         .get("api/links/list/data/")
         .then((res) => {
-          console.log("API Response:", res.data); 
           this.api_response = JSON.stringify(res.data);
           
           // Kiểm tra cấu trúc response
@@ -519,7 +517,6 @@ loadlink() {
   baseRequest
     .get("api/links/list/")
     .then((res) => {
-        console.log('Links:', res.data); 
       if (res.data && res.data.data) {
         this.list_link = res.data.data;
       } else if (Array.isArray(res.data)) {
@@ -527,7 +524,6 @@ loadlink() {
       } else {
         this.list_link = {};
       }
-      console.log('list_link:', this.list_link);
     })
     .catch(() => {
       this.list_link = {};
@@ -619,7 +615,6 @@ initializeBaseUrl() {
       
       // Bỏ dấu / cuối nếu có
       this.baseUrl = this.baseUrl.replace(/\/$/, '');
-      console.log('Base URL:', this.baseUrl); // Debug
     },
     
     

@@ -65,7 +65,6 @@ def top_san_pham(request):
     else:
         return JsonResponse({"error": "Tham số 'loai' không hợp lệ"}, status=400)
 
-    print(f"[DEBUG] loai={loai}, start={start}, end={end}")
 
     views = (
         SanPhamView.objects.filter(
@@ -77,7 +76,6 @@ def top_san_pham(request):
         .order_by("-so_luot")[:10]
     )
 
-    print(f"[DEBUG] Views count: {views.count()}")
 
     data = [
         {
@@ -226,10 +224,6 @@ def create_san_pham(request):
 
     except Exception as e:
         import traceback
-        print("=== ERROR DEBUG ===")
-        print(f"Error: {str(e)}")
-        print(f"Request data: {dict(request.data)}")
-        print(f"Traceback: {traceback.format_exc()}")
 
         return JsonResponse({
             'status': False,

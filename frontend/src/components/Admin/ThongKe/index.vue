@@ -370,7 +370,7 @@ export default {
   hourlyData.forEach(item => {
     // item.hour là dạng 'HH:00' UTC
     let hourUTC = parseInt(item.hour.split(':')[0], 10);
-    let hourVN = (hourUTC + 7) % 24;
+    let hourVN = (hourUTC +8) % 24;
     let hourVNStr = hourVN.toString().padStart(2, '0') + ':00';
     hourlyMap[hourVNStr] = item.visits;
   });
