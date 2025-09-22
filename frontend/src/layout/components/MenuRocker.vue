@@ -31,7 +31,28 @@
             </a>
           </router-link>
         </li>
+       
         <li class="nav-item">
+          <router-link to="/admin/quan-ly-link">
+            <a class="nav-link" href="/admin/quan-ly-link">
+              <div class="parent-icon"><i class="fa-solid fa-link-slash"></i></div>
+              <div class="menu-title">Quản Lý Link Mạng Xã Hội</div>
+            </a>
+          </router-link>
+        </li>
+        <li class="nav-item dropdown">
+          <a
+            href="javascript:;"
+            class="nav-link dropdown-toggle dropdown-toggle-nocaret"
+            data-bs-toggle="dropdown"
+          >
+            <div class="parent-icon">
+              <i class="fa-solid fa-book"></i>
+            </div>
+            <div class="menu-title">Sản Phẩm</div>
+          </a>
+          <ul class="dropdown-menu">
+            <li class="nav-item">
           <router-link to="/admin/loai-san-pham">
             <a class="nav-link" href="/admin/loai-san-pham">
               <div class="parent-icon"><i class="fa-brands fa-product-hunt"></i></div>
@@ -47,19 +68,26 @@
             </a>
           </router-link>
         </li>
-        <li class="nav-item">
-          <router-link to="/admin/quan-ly-link">
-            <a class="nav-link" href="/admin/quan-ly-link">
-              <div class="parent-icon"><i class="fa-solid fa-link-slash"></i></div>
-              <div class="menu-title">Quản Lý Link Mạng Xã Hội</div>
-            </a>
-          </router-link>
+          </ul>
         </li>
-        <li class="nav-item">
+        
+        <li class="nav-item dropdown">
+          <a
+            href="javascript:;"
+            class="nav-link dropdown-toggle dropdown-toggle-nocaret"
+            data-bs-toggle="dropdown"
+          >
+            <div class="parent-icon">
+              <i class="fa-solid fa-chart-simple"></i>
+            </div>
+            <div class="menu-title">Thống Kê</div>
+          </a>
+          <ul class="dropdown-menu">
+            <li class="nav-item">
           <router-link to="/admin/quan-ly-thong-ke">
             <a class="nav-link" href="/admin/quan-ly-thong-ke">
               <div class="parent-icon"><i class="fa-solid fa-eye"></i></div>
-              <div class="menu-title">Quản Lý Thống Kê Truy Cập</div>
+              <div class="menu-title">Thống Kê Lượt Truy Cập</div>
             </a>
           </router-link>
         </li>
@@ -67,7 +95,7 @@
           <router-link to="/admin/quan-ly-thong-ke-san-pham">
             <a class="nav-link" href="/admin/quan-ly-thong-ke-san-pham">
               <div class="parent-icon"><i class="fa-solid fa-fire"></i></div>
-              <div class="menu-title">Quản Lý Thống Kê Sản Phẩm</div>
+              <div class="menu-title">Thống Kê Sản Phẩm</div>
             </a>
           </router-link>
         </li>
@@ -75,9 +103,11 @@
           <router-link to="/admin/quan-ly-thong-ke-mang-xa-hoi">
             <a class="nav-link" href="/admin/quan-ly-thong-ke-mang-xa-hoi">
               <div class="parent-icon"><i class="fa-solid fa-square-share-nodes"></i></div>
-              <div class="menu-title">Quản Lý Thống Kê Mạng Xã Hội</div>
+              <div class="menu-title">Thống Kê Mạng Xã Hội</div>
             </a>
           </router-link>
+        </li>
+          </ul>
         </li>
 
       </ul>
@@ -87,4 +117,21 @@
 <script>
 export default {};
 </script>
-<style></style>
+<style>
+.navbar-nav .dropdown-menu {
+  min-width: 260px !important; /* Tăng chiều rộng dropdown */
+  width: auto;
+}
+
+.navbar-nav .dropdown-menu .nav-link {
+  white-space: nowrap; /* Không cho chữ xuống dòng */
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.menu-title {
+  white-space: nowrap;
+  margin-left: 8px;
+  font-size: 15px;
+}</style>

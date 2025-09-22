@@ -258,6 +258,16 @@ export default {
     this.loadLoaiSanPham();
   },
   methods: {
+    prepareEdit(sanPhamItem) {
+    // Chỉ set dữ liệu cho modal, không reset list, không reload API
+    this.edit_san_pham = { ...sanPhamItem, new_image: null };
+  },
+  prepareDelete(sanPhamItem) {
+    this.delete_san_pham = { 
+      id: sanPhamItem.id, 
+      ten_san_pham: sanPhamItem.ten_san_pham 
+    };
+  },
     loadLoaiSanPham() {
       this.loading = true;
       baseRequest
