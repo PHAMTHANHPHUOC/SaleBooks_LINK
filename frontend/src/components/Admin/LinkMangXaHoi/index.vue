@@ -257,14 +257,13 @@
                     </template> 
                   </td>
                   <td class="align-middle text-nowrap text-center">
-                                <template v-if="linkItem.tinh_trang == 1">
-                                  <button v-on:click="changeStatus(linkItem)" class="btn btn-success w-100">Hiển Thị</button>
-                                </template>
-                                <template v-else-if="linkItem.tinh_trang == 0">
-                                  <button v-on:click="changeStatus(linkItem)" class="btn btn-danger w-100">Tạm Tắt</button>
-                                </template>
-                              </td>
-
+                    <template v-if="linkItem.tinh_trang == 1">
+                      <button v-on:click="changeStatus(linkItem)" class="btn btn-success w-100">Hiển Thị</button>
+                    </template>
+                    <template v-else-if="linkItem.tinh_trang == 0">
+                      <button v-on:click="changeStatus(linkItem)" class="btn btn-danger w-100">Tạm Tắt</button>
+                    </template>
+                  </td>
                   <td class="text-center align-middle text-nowrap">
                     <button class="btn btn-info me-2" @click="prepareEdit(linkItem)" data-bs-toggle="modal" data-bs-target="#editModal">Cập Nhật</button>
                     <button class="btn btn-danger" @click="prepareDelete(linkItem)" data-bs-toggle="modal" data-bs-target="#deleteModal">Xóa Bỏ</button>

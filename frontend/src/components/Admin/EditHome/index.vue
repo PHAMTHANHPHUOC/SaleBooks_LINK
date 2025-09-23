@@ -109,6 +109,10 @@ export default {
     await this.loadAllProductTypes();
     // Test API data
     this.testApiData();
+    if (!sessionStorage.getItem("reloaded")) {
+            sessionStorage.setItem("reloaded", "true");
+            window.location.reload();
+          }
   },
   methods: {
     async loadAllProductTypes() {
