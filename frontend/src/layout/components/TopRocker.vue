@@ -60,7 +60,7 @@ export default {
         dangXuat() {
             const token = localStorage.getItem("chia_khoa");
             axios
-                .post("http://127.0.0.1:8000/logout/", {}, {
+                .post("https://api.tinydaisycoloring.com/logout/", {}, {
                     headers: {
                         Authorization: "Token " + token,
                     },
@@ -78,7 +78,7 @@ export default {
         dangXuatAll() {
             const token = localStorage.getItem("chia_khoa");
             axios
-                .post("http://127.0.0.1:8000/logout-all/", {}, {
+                .post("https://api.tinydaisycoloring.com/logout-all/", {}, {
                     headers: {
                         Authorization: "Token " + token,
                     },
