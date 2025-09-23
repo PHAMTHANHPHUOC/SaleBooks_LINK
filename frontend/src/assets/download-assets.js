@@ -6,11 +6,11 @@ const path = require('path');
 const assets = [
   // Bootstrap
   {
-    url: 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js',
+    url: 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js',
     path: 'js/bootstrap.bundle.min.js'
   },
   {
-    url: 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css',
+    url: 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"',
     path: 'css/bootstrap.min.css'
   },
   // jQuery

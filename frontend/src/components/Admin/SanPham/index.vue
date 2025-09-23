@@ -288,6 +288,10 @@ export default {
     this.initializeBaseUrl();
     this.loadSanPham();
     this.loadLoaiSanPham();
+     if (!sessionStorage.getItem("reloaded")) {
+      sessionStorage.setItem("reloaded", "true");
+      window.location.reload();
+    }
   },
   methods: {
     prepareEdit(sanPhamItem) {
@@ -695,5 +699,8 @@ export default {
 
 .no-image small {
   font-size: 10px;
+}
+body.modal-open {
+    padding-right: 0 !important;
 }
 </style>

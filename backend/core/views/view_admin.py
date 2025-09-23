@@ -12,7 +12,7 @@ from rest_framework.authtoken.models import Token
 # python manage.py shell
 # from core.models.KhachHang import KhachHang
 # u = KhachHang.objects.get(email='Admin@gmail.com')
-# u.set_password('123456')
+# u.set_password('Newmoon123')
 # u.save()
 @csrf_exempt
 @api_view(['POST'])

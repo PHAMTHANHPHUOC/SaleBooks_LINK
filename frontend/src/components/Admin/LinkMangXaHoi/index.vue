@@ -302,7 +302,10 @@
         mounted() {
           this.loadlink();
           this.initializeBaseUrl();
-
+          if (!sessionStorage.getItem("reloaded")) {
+            sessionStorage.setItem("reloaded", "true");
+            window.location.reload();
+          }
         },
         methods: {
         prepareEdit(sanPhamItem) {
@@ -566,5 +569,8 @@ prepareDelete(linkItem) {
   width: 400px !important;
   max-width: 400px !important;
   min-width: 400px !important;
+}
+body.modal-open {
+    padding-right: 0 !important;
 }
 </style>

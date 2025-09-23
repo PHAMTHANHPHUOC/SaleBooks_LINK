@@ -256,6 +256,10 @@ export default {
   },
   mounted() {
     this.loadLoaiSanPham();
+    if (!sessionStorage.getItem("reloaded")) {
+      sessionStorage.setItem("reloaded", "true");
+      window.location.reload();
+    }
   },
   methods: {
     prepareEdit(sanPhamItem) {
@@ -425,3 +429,7 @@ export default {
   },
 };
 </script>
+<style>
+body.modal-open {
+    padding-right: 0 !important;
+}</style>
