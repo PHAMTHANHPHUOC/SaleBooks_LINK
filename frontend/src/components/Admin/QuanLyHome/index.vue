@@ -234,10 +234,7 @@ export default {
   mounted() {
     this.loadStyle();
     this.loadBackground();
-     if (!sessionStorage.getItem("reloaded")) {
-      sessionStorage.setItem("reloaded", "true");
-      window.location.reload();
-    }
+    
   },
   methods: {
   prepareEdit(sanPhamItem) {

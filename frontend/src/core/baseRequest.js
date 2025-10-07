@@ -1,6 +1,5 @@
 import axios from "axios";
-// const apiUrl = 'http://127.0.0.1:8000/';
-const apiUrl = 'https://api.tinydaisycoloring.com/';
+const apiUrl = 'http://127.0.0.1:8000/';
 import { createToaster } from "@meforma/vue-toaster";
 const toaster = createToaster({ position: "top-right" });
 

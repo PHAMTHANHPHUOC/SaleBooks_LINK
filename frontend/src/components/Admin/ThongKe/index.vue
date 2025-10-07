@@ -365,14 +365,10 @@ export default {
     hours.push(hourVN);
   }
 
-  // Chuyển đổi dữ liệu backend từ UTC sang giờ Việt Nam
+  // Không cần chuyển đổi giờ nữa, lấy trực tiếp từ API
   const hourlyMap = {};
   hourlyData.forEach(item => {
-    // item.hour là dạng 'HH:00' UTC
-    let hourUTC = parseInt(item.hour.split(':')[0], 10);
-    let hourVN = (hourUTC +8) % 24;
-    let hourVNStr = hourVN.toString().padStart(2, '0') + ':00';
-    hourlyMap[hourVNStr] = item.visits;
+    hourlyMap[item.hour] = item.visits;
   });
 
   // Tạo mảng visits đủ 24 giờ, nếu thiếu thì điền 0
@@ -495,15 +491,67 @@ export default {
     },
 
     getCountryFlag(countryCode) {
-      const flags = {
-        'VN': '🇻🇳', 'US': '🇺🇸', 'JP': '🇯🇵', 'KR': '🇰🇷', 'CN': '🇨🇳',
-        'TH': '🇹🇭', 'SG': '🇸🇬', 'MY': '🇲🇾', 'ID': '🇮🇩', 'PH': '🇵🇭',
-        'IN': '🇮🇳', 'AU': '🇦🇺', 'GB': '🇬🇧', 'DE': '🇩🇪', 'FR': '🇫🇷',
-        'IT': '🇮🇹', 'ES': '🇪🇸', 'BR': '🇧🇷', 'CA': '🇨🇦', 'RU': '🇷🇺',
-        'Unknown': '🌐'
-      }
-      return flags[countryCode] || '🌐'
-    },
+    const flags = {
+      // Châu Á - Thái Bình Dương
+      'VN': '🇻🇳', 'CN': '🇨🇳', 'JP': '🇯🇵', 'KR': '🇰🇷', 'TH': '🇹🇭',
+      'SG': '🇸🇬', 'MY': '🇲🇾', 'ID': '🇮🇩', 'PH': '🇵🇭', 'IN': '🇮🇳',
+      'AU': '🇦🇺', 'NZ': '🇳🇿', 'BD': '🇧🇩', 'LK': '🇱🇰', 'MM': '🇲🇲',
+      'KH': '🇰🇭', 'LA': '🇱🇦', 'BN': '🇧🇳', 'TW': '🇹🇼', 'HK': '🇭🇰',
+      'MO': '🇲🇴', 'MN': '🇲🇳', 'PK': '🇵🇰', 'AF': '🇦🇫', 'NP': '🇳🇵',
+      'BT': '🇧🇹', 'MV': '🇲🇻', 'FJ': '🇫🇯', 'PG': '🇵🇬', 'TO': '🇹🇴',
+
+      // Bắc Mỹ
+      'US': '🇺🇸', 'CA': '🇨🇦', 'MX': '🇲🇽', 'GT': '🇬🇹', 'BZ': '🇧🇿',
+      'SV': '🇸🇻', 'HN': '🇭🇳', 'NI': '🇳🇮', 'CR': '🇨🇷', 'PA': '🇵🇦',
+
+      // Nam Mỹ
+      'BR': '🇧🇷', 'AR': '🇦🇷', 'CL': '🇨🇱', 'PE': '🇵🇪', 'CO': '🇨🇴',
+      'VE': '🇻🇪', 'EC': '🇪🇨', 'BO': '🇧🇴', 'PY': '🇵🇾', 'UY': '🇺🇾',
+      'GY': '🇬🇾', 'SR': '🇸🇷', 'GF': '🇬🇫',
+
+      // Châu Âu
+      'GB': '🇬🇧', 'DE': '🇩🇪', 'FR': '🇫🇷', 'IT': '🇮🇹', 'ES': '🇪🇸',
+      'NL': '🇳🇱', 'BE': '🇧🇪', 'CH': '🇨🇭', 'AT': '🇦🇹', 'SE': '🇸🇪',
+      'NO': '🇳🇴', 'DK': '🇩🇰', 'FI': '🇫🇮', 'PL': '🇵🇱', 'CZ': '🇨🇿',
+      'SK': '🇸🇰', 'HU': '🇭🇺', 'RO': '🇷🇴', 'BG': '🇧🇬', 'GR': '🇬🇷',
+      'PT': '🇵🇹', 'IE': '🇮🇪', 'IS': '🇮🇸', 'LU': '🇱🇺', 'MT': '🇲🇹',
+      'CY': '🇨🇾', 'EE': '🇪🇪', 'LV': '🇱🇻', 'LT': '🇱🇹', 'SI': '🇸🇮',
+      'HR': '🇭🇷', 'RS': '🇷🇸', 'BA': '🇧🇦', 'ME': '🇲🇪', 'MK': '🇲🇰',
+      'AL': '🇦🇱', 'XK': '🇽🇰', 'MD': '🇲🇩', 'UA': '🇺🇦', 'BY': '🇧🇾',
+      'RU': '🇷🇺',
+
+      // Trung Đông
+      'TR': '🇹🇷', 'SA': '🇸🇦', 'AE': '🇦🇪', 'IL': '🇮🇱', 'IR': '🇮🇷',
+      'IQ': '🇮🇶', 'SY': '🇸🇾', 'LB': '🇱🇧', 'JO': '🇯🇴', 'KW': '🇰🇼',
+      'QA': '🇶🇦', 'BH': '🇧🇭', 'OM': '🇴🇲', 'YE': '🇾🇪', 'PS': '🇵🇸',
+      'GE': '🇬🇪', 'AM': '🇦🇲', 'AZ': '🇦🇿',
+
+      // Châu Phi
+      'ZA': '🇿🇦', 'EG': '🇪🇬', 'NG': '🇳🇬', 'KE': '🇰🇪', 'ET': '🇪🇹',
+      'GH': '🇬🇭', 'UG': '🇺🇬', 'TZ': '🇹🇿', 'ZW': '🇿🇼', 'BW': '🇧🇼',
+      'ZM': '🇿🇲', 'MW': '🇲🇼', 'MZ': '🇲🇿', 'MG': '🇲🇬', 'MU': '🇲🇺',
+      'SC': '🇸🇨', 'RW': '🇷🇼', 'BI': '🇧🇮', 'DJ': '🇩🇯', 'SO': '🇸🇴',
+      'MA': '🇲🇦', 'DZ': '🇩🇿', 'TN': '🇹🇳', 'LY': '🇱🇾', 'SD': '🇸🇩',
+      'SS': '🇸🇸', 'TD': '🇹🇩', 'NE': '🇳🇪', 'ML': '🇲🇱', 'BF': '🇧🇫',
+      'CI': '🇨🇮', 'LR': '🇱🇷', 'SL': '🇸🇱', 'GN': '🇬🇳', 'GW': '🇬🇼',
+      'SN': '🇸🇳', 'GM': '🇬🇲', 'MR': '🇲🇷', 'CV': '🇨🇻', 'ST': '🇸🇹',
+      'GQ': '🇬🇶', 'GA': '🇬🇦', 'CG': '🇨🇬', 'CD': '🇨🇩', 'CF': '🇨🇫',
+      'CM': '🇨🇲', 'AO': '🇦🇴', 'NA': '🇳🇦', 'ER': '🇪🇷', 'KM': '🇰🇲',
+
+      // Caribbean & Pacific Islands
+      'JM': '🇯🇲', 'CU': '🇨🇺', 'HT': '🇭🇹', 'DO': '🇩🇴', 'PR': '🇵🇷',
+      'TT': '🇹🇹', 'BB': '🇧🇧', 'BS': '🇧🇸', 'BM': '🇧🇲', 'GD': '🇬🇩',
+      'LC': '🇱🇨', 'VC': '🇻🇨', 'AG': '🇦🇬', 'KN': '🇰🇳', 'DM': '🇩🇲',
+
+      // Special cases
+      'Unknown': '🌐',
+      'XX': '🌐',
+      'EU': '🇪🇺',
+      'UN': '🇺🇳'
+    }
+  
+  return flags[countryCode?.toUpperCase()] || flags[countryCode] || '🌐'
+},
 
     getProgressWidth(visits) {
       const maxVisits = Math.max(...this.getCurrentCountryData.map(c => c.visits))

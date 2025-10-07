@@ -25,6 +25,7 @@
           <img
             :src="getFullImageUrl(item.anh_dai_dien)"
             class="icon-connect"
+            loading="eager"
             @error="handleImageError"
             @click="showImagePreview(getFullImageUrl(item.anh_dai_dien))"
           />
@@ -49,6 +50,7 @@
       <img
         :src="getFullImageUrl(item.anh_dai_dien)"
         class="btn-icon"
+        loading="eager"
         @error="handleImageError"
         @click="showImagePreview(getFullImageUrl(item.anh_dai_dien))"
       />
@@ -77,101 +79,63 @@
   </span>
   </a>
 </div>
-
-    <div v-for="type in productTypes.filter(link => link.layout === 2)" :key="type.id" class="product-section ">
+<div v-for="type in sortedProductTypes" :key="type.sort_oder" class="product-section" :class="{ 'produc-layout-01': type.layout === 1 }">
   <h3 :style="getStyle('loai-san-pham')" class="h3-title">{{ type.ten_loai }}</h3>
-  <div class="product-list-btn">
-    <a
-      :style="getStyle('background-layout-icon')"
-      v-for="product in type.products"
-      :key="product.id"
-      :href="product.duong_dan_ngoai"
-      @click="handleClick(product.id)"
-      target="_blank"
-      class="btn-layout2"
-    >
-      <img
-        :src="getFullImageUrl(product.anh_dai_dien)"
-        class="btn-layout2-img"
-        @error="handleImageError"
-        @click.stop="showImagePreview(getFullImageUrl(product.anh_dai_dien))"
-      />
-      <span  class="btn-layout2-content">
+  
+  <div v-if="type.layout === 0" class="product-list">
+    <a v-for="product in type.products" :key="product.id" :href="product.duong_dan_ngoai" @click="handleClick(product.id)" target="_blank" class="product-link">
+      <div class="card">
+        <img :src="getFullImageUrl(product.anh_dai_dien)" class="card-img-top" loading="eager" @error="handleImageError" @click="showImagePreview(getFullImageUrl(product.anh_dai_dien))" />
+        <div :style="getStyle('card-body-style')" class="card-body">
+          <h4 :style="getStyle('san-pham')" class="product-name">{{ product.ten_san_pham }}</h4>
+          <h4 :style="getStyle('price')" class="product-price">{{ product.gia_mac_dinh }}</h4>
+        </div>
+      </div>
+    </a>
+  </div>
+  
+  <div v-if="type.layout === 2" class="product-list-btn">
+    <a :style="getStyle('background-layout-icon')" v-for="product in type.products" :key="product.id" :href="product.duong_dan_ngoai" @click="handleClick(product.id)" target="_blank" class="btn-layout2">
+      <img :src="getFullImageUrl(product.anh_dai_dien)" class="btn-layout2-img" loading="eager" @error="handleImageError" @click.stop="showImagePreview(getFullImageUrl(product.anh_dai_dien))" />
+      <span class="btn-layout2-content">
         <span :style="getStyle('collapse-title')" class="btn-layout2-title">{{ product.ten_san_pham }}</span><br>
         <span :style="getStyle('collapse-sub')" class="btn-layout2-sub">{{ product.gia_mac_dinh }}</span>
       </span>
     </a>
   </div>
-</div>
-    <!-- Product Section: For từng loại sản phẩm -->
-    <div  v-for="type in productTypes.filter(link => link.layout === 0)" :key="type.id" class="product-section">
-      <h3 :style="getStyle('loai-san-pham')" class="h3-title ">{{ type.ten_loai }}</h3>
-      <div class="product-list ">
-        <a v-for="product in type.products" :key="product.id" :href="product.duong_dan_ngoai"  @click="handleClick(product.id)" target="_blank" class="product-link">
-          <div class="card">
-            <img :src="getFullImageUrl(product.anh_dai_dien)" 
-                 class="card-img-top" 
-                 @error="handleImageError"
-                 @click="showImagePreview(getFullImageUrl(product.anh_dai_dien))" />
-            <div :style="getStyle('card-body-style')" class="card-body">
-              <h4 :style="getStyle('san-pham')" class="product-name">{{ product.ten_san_pham }}</h4>
-              <h4 :style="getStyle('price')" class="product-price">{{ product.gia_mac_dinh }}</h4>
-            </div>
-          </div>
-        </a>
-      </div>
-      <!-- Enhanced calcMargin for multiple devices -->
-      <h4 :style="{ marginTop: calcMargin(type.products.length) + 'px' }" class="shop-now-wrapper">
-        <a v-if="type.link_danh_muc" target="_blank" rel="noopener" :href="type.link_danh_muc" :style="getStyle('button-shop-now')" class="shop-now-btn">VIEW MORE</a>
-      </h4>
-    </div>
-    <div v-for="type in productTypes.filter(link => link.layout === 1)" :key="type.id" class="product-section produc-layout-01">
-      <h3 :style="getStyle('loai-san-pham')" class="h3-title ">{{ type.ten_loai }}</h3>
-      <!-- THÊM: Container wrapper -->
-    <div class="horizontal-scroll-container">
-    <!-- THÊM: Left button -->
-    <button 
-      class="scroll-nav-btn scroll-nav-left" 
-      @click="scrollLeft(type.id)"
-      :disabled="scrollPositions[type.id] <= 0"
-    >
+  
+  <div v-if="type.layout === 1" class="horizontal-scroll-container">
+    <button class="scroll-nav-btn scroll-nav-left" @click="scrollLeft(type.id)" :disabled="scrollPositions[type.id] <= 0">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
         <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </button>
-      <div
-       :ref="`scroll-${type.id}`"
-      class="product-list horizontal-scroll"
-      @scroll="updateScrollPosition(type.id, $event)">
-        <a v-for="product in type.products" :key="product.id" :href="product.duong_dan_ngoai" @click="handleClick(product.id)" target="_blank" class="product-link">
-          <div class="card">
-            <img :src="getFullImageUrl(product.anh_dai_dien)" 
-                class="card-img-top" 
-                @error="handleImageError"
-                @click="showImagePreview(getFullImageUrl(product.anh_dai_dien))" />
-            <div :style="getStyle('card-body-style')" class="card-body">
-              <h4 :style="getStyle('san-pham')" class="product-name">{{ product.ten_san_pham }}</h4>
-              <h4 :style="getStyle('price')" class="product-price">{{ product.gia_mac_dinh }}</h4>
-            </div>
+    <div :ref="`scroll-${type.id}`" class="product-list horizontal-scroll" @scroll="updateScrollPosition(type.id, $event)">
+      <a v-for="product in type.products" :key="product.id" :href="product.duong_dan_ngoai" @click="handleClick(product.id)" target="_blank" class="product-link">
+        <div class="card">
+          <img :src="getFullImageUrl(product.anh_dai_dien)" class="card-img-top" loading="eager" @error="handleImageError" @click="showImagePreview(getFullImageUrl(product.anh_dai_dien))" />
+          <div :style="getStyle('card-body-style')" class="card-body">
+            <h4 :style="getStyle('san-pham')" class="product-name">{{ product.ten_san_pham }}</h4>
+            <h4 :style="getStyle('price')" class="product-price">{{ product.gia_mac_dinh }}</h4>
           </div>
-        </a>
-  </div>
-  <button 
-      class="scroll-nav-btn scroll-nav-right" 
-      @click="scrollRight(type.id)"
-      :disabled="scrollPositions[type.id] >= maxScrollPositions[type.id]"
-    >
+        </div>
+      </a>
+    </div>
+    <button class="scroll-nav-btn scroll-nav-right" @click="scrollRight(type.id)" :disabled="scrollPositions[type.id] >= maxScrollPositions[type.id]">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
         <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </button>
   </div>
-   <h4  class="shop-now-wrapper">
-        <a v-if="type.link_danh_muc" target="_blank" rel="noopener" :href="type.link_danh_muc" :style="getStyle('button-shop-now')" class="shop-now-btn btn-layout-01">VIEW MORE</a>
-      </h4>
-    </div>
-  </div>
   
+  <h4 v-if="type.layout === 0" :style="{ marginTop: calcMargin(type.products.length) + 'px' }" class="shop-now-wrapper">
+    <a v-if="type.link_danh_muc" target="_blank" rel="noopener" :href="type.link_danh_muc" :style="getStyle('button-shop-now')" class="shop-now-btn">VIEW MORE</a>
+  </h4>
+  <h4 v-if="type.layout === 1" class="shop-now-wrapper">
+    <a v-if="type.link_danh_muc" target="_blank" rel="noopener" :href="type.link_danh_muc" :style="getStyle('button-shop-now')" class="shop-now-btn btn-layout-01">VIEW MORE</a>
+  </h4>
+</div>
+  </div>
   <footer class="footer">
     <div class="footer-inner">
       <img src="../../../assets/images/TINY.jpg" alt="Tiny Logo" class="avatar-footer" />
@@ -202,6 +166,10 @@ export default {
     };
   },
   computed: {
+     sortedProductTypes() {
+    // Sắp xếp theo id tăng dần
+    return [...this.productTypes].sort((a, b) => a.sort_oder - b.sort_oder);
+  },
     isMobile() {
       return this.windowWidth <= 820;
     },
@@ -212,7 +180,7 @@ export default {
       
       // Phân loại thiết bị chi tiết
       if (width <= 375) return 'small-phone';      // iPhone SE, iPhone 12 mini
-      if (width <= 390) return 'pro-phone';      // iPhone SE, iPhone 12 mini
+      if (width <= 390) return 'pro-phone';        // iPhone SE, iPhone 12 mini
       if (width <= 414) return 'medium-phone';     // iPhone XR, iPhone 12/13/14
       if (width <= 480) return 'large-phone';      // iPhone 14 Pro Max, Pixel 7
       if (width <= 768) return 'tablet-portrait';  // iPad portrait
@@ -223,13 +191,14 @@ export default {
     }
   },
   async mounted() {
+    await this.loadStyle();
     this.initializeBaseUrl();
     this.loadlink();
     this.loadAllProductTypes();
     this.loadBackground();
     this.loadlink_Array();
     this.initializeScrollPositions(); 
-    await this.loadStyle();
+    
     // this.loadFonts();
   try {
     const res = await baseRequest.get('api/frontend-page-visit/?page=home');

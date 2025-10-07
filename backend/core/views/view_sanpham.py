@@ -399,6 +399,7 @@ def create_loai_san_pham(request):
         link_danh_muc = request.data.get('link_danh_muc', '')  # Mặc định là rỗng nếu không có
         tinh_trang = request.data.get('tinh_trang')  # Mặc định là 0 nếu không có
         layout = request.data.get('layout', '0')  # Mặc định là 'default' nếu không có
+        sort_oder = request.data.get('sort_oder', '0')  # Mặc định là '0' nếu không có
         LoaiSanPham.objects.create(ten_loai=ten_loai,  tinh_trang=tinh_trang,link_danh_muc=link_danh_muc)
         return JsonResponse({'status': True, 'message': 'thêm loại sản phẩm thành công.'})
     except Exception as e:
@@ -411,6 +412,7 @@ def update_loai_san_pham(request, id):
         data.link_danh_muc = request.data.get('link_danh_muc', '')  # Cập nhật link danh mục nếu có
         data.tinh_trang = request.data.get('tinh_trang')  # Cập nhật trạng thái nếu có
         data.layout = request.data.get('layout', data.layout)  # Cập nhật layout nếu có, giữ nguyên nếu không
+        data.sort_oder = request.data.get('sort_oder', data.sort_oder)  # Cập nhật thứ tự nếu có, giữ nguyên nếu không
         data.save()
         return Response({
             'status': True,
@@ -499,6 +501,7 @@ def product_data_type(request):
             'ten_loai': loai.ten_loai,
             'link_danh_muc': loai.link_danh_muc,  # Thêm trường link_danh_muc
             'tinh_trang': loai.tinh_trang,
-            'layout': loai.layout
+            'layout': loai.layout,
+            'sort_oder': loai.sort_oder
         })
     return Response(data)

@@ -288,10 +288,8 @@ export default {
     this.initializeBaseUrl();
     this.loadSanPham();
     this.loadLoaiSanPham();
-     if (!sessionStorage.getItem("reloaded")) {
-      sessionStorage.setItem("reloaded", "true");
-      window.location.reload();
-    }
+ 
+
   },
   methods: {
     prepareEdit(sanPhamItem) {
@@ -313,16 +311,13 @@ export default {
       this.baseUrl = this.baseUrl.replace(/\/$/, '');
     },
 
-    // Tạo URL đầy đủ cho ảnh
     getFullImageUrl(imagePath) {
       if (!imagePath) return '';
-      
-      // Nếu đã là URL đầy đủ thì return luôn
+
       if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
         return imagePath;
       }
       
-      // Nếu không bắt đầu bằng / thì thêm vào
       if (!imagePath.startsWith('/')) {
         imagePath = '/' + imagePath;
       }

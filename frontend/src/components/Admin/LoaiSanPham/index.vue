@@ -18,6 +18,7 @@
             class="form-control mt-1"
             type="text"
           />
+         
   
           <label class="form-lable mt-2"> Tình Trạng</label>
           <select
@@ -48,6 +49,7 @@
               <thead>
                 <tr>
                   <th class="text-center align-middle text-nowrap">#</th>
+                  <th class="text-center align-middle text-nowrap">Số thự tự load</th>
                   <th class="text-center align-middle text-nowrap">
                     Tên Loại Sản Phẩm
                   </th>
@@ -71,6 +73,7 @@
                 </tr>
                 <tr v-else v-for="(v, k) in list_loai_san_pham" :key="k">
                   <th class="text-center align-middle text-nowrap">{{ k + 1 }}</th>
+                  <th class="text-center align-middle text-nowrap">{{ v.sort_oder}}</th>
                   <td class="align-middle text-nowrap">{{ v.ten_loai }}</td>
                   <td class="align-middle text-nowrap">  {{ v.link_danh_muc }}</td>
                  
@@ -191,6 +194,12 @@
                   class="form-control mt-1"
                   type="text"
                 />
+                <label class="form-lable">Số thứ tự</label>
+                <input
+                  v-model="edit_loai_san_pham.sort_oder"
+                  class="form-control mt-1"
+                  type="text"
+                />
 
                 <label class="form-lable mt-2"> Tình Trạng</label>
                 <select
@@ -256,10 +265,8 @@ export default {
   },
   mounted() {
     this.loadLoaiSanPham();
-    if (!sessionStorage.getItem("reloaded")) {
-      sessionStorage.setItem("reloaded", "true");
-      window.location.reload();
-    }
+ 
+
   },
   methods: {
     prepareEdit(sanPhamItem) {

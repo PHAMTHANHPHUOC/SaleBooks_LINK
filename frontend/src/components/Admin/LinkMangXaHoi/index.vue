@@ -301,10 +301,7 @@
         mounted() {
           this.loadlink();
           this.initializeBaseUrl();
-          if (!sessionStorage.getItem("reloaded")) {
-            sessionStorage.setItem("reloaded", "true");
-            window.location.reload();
-          }
+        
         },
         methods: {
         prepareEdit(sanPhamItem) {

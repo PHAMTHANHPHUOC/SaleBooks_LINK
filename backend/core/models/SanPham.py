@@ -1,3 +1,4 @@
+from unicodedata import category
 from django.db import models
 from django.utils import timezone
 from rest_framework import serializers
@@ -8,9 +9,9 @@ class LoaiSanPham(models.Model):
     tinh_trang = models.IntegerField(default=0)
     layout = models.IntegerField(default=0)
     link_danh_muc = models.URLField(blank=True, null=True)  
+    sort_oder = models.IntegerField(default=0)  # Thứ tự sắp xếp
     
-    # Mô tả loại sản phẩm (tuỳ chọn)
-    
+   
     def __str__(self):
         return self.ten_loai
 
@@ -46,7 +47,7 @@ class SanPhamView(models.Model):
 class SanPhamLoai(models.Model):
     san_pham = models.ForeignKey("SanPham", on_delete=models.CASCADE)
     loai = models.ForeignKey("LoaiSanPham", on_delete=models.CASCADE)
-    order = models.IntegerField(default=0)  # <--- quan trọng: vị trí trong loại
+    order = models.IntegerField(default=0) 
 
     class Meta:
         unique_together = ("san_pham", "loai")  # tránh trùng lặp
